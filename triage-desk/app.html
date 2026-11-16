@@ -2,6 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0&display=block">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -62,19 +63,114 @@ h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
 p { margin: 0; }
 .wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
-/* Shell */
-.shell { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--shell); color: var(--shell-ink); }
-.shell .wrap { display: flex; align-items: center; gap: 20px; min-height: 60px; flex-wrap: wrap; padding-block: 8px; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: var(--t-md); letter-spacing: -0.01em; white-space: nowrap; }
-.brand svg { display: block; }
-.tabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
-.tab { color: var(--shell-ink-2); text-decoration: none; padding: 8px 12px; border-radius: var(--r-sm); font-weight: 500; white-space: nowrap; position: relative; transition: color .15s ease, background-color .15s ease; }
-.tab[aria-current="page"] { color: var(--shell-ink); }
-.tab[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 2px; background: var(--signal); }
-@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--shell-ink); background: var(--shell-2); } }
-.shell-actions { display: flex; gap: 8px; align-items: center; }
+/* Icons: Material Symbols Rounded, one set, one size per context */
+.ms { font-family: "Material Symbols Rounded"; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; letter-spacing: normal; text-transform: none; white-space: nowrap; direction: ltr; display: inline-block; width: 1em; height: 1em; overflow: hidden; flex: none; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" 0, "wght" 450, "GRAD" 0, "opsz" 20; }
+.no-icons .ms { display: none !important; }
+.ms.fill { font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20; }
 
-/* Buttons */
+/* App shell: side rail on wide screens, bottom tab bar on phones */
+.rail { position: fixed; inset: 0 auto 0 0; width: 236px; z-index: 6; display: flex; flex-direction: column; gap: 4px; background: var(--shell); color: var(--shell-ink); padding: calc(22px + env(safe-area-inset-top, 0px)) 12px calc(16px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.wordmark { font-weight: 700; font-size: var(--t-md); letter-spacing: -0.015em; padding: 2px 12px 20px; }
+.tab { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 12px; color: var(--shell-ink-2); text-decoration: none; font-weight: 600; transition: color .15s ease, background-color .15s ease; }
+.tab .tab-ic { position: relative; display: grid; place-items: center; }
+.tab .ms { font-size: 22px; transition: font-variation-settings .2s ease, color .15s ease; }
+.tab[aria-current="page"] { color: var(--shell-ink); background: var(--shell-2); }
+.tab[aria-current="page"] .ms { font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24; color: var(--signal); }
+@media (hover: hover) and (pointer: fine) { .rail .tab:hover { color: var(--shell-ink); background: color-mix(in srgb, var(--shell-2) 70%, transparent); } }
+.rail-foot { margin-top: auto; display: grid; gap: 8px; }
+.rail-foot .btn { justify-content: flex-start; min-height: 42px; }
+.rail-foot .demo-chip { justify-self: start; }
+.app-main { margin-left: 236px; min-width: 0; }
+.topbar, .tabbar { display: none; }
+.icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; transition: transform .16s var(--ease-out), border-color .15s ease; }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn.primary { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+
+@media (max-width: 899px) {
+  .rail { display: none; }
+  .app-main { margin-left: 0; }
+  body::before { background: var(--ground); }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; min-height: 56px; background: var(--ground); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .topbar .wordmark { padding: 0; color: var(--ink); }
+  .topbar-acts { display: flex; gap: 8px; align-items: center; }
+  .topbar .demo-chip { border-color: color-mix(in srgb, var(--ink) 25%, transparent); color: var(--ink-2); }
+  .tabbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; background: var(--surface); border-top: 1px solid var(--line); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+  .tabbar .tab { flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; padding: 0 4px; font-size: 11px; color: var(--ink-2); background: none; }
+  .tabbar .tab .tab-ic { width: 56px; height: 30px; border-radius: 15px; }
+  .tabbar .tab .tab-ic::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: color-mix(in srgb, var(--signal) 40%, var(--surface)); opacity: 0; transform: scaleX(0.5); transition: opacity .2s ease, transform .25s var(--ease-out); }
+  .tabbar .tab .ms { position: relative; font-size: 24px; }
+  .tabbar .tab[aria-current="page"] { color: var(--ink); background: none; }
+  .tabbar .tab[aria-current="page"] .tab-ic::before { opacity: 1; transform: none; }
+  .tabbar .tab[aria-current="page"] .ms { color: var(--ink); }
+  main { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important; padding-top: 8px !important; }
+  .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important; }
+}
+
+/* Today */
+.today-head { display: grid; gap: 4px; }
+.today-head .greet { font-size: var(--t-sm); color: var(--ink-2); font-weight: 600; }
+.today-head h1 { font-size: 2.375rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1.02; }
+.today-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.today-col { display: grid; gap: 20px; min-width: 0; align-content: start; }
+.now { --tier: var(--p1-hi); position: relative; border-radius: 24px; padding: 22px 22px 20px; background: var(--shell); color: var(--shell-ink); display: grid; gap: 18px; overflow: hidden; }
+.now .body { display: grid; gap: 18px; }
+.now .lbl { display: flex; align-items: center; gap: 8px; font-size: var(--t-sm); font-weight: 700; color: var(--shell-ink-2); }
+.now .live { width: 8px; height: 8px; border-radius: 50%; background: var(--tier); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tier) 25%, transparent); }
+.now .lbl .pill { margin-left: auto; background: color-mix(in srgb, var(--tier) 22%, transparent); color: var(--tier); }
+.now .tt { font-size: 1.75rem; font-weight: 650; letter-spacing: -0.025em; line-height: 1.12; text-wrap: balance; }
+.now .meta { margin-top: 6px; font-size: var(--t-sm); color: var(--shell-ink-2); }
+.now .clock { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.now .left { font-size: 2.75rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.045em; line-height: .85; }
+.now .left small { display: block; margin-top: 8px; font-size: var(--t-sm); font-weight: 600; font-stretch: 100%; letter-spacing: 0; color: var(--shell-ink-2); }
+.now .range { font-size: var(--t-sm); color: var(--shell-ink-2); text-align: right; }
+.now .prog { height: 6px; border-radius: 3px; background: var(--shell-line); overflow: hidden; }
+.now .prog i { display: block; height: 100%; border-radius: 3px; background: var(--tier); transform-origin: left; transition: transform .6s var(--ease-out); }
+.now .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.now .acts .btn { min-height: 48px; padding: 0 18px; font-size: var(--t-base); border-radius: 14px; }
+.now.meet { --tier: #A9B8E0; }
+.now.mine { --tier: var(--signal); background: color-mix(in srgb, var(--shell) 82%, var(--signal)); }
+.now.calm { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.now.calm .lbl, .now.calm .meta, .now.calm .range, .now.calm .left small { color: var(--ink-2); }
+.sec-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sec-title h2 { font-size: var(--t-lg); font-weight: 650; letter-spacing: -0.02em; }
+.sec-title a, .sec-title button.link { font-size: var(--t-sm); font-weight: 600; color: var(--p3); text-decoration: none; background: none; border: 0; cursor: pointer; padding: 0; }
+.tl { display: grid; margin-top: 8px; }
+.tl-row { --tier: var(--ink-2); position: relative; display: grid; grid-template-columns: 52px 16px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 60px; padding: 8px 12px 8px 4px; width: 100%; text-align: left; border: 0; border-radius: 16px; background: transparent; color: inherit; cursor: pointer; transition: background-color .15s ease; }
+@media (hover: hover) and (pointer: fine) { button.tl-row:hover { background: var(--surface); } }
+.tl-row:active { background: var(--surface); }
+.tl-row .tm { font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); text-align: right; }
+.tl-row .rl { position: relative; align-self: stretch; display: grid; place-items: center; }
+.tl-row .rl::before { content: ""; position: absolute; top: -8px; bottom: -8px; left: 50%; width: 2px; transform: translateX(-50%); background: var(--line); }
+.tl-row:first-child .rl::before { top: 50%; }
+.tl-row:last-child .rl::before { bottom: 50%; }
+.tl-row .rl i { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--tier); box-shadow: 0 0 0 3px var(--ground); }
+.tl-row.meet .rl i { border-radius: 4px; background: var(--meet-fill-strong); }
+.tl-row.mine .rl i { background: var(--ground); border: 2px dashed var(--ink-2); }
+.tl-row .tt { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-row .sub { font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-row .end { display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: var(--t-sm); }
+.tl-row.past { opacity: .5; }
+.tl-empty { padding: 16px 4px; color: var(--ink-2); font-size: var(--t-sm); }
+.card-app { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.ask-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; padding: 14px; border-radius: 16px; background: var(--ground); }
+.ask-card .tt { font-weight: 600; line-height: 1.3; }
+.ask-card .sub { font-size: var(--t-sm); color: var(--ink-2); }
+.ask-card .big-n { font-size: 1.75rem; grid-row: span 2; }
+.ask-card .acts { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 10px; }
+.ask-card .acts .btn { min-height: 42px; border-radius: 12px; flex: 1; }
+.ask-card .acts .btn-accept { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .ask-card .acts .btn-accept:hover { background: color-mix(in srgb, var(--ink) 88%, var(--ground)); border-color: var(--ink); } }
+.week-num { display: flex; align-items: end; gap: 12px; }
+.week-num b { font-size: 3.25rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.05em; line-height: .8; }
+.week-num span { font-size: var(--t-sm); color: var(--ink-2); padding-bottom: 2px; }
+.week-days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.week-days div { display: grid; gap: 6px; justify-items: center; font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; }
+.week-days .bar { width: 100%; height: 44px; border-radius: 8px; background: var(--surface-2); display: flex; flex-direction: column-reverse; overflow: hidden; }
+.week-days .bar i { display: block; width: 100%; }
+.week-days .today-d { color: var(--ink); }
+@media (max-width: 1000px) { .today-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Buttons *//* Buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: var(--t-sm); cursor: pointer; text-decoration: none; transition: transform .12s var(--ease-out), background-color .15s ease, border-color .15s ease; }
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
@@ -90,7 +186,7 @@ p { margin: 0; }
 }
 .btn svg { flex: none; }
 
-main { padding-block: 24px 64px; }
+main { padding-block: 32px 64px; }
 .view { display: grid; gap: 20px; }
 .view > * { min-width: 0; }
 .view-head { display: flex; align-items: end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
@@ -465,43 +561,57 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   .weight { grid-template-columns: minmax(0, 1fr) 110px 24px; }
   .form .two { grid-template-columns: 1fr; }
   .bd { grid-template-columns: 110px minmax(0, 1fr) 36px; }
-  .shell-actions .btn span { display: none; }
-  .shell .wrap { gap: 10px 14px; }
-  .tabs { order: 3; flex-basis: 100%; }
   .demo-chip span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-property: opacity, background-color, border-color, color !important; }
-  .btn:active, .blk:active, .seg-band:active, .seg-week:active, .card-p1:active { transform: none; }
+  .btn:active, .blk:active, .seg-band:active, .seg-week:active, .card-p1:active, .icon-btn:active { transform: none; }
   .card-p1:hover { transform: none !important; }
   .enter { animation-name: band-fade; }
   @starting-style { .sheet[open], .modal[open] { transform: none; } }
 }
 </style>
 
-<header class="shell">
-  <div class="wrap">
-    <div class="brand">
-      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="2" y="3" width="18" height="4" rx="2" fill="var(--signal)"/><rect x="2" y="9" width="13" height="4" rx="2" fill="var(--signal)" opacity=".75"/><rect x="2" y="15" width="8" height="4" rx="2" fill="var(--signal)" opacity=".5"/></svg>
-      Triage Desk
-    </div>
-    <nav class="tabs" aria-label="Views">
-      <a class="tab" href="#queue" data-view="queue">Queue</a>
-      <a class="tab" href="#plan" data-view="plan">Week plan</a>
-      <a class="tab" href="#scoring" data-view="scoring">Scoring rules</a>
-    </nav>
-    <div class="shell-actions">
-      <button class="demo-chip" id="demoChip" type="button" hidden title="These are example requests. Import your forms to replace them. Nothing is saved until you do.">Example data<span>, import yours</span></button>
-      <button class="btn btn-ghost-dark" id="addBtn" type="button" aria-label="Add request">
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Add request</span></button>
-      <button class="btn btn-primary" id="importBtn" type="button" aria-label="Import forms">
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Import forms</span></button>
-    </div>
+<nav class="rail" aria-label="Main">
+  <div class="wordmark">Triage Desk</div>
+  <a class="tab" href="#today" data-view="today"><span class="tab-ic"><span class="ms" aria-hidden="true">today</span></span><span>Today</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Queue</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a>
+  <div class="rail-foot">
+    <button class="demo-chip" type="button" hidden title="These are example requests. Import your forms to replace them. Nothing is saved until you do.">Example data<span>, import yours</span></button>
+    <button class="btn btn-ghost-dark" type="button" data-action="add"><span class="ms" aria-hidden="true">add</span>Add request</button>
+    <button class="btn btn-primary" type="button" data-action="import"><span class="ms" aria-hidden="true">upload_file</span>Import forms</button>
+  </div>
+</nav>
+
+<div class="app-main">
+<header class="topbar">
+  <span class="wordmark">Triage Desk</span>
+  <div class="topbar-acts">
+    <button class="demo-chip" type="button" hidden title="These are example requests. Import your forms to replace them. Nothing is saved until you do.">Example data<span>, import yours</span></button>
+    <button class="icon-btn" type="button" data-action="add" aria-label="Add request"><span class="ms" aria-hidden="true">add</span></button>
+    <button class="icon-btn primary" type="button" data-action="import" aria-label="Import forms"><span class="ms" aria-hidden="true">upload_file</span></button>
   </div>
 </header>
 
 <main class="wrap">
+  <!-- TODAY -->
+  <section class="view" id="view-today" aria-labelledby="tTitle">
+    <div class="today-head"><span class="greet" id="tGreet"></span><h1 id="tTitle">Today</h1></div>
+    <div class="today-grid">
+      <div class="today-col">
+        <div id="nowCard"></div>
+        <div>
+          <div class="sec-title"><h2 id="tlTitle">Later today</h2><a href="#plan">Week plan</a></div>
+          <div class="tl" id="timeline"></div>
+        </div>
+      </div>
+      <div class="today-col">
+        <section class="card-app" id="askCard"></section>
+        <section class="card-app" id="weekCard"></section>
+      </div>
+    </div>
+  </section>
+
   <!-- QUEUE -->
   <section class="view" id="view-queue" aria-labelledby="qTitle">
     <div class="q-head">
@@ -607,8 +717,8 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   <section class="view" id="view-scoring" hidden aria-labelledby="sTitle">
     <div class="view-head">
       <div>
-        <h1 id="sTitle">Scoring rules</h1>
-        <p>Each request gets a score out of 100. Change the weights to match what your organisation values, and the queue and week plan update straight away.</p>
+        <h1 id="sTitle">Settings</h1>
+        <p>How requests are scored, and your data. Changes update the queue and your plan straight away.</p>
       </div>
       <button class="btn" type="button" id="resetWeights">Reset to defaults</button>
     </div>
@@ -640,6 +750,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
         <div class="panel">
           <div class="panel-head"><h2>Your data</h2><span class="small muted" id="storeMode"></span></div>
           <div class="data-actions">
+            <button class="btn btn-primary" type="button" data-action="import">Import forms</button>
             <button class="btn" type="button" id="exportCsv">Export ranked list (CSV)</button>
             <button class="btn" type="button" id="templateCsv">Download intake form template</button>
           </div>
@@ -651,6 +762,8 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
     </div>
   </section>
 </main>
+</div>
+<nav class="tabbar" aria-label="Main"><a class="tab" href="#today" data-view="today"><span class="tab-ic"><span class="ms" aria-hidden="true">today</span></span><span>Today</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Queue</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a></nav>
 
 <dialog class="modal" id="importDlg" aria-labelledby="impTitle">
   <div class="modal-inner">
@@ -1496,7 +1609,7 @@ function placeNowLine() {
   const el = $('#nowLine'); if (!el || !S.ui.ttRange) return;
   const n = new Date(); el.style.top = ((n.getHours() + n.getMinutes() / 60 - S.ui.ttRange.startH) * S.ui.ttRange.pph) + 'px';
 }
-setInterval(placeNowLine, 60000);
+setInterval(() => { placeNowLine(); if (!$('#view-today').hidden) renderTodayView(); }, 60000);
 function renderCalMod() {
   const c = S.cal;
   if (c && c.events) {
@@ -1575,7 +1688,7 @@ function renderScoring() {
   $('#storeMode').textContent = Store.mode === 'db' ? 'Saved to your account, private to you' : Store.mode === 'local' ? 'Saved in this browser only' : 'Not saved: storage is blocked here';
 }
 
-function renderAll(opts) { computeAll(); renderQueue(); renderPlan(opts || { flip: true }); $('#demoChip').hidden = !S.examples; }
+function renderAll(opts) { computeAll(); renderQueue(); renderPlan(opts || { flip: true }); $$('.demo-chip').forEach(c => c.hidden = !S.examples); renderTodayView(); }
 
 /* ---------- Detail sheet ---------- */
 let openId = null;
@@ -1762,14 +1875,132 @@ function templateCsv() {
   saveFile('change-request-intake-template.csv', head.map(csvCell).join(',') + '\n' + ex.map(csvCell).join(','));
 }
 
+
+/* ---------- Today (home) ---------- */
+function todayItems() {
+  const key = iso(today());
+  const day = S.plan.days.find(d => d.key === key);
+  const list = day ? day.blocks.slice().sort((a, b) => a.start - b.start) : [];
+  // join back-to-back pieces of the same request into one item
+  const out = [];
+  for (const b of list) {
+    const prev = out[out.length - 1];
+    if (prev && b.r && prev.r === b.r && Math.abs(prev.start + prev.h - b.start) < 0.01) prev.h += b.h; else out.push({ ...b });
+  }
+  return { day, items: out };
+}
+function itemKey(b) { return b.mine ? 'mine' : b.meet ? 'm|' + b.m.t + '|' + b.m.s : 'r|' + b.r.id + '|' + b.start; }
+function itemTitle(b) { return b.mine ? 'Your time' : b.meet ? b.m.t : b.r.title; }
+function bigLeft(h, sfx) { const m = Math.max(1, Math.round(h * 60)); return m < 60 ? `${m}<small>min ${sfx}</small>` : `${(Math.round(m / 6) / 10).toString()}<small>hours ${sfx}</small>`; }
+function durText(h) { const m = Math.round(h * 60); return m < 60 ? `${m} min` : (m % 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m / 60}h`); }
+function renderTodayView() {
+  if (!S.plan || !$('#nowCard')) return;
+  const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
+  const hour = now.getHours();
+  $('#tGreet').textContent = `${hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'}. ${now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+  const { items } = todayItems();
+  const cur = items.find(b => b.start <= nowH && b.start + b.h > nowH);
+  const next = items.find(b => b.start > nowH);
+  const focus = cur || next;
+  let card;
+  if (!focus) {
+    const upcoming = S.plan.days.find(d => d.date > today() && d.blocks.some(b => b.r));
+    const first = upcoming && upcoming.blocks.filter(b => b.r).sort((a, b) => a.start - b.start)[0];
+    card = `<div class="now calm"><div class="body">
+      <span class="lbl">${items.length ? 'Done for today' : 'Nothing planned today'}</span>
+      <div><div class="tt">${items.length ? 'That’s your day. Time to switch off.' : 'A clear day.'}</div>
+      ${first ? `<div class="meta">Next up ${fmtDay(upcoming.date)} at ${clock(first.start)}: ${esc(first.r.title)}</div>` : ''}</div></div></div>`;
+  } else {
+    const isNow = focus === cur;
+    const kind = focus.mine ? 'mine' : focus.meet ? 'meet' : '';
+    const endH = focus.start + focus.h;
+    const leftH = isNow ? endH - nowH : focus.start - nowH;
+    const prog = isNow ? clamp((nowH - focus.start) / focus.h, 0, 1) : 0;
+    const r = focus.r;
+    const label = isNow ? (focus.meet ? 'In a meeting now' : focus.mine ? 'Your time' : 'Now') : `Next at ${clock(focus.start)}`;
+    const title = focus.mine ? 'Step away from the queue' : esc(itemTitle(focus));
+    const meta = focus.mine ? `Back at ${clock(endH)}. Everything else can wait.` : focus.meet ? (focus.m.teams ? 'Teams meeting' : 'Meeting') : `${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')}. ${whenText(r).txt}.`;
+    const acts = r ? `<div class="acts"><button class="btn btn-primary" type="button" data-done="${esc(r.id)}"><span class="ms fill" aria-hidden="true">check_circle</span>Mark done</button><button class="btn btn-ghost-dark" type="button" data-open="${esc(r.id)}">Details</button></div>` : '';
+    card = `<div class="now ${kind}" style="${r ? `--tier:${r._tier === 'P1' ? 'var(--p1-hi)' : r._tier === 'P2' ? 'var(--p2-hi)' : TIER_VAR(r._tier)}` : ''}"><div class="body">
+      <span class="lbl">${isNow ? '<i class="live" aria-hidden="true"></i>' : ''}${label}${r ? `<span class="pill">${r._tier} ${TIER_NAME[r._tier]}</span>` : focus.meet && focus.m.teams ? '<span class="ms fill" aria-hidden="true" style="margin-left:auto;color:var(--tier)">videocam</span>' : ''}</span>
+      <div><div class="tt">${title}</div><div class="meta">${meta}</div></div>
+      <div class="clock"><span class="left">${bigLeft(Math.max(0, leftH), isNow ? 'left' : 'to go')}</span><span class="range">${clock(focus.start)}–${clock(endH)}<br>${durText(focus.h)}</span></div>
+      ${isNow ? `<span class="prog" role="progressbar" aria-label="Time elapsed" aria-valuenow="${Math.round(prog * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="transform:scaleX(${prog.toFixed(3)})"></i></span>` : ''}
+      ${acts}</div></div>`;
+  }
+  $('#nowCard').innerHTML = card;
+
+  const rest = items.filter(b => b !== focus && b.start + b.h > nowH);
+  $('#tlTitle').textContent = 'Later today';
+  $('#timeline').innerHTML = rest.length ? rest.map(b => {
+    const k = itemKey(b);
+    if (b.mine) return `<div class="tl-row mine" data-k="${esc(k)}"><span class="tm">${clock(b.start)}</span><span class="rl"><i></i></span><span style="min-width:0"><span class="tt" style="display:block">Your time</span><span class="sub">${durText(b.h)}, protected</span></span><span></span></div>`;
+    if (b.meet) return `<div class="tl-row meet" data-k="${esc(k)}"><span class="tm">${clock(b.start)}</span><span class="rl"><i></i></span><span style="min-width:0"><span class="tt" style="display:block">${esc(b.m.t)}</span><span class="sub">${durText(b.h)}${b.m.tentative ? ', tentative' : ''}</span></span><span class="end">${b.m.teams ? '<span class="ms fill" aria-hidden="true">videocam</span>' : ''}</span></div>`;
+    return `<button type="button" class="tl-row" data-k="${esc(k)}" data-open="${esc(b.r.id)}" style="--tier:${TIER_VAR(b.r._tier)}"><span class="tm">${clock(b.start)}</span><span class="rl"><i></i></span><span style="min-width:0"><span class="tt" style="display:block">${esc(b.r.title)}</span><span class="sub">${durText(b.h)}</span></span><span class="end">${pillHtml(b.r)}</span></button>`;
+  }).join('') : `<p class="tl-empty">${focus ? 'Nothing after this today.' : 'Nothing left on today’s plan.'}</p>`;
+
+  // New requests to decide on
+  const fresh = S.requests.filter(r => r.status === 'new').sort((a, b) => b._score - a._score);
+  $('#askCard').innerHTML = `<div class="sec-title"><h2>${fresh.length ? `${fresh.length} to decide on` : 'All decided'}</h2><a href="#queue">Queue</a></div>`
+    + (fresh.length ? fresh.slice(0, 3).map(r => `<div class="ask-card" data-k="ask|${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">
+        <span style="min-width:0"><button type="button" class="tt" data-open="${esc(r.id)}" style="all:unset;cursor:pointer;font-weight:600;display:block">${esc(r.title)}</button><span class="sub">${esc(r.requester || 'No requester')}, ${(t => t[0].toLowerCase() + t.slice(1))(whenText(r).txt)}</span></span>
+        <span class="big-n" aria-label="Score ${r._score}">${r._score}</span>
+        <span class="acts"><button class="btn" type="button" data-decide="${esc(r.id)}" data-to="hold">Not now</button><button class="btn btn-accept" type="button" data-decide="${esc(r.id)}" data-to="accepted">Accept</button></span></div>`).join('')
+      + (fresh.length > 3 ? `<p class="small muted">and ${fresh.length - 3} more in the Queue</p>` : '')
+      : `<p class="small muted">Every request has an answer. New ones appear here when you import.</p>`);
+
+  // This week, one big number
+  const wkDays = S.plan.days.slice(0, 7);
+  const free = wkDays.reduce((a, d) => a + (d.past ? 0 : Math.max(0, d.capEff - d.used)), 0);
+  const meetH = wkDays.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0), planned = wkDays.reduce((a, d) => a + d.used, 0);
+  const work = wkDays.filter(d => d.cap > 0).slice(0, 5);
+  const win = S.plan.dEnd - S.plan.dStart || 8;
+  $('#weekCard').innerHTML = `<div class="sec-title"><h2>This week</h2><a href="#plan">Plan</a></div>
+    <div class="week-num"><b>${fmtH(planned)}</b><span>of change work planned,<br>${fmtDur(meetH)} in meetings</span></div>
+    <div class="week-days" aria-hidden="true">${work.map(d => { const hiH = d.hi.reduce((a, b) => a + b.h, 0), loH = d.lo.reduce((a, b) => a + b.h, 0); return `<div class="${d.key === iso(today()) ? 'today-d' : ''}"><span class="bar">${d.off ? `<i style="height:100%;background:repeating-linear-gradient(135deg,var(--surface) 0 4px,var(--surface-2) 4px 8px)"></i>` : `<i style="height:${loH / win * 100}%;background:var(--p3)"></i><i style="height:${hiH / win * 100}%;background:var(--p2)"></i><i style="height:${d.meetH / win * 100}%;background:var(--meet-fill-strong)"></i>`}</span>${d.date.toLocaleDateString('en-GB', { weekday: 'narrow' })}</div>`; }).join('')}</div>
+    <p class="small muted">${free >= 0.5 ? `${fmtH(free)} still free for new work.` : 'No free time left this week.'}</p>`;
+}
+function flipWithin(root, mutate) {
+  const before = {};
+  const reduce = reduceMotion();
+  $$('[data-k]', root).forEach(el => { before[el.dataset.k] = el.getBoundingClientRect(); });
+  mutate();
+  if (reduce) return;
+  $$('[data-k]', root).forEach(el => {
+    const was = before[el.dataset.k]; const now = el.getBoundingClientRect();
+    if (was) { const dy = was.top - now.top; if (Math.abs(dy) > 1) el.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }); }
+    else el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+  });
+}
+async function markDone(id) {
+  const r = findReq(id); if (!r) return;
+  const body = $('#nowCard .body');
+  if (body && !reduceMotion()) await body.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-12px)' }], { duration: 180, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }).finished;
+  r.status = 'done'; Store.saveRequest(r);
+  flipWithin($('#view-today'), () => { computeAll(); renderQueue(); renderPlan(); $$('.demo-chip').forEach(c => c.hidden = !S.examples); renderTodayView(); });
+  const nb = $('#nowCard .body');
+  if (nb && !reduceMotion()) nb.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+  toast(`Marked done: ${r.title}`);
+}
+async function decide(id, to, cardEl) {
+  const r = findReq(id); if (!r) return;
+  if (cardEl && !reduceMotion()) await cardEl.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${to === 'accepted' ? 24 : -24}px)` }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }).finished;
+  r.status = to; Store.saveRequest(r);
+  flipWithin($('#view-today'), () => { computeAll(); renderQueue(); renderPlan(); renderTodayView(); });
+  toast(to === 'accepted' ? `Accepted: ${r.title}. It’s in your plan.` : `On hold: ${r.title}`);
+}
+
 /* ---------- Routing ---------- */
-const VIEWS = ['queue', 'plan', 'scoring'];
+const VIEWS = ['today', 'queue', 'plan', 'scoring'];
 function route() {
-  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'queue';
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'today';
   for (const x of VIEWS) $('#view-' + x).hidden = x !== v;
   $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.view === v ? 'page' : 'false'));
   if (v === 'scoring') renderScoring();
   if (v === 'plan') { renderPlan(); }
+  if (v === 'queue') placeIndicator(false);
+  if (v === 'today') renderTodayView();
+  window.scrollTo(0, 0);
 }
 
 /* ---------- Toast ---------- */
@@ -1785,9 +2016,11 @@ function addRequest() {
 document.addEventListener('click', e => {
   const t = e.target.closest('button, [data-open], a'); if (!t) return;
   if (t.matches('[data-open]')) { openDetail(t.dataset.open); return; }
-  if (t.id === 'importBtn' || t.dataset.action === 'import') { openImport(); return; }
-  if (t.id === 'addBtn' || t.dataset.action === 'add') { addRequest(); return; }
-  if (t.id === 'demoChip') { openImport(); return; }
+  if (t.dataset.action === 'import') { openImport(); return; }
+  if (t.dataset.action === 'add') { addRequest(); return; }
+  if (t.matches('.demo-chip')) { openImport(); return; }
+  if (t.matches('[data-done]')) { markDone(t.dataset.done); return; }
+  if (t.matches('[data-decide]')) { decide(t.dataset.decide, t.dataset.to, t.closest('.ask-card')); return; }
   if (t.id === 'calBtn' || t.matches('[data-cal-open]')) { openCal(); return; }
   if (t.matches('[data-cal-tab]')) { calImp.tab = t.dataset.calTab; renderCalDlg(); return; }
   if (t.matches('[data-cal-again]')) { calImp.events = null; calImp.err = ''; renderCalDlg(); return; }
@@ -1893,7 +2126,7 @@ $('#view-scoring').addEventListener('input', e => {
   else return;
   renderAll(); Store.saveSettings();
 });
-window.addEventListener('hashchange', () => { route(); if (location.hash === '#queue' || !location.hash) placeIndicator(false); });
+window.addEventListener('hashchange', route);
 window.addEventListener('resize', () => { if (!$('#view-plan').hidden) slideIndicator($('#weekTrack'), $('#weekInd'), $(`#weekTrack [data-week="${S.ui.week}"]`), false); });
 $('#calDlg').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $('#calDlg').addEventListener('change', e => { if (e.target.id === 'calFile' && e.target.files.length) readCal(Array.from(e.target.files)); });
@@ -1912,6 +2145,7 @@ function applySettings(s) {
 }
 S.requests = examples(); S.examples = true;
 buildBandbar();
+try { document.fonts.load('20px "Material Symbols Rounded"').then(f => { if (!f.length) document.documentElement.classList.add('no-icons'); }).catch(() => document.documentElement.classList.add('no-icons')); setTimeout(() => { if (!document.fonts.check('20px "Material Symbols Rounded"')) document.documentElement.classList.add('no-icons'); }, 3500); } catch (e) {}
 renderCapacity(); renderAll(); route();
 (async () => {
   await Store.init();
