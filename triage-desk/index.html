@@ -545,6 +545,136 @@ details.panel[open] > summary .chev { transform: rotate(180deg); }
 
 @media (max-width: 1080px) { .plan-bento { grid-template-columns: minmax(0, 1fr); } }
 
+/* ---- My week ---- */
+.mw { gap: 22px; }
+.mw-hero { display: flex; justify-content: space-between; align-items: end; gap: 16px 24px; flex-wrap: wrap; }
+.mw-hero .ov-intro h1 { font-size: clamp(2.25rem, 4vw, 3.25rem); }
+.mw-layout { display: grid; grid-template-columns: 370px minmax(0, 1fr); grid-template-areas: "cap plan" "focus plan" "focus bottom"; gap: 20px; align-items: start; }
+.mw-cap { grid-area: cap; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: center; padding: 22px; }
+.mw-focus { grid-area: focus; padding: 22px; align-self: stretch; }
+.mw-plan { grid-area: plan; padding: 22px; }
+.mw-bottom { grid-area: bottom; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.mw-bottom > section { padding: 22px; }
+.cap-ring { position: relative; width: 168px; height: 168px; display: grid; place-items: center; }
+.cap-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.cap-ring .rc { display: grid; justify-items: center; text-align: center; }
+.cap-ring .rc div { font-size: var(--t-md); color: var(--ink-2); }
+.cap-ring .rc b { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.04em; color: var(--ink); }
+.cap-ring .rc span { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.25; }
+.cap-list h2 { font-size: var(--t-lg); font-weight: 700; margin-bottom: 12px; }
+.cap-row { display: grid; grid-template-columns: 22px 46px minmax(0, 1fr); gap: 8px; align-items: center; padding: 5px 0; font-size: var(--t-sm); color: var(--ink-2); }
+.cap-row .ms { font-size: 19px; color: var(--ink-2); }
+.cap-row b { font-size: var(--t-md); color: var(--ink); font-weight: 700; }
+.panel-h { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 14px; }
+.panel-h h2 { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.02em; }
+.panel-h p { font-size: var(--t-sm); color: var(--ink-2); margin-top: 2px; }
+.count-chip { flex: none; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .07); border: 1px solid var(--glass-line); font-size: var(--t-xs); font-weight: 600; color: var(--ink); white-space: nowrap; }
+.wf-list { display: grid; }
+.wf-row { --tier: var(--p4); display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 12px 6px; border: 0; border-top: 1px solid var(--glass-line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; border-radius: 14px; transition: background-color .15s ease, transform .2s var(--ease-out); }
+.wf-row:first-child { border-top-color: transparent; }
+.wf-meta { display: grid; justify-items: end; gap: 6px; }
+.wf-row .tile { width: 48px; height: 48px; background: color-mix(in srgb, var(--tier) 26%, #13254C); color: color-mix(in srgb, var(--tier) 70%, #fff); border: 1px solid color-mix(in srgb, var(--tier) 40%, transparent); }
+.wf-row b { display: block; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wf-row small { display: block; font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+.wf-row .hrs { display: flex; align-items: center; gap: 5px; font-size: var(--t-sm); font-weight: 600; white-space: nowrap; }
+.wf-row .hrs .ms { font-size: 17px; color: var(--ink-2); }
+.wf-row > .ms:last-child { color: var(--ink-2); font-size: 20px; transition: transform .2s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .wf-row:hover { background: rgba(255, 255, 255, .04); } .wf-row:hover > .ms:last-child { transform: translateX(3px); color: var(--ink); } }
+.st-pill { padding: 4px 10px; border-radius: 999px; font-size: var(--t-xs); font-weight: 700; white-space: nowrap; border: 1px solid; }
+.st-pill.prog { color: #9CC6FF; background: rgba(79, 163, 255, .14); border-color: rgba(79, 163, 255, .35); }
+.st-pill.ok { color: #7EEBB8; background: rgba(61, 220, 151, .12); border-color: rgba(61, 220, 151, .32); }
+.st-pill.tight { color: #FFD08A; background: rgba(255, 179, 71, .13); border-color: rgba(255, 179, 71, .38); }
+.st-pill.risk { color: #FF9AA4; background: rgba(255, 93, 108, .14); border-color: rgba(255, 93, 108, .4); }
+.st-pill.done { color: var(--ink-2); background: rgba(255, 255, 255, .06); border-color: var(--glass-line); }
+.pl-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-bottom: 18px; }
+.pl-head > .ms { font-size: 30px; color: var(--p3); }
+.pl-head h2 { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.02em; }
+.pl-head p { font-size: var(--t-sm); color: var(--ink-2); }
+.pl-nav { display: flex; align-items: center; gap: 8px; }
+.pl-nav .icon-btn:disabled { opacity: .35; cursor: default; }
+.pl-sel { min-height: 42px; padding: 0 34px 0 14px; border-radius: 12px; border: 1px solid var(--glass-line); background: rgba(5, 12, 32, .45); color: var(--ink); font-weight: 600; font-size: var(--t-sm); }
+.pl-body { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 18px; align-items: start; }
+.pl-cal { overflow-x: auto; border-radius: 18px; border: 1px solid var(--glass-line); background: rgba(5, 12, 32, .35); }
+.pc-grid { display: grid; grid-template-columns: 54px repeat(var(--cols), minmax(112px, 1fr)); min-width: calc(54px + var(--cols) * 112px); }
+.pc-dh { padding: 12px 6px 10px; text-align: center; border-left: 1px solid var(--glass-line); border-bottom: 1px solid var(--glass-line); font-weight: 700; }
+.pc-dh small { display: block; font-weight: 500; font-size: var(--t-sm); color: var(--ink-2); }
+.pc-dh.today { color: var(--p3); background: rgba(79, 163, 255, .07); }
+.pc-dh .load { display: block; height: 4px; margin: 8px 14px 0; border-radius: 2px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.pc-dh .load i { display: block; height: 100%; background: var(--p3); border-radius: 2px; }
+.pc-corner { border-bottom: 1px solid var(--glass-line); }
+.pc-gut { position: relative; }
+.pc-gut span { position: absolute; right: 10px; transform: translateY(-50%); font-size: var(--t-xs); color: var(--ink-2); }
+.pc-gut span:first-child { transform: none; }
+.pc-col { position: relative; border-left: 1px solid var(--glass-line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--pph2) - 1px), rgba(160, 190, 255, .09) calc(var(--pph2) - 1px), rgba(160, 190, 255, .09) var(--pph2)); }
+.pc-col.today { background-color: rgba(79, 163, 255, .05); }
+.pc-col.ooo { background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .03) 0 8px, rgba(255, 255, 255, .07) 8px 16px); }
+.pc-col .ooo-label { position: absolute; top: 40%; left: 8px; right: 8px; text-align: center; font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); }
+.pb { --tier: var(--p4); position: absolute; left: 6px; right: 6px; display: grid; align-content: start; gap: 2px; padding: 7px 9px; overflow: hidden; text-align: left; border-radius: 12px; color: #F4F8FF; background: linear-gradient(180deg, color-mix(in srgb, var(--tier) 46%, #13254C), color-mix(in srgb, var(--tier) 30%, #13254C)); border: 1px solid color-mix(in srgb, var(--tier) 60%, transparent); box-shadow: 0 6px 16px rgba(3, 8, 24, .25); cursor: pointer; will-change: transform; transition: transform .2s var(--ease-out), filter .15s ease; }
+@media (hover: hover) and (pointer: fine) { button.pb:hover { transform: translateY(-2px); filter: brightness(1.08); } }
+button.pb:active { transform: scale(0.98); }
+.pb-t { display: flex; gap: 6px; align-items: start; min-width: 0; }
+.pb-t .ms { font-size: 17px; margin-top: 1px; color: color-mix(in srgb, var(--tier) 40%, #fff); }
+.pb-t b { font-size: var(--t-sm); font-weight: 700; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.pb-s { font-size: 11.5px; color: rgba(238, 243, 255, .78); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 23px; }
+.pb-d { display: flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; padding-left: 23px; margin-top: 2px; }
+.pb-d .ms { font-size: 14px; }
+.pb.short .pb-t b { -webkit-line-clamp: 1; }
+.pb.tiny { padding: 0 8px; align-content: center; }
+.pb.tiny .pb-t b { -webkit-line-clamp: 1; font-size: 11.5px; }
+.pb.tiny .pb-t .ms { font-size: 14px; }
+.pb.meet { --tier: #8B9BC0; cursor: default; background: rgba(255, 255, 255, .07); border-color: rgba(160, 190, 255, .22); box-shadow: none; }
+.pb.mine { --tier: #3DDC97; cursor: default; background: linear-gradient(180deg, rgba(61, 220, 151, .28), rgba(61, 220, 151, .16)); border-color: rgba(61, 220, 151, .5); box-shadow: none; }
+.pc-col.ooo .pb.meet { opacity: .45; }
+.pl-side h3 { display: flex; align-items: center; gap: 10px; font-size: var(--t-lg); font-weight: 700; }
+.pl-side h3 .ms { color: var(--p3); font-size: 24px; }
+.pl-side > p { font-size: var(--t-sm); color: var(--ink-2); margin: 2px 0 14px 34px; }
+.un-list { display: grid; gap: 10px; }
+.un-item { --tier: var(--p4); display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 10px 10px 10px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid var(--glass-line); }
+.un-item .tile { width: 40px; height: 40px; border-radius: 11px; background: color-mix(in srgb, var(--tier) 26%, #13254C); color: color-mix(in srgb, var(--tier) 70%, #fff); }
+.un-item .tile .ms { font-size: 21px; }
+.un-open { border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; padding: 0; min-width: 0; }
+.un-open b { display: block; font-size: var(--t-sm); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.un-open small { display: block; font-size: var(--t-xs); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.un-item .hrs { font-weight: 700; font-size: var(--t-md); white-space: nowrap; }
+.un-pull { width: 32px; height: 32px; border-radius: 10px; border: 1px solid rgba(79, 163, 255, .45); background: rgba(79, 163, 255, .12); color: #CFE2FF; display: grid; place-items: center; cursor: pointer; transition: transform .16s var(--ease-out), background-color .15s ease; }
+.un-pull:active { transform: scale(0.92); }
+@media (hover: hover) and (pointer: fine) { .un-pull:hover { background: rgba(79, 163, 255, .25); } }
+.un-pull .ms { font-size: 18px; }
+.un-add { width: 100%; margin-top: 14px; min-height: 48px; border-radius: 14px; justify-content: center; border-color: rgba(79, 163, 255, .55) !important; color: #DCE9FF !important; font-weight: 700; }
+.oc-list { display: grid; gap: 4px; }
+.oc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: center; width: 100%; padding: 7px 6px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font-size: var(--t-base); transition: background-color .15s ease; }
+@media (hover: hover) and (pointer: fine) { .oc-row:hover { background: rgba(255, 255, 255, .04); } }
+.oc-box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(238, 243, 255, .55); display: grid; place-items: center; transition: background-color .18s ease, border-color .18s ease; }
+.oc-box svg { width: 14px; height: 14px; }
+.oc-box path { stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .24s var(--ease-out); }
+.oc-row[aria-checked="true"] .oc-box { background: #22B573; border-color: #22B573; }
+.oc-row[aria-checked="true"] .oc-box path { stroke-dashoffset: 0; }
+.oc-row[aria-checked="true"] .oc-txt { color: var(--ink-2); }
+.bl-list { display: grid; gap: 10px; }
+.bl-item { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid var(--glass-line); color: var(--ink); text-align: left; cursor: pointer; transition: transform .2s var(--ease-out), background-color .15s ease; }
+@media (hover: hover) and (pointer: fine) { .bl-item:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .08); } }
+.bl-item i { width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--c); }
+.bl-item b { display: block; font-weight: 700; font-size: var(--t-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bl-item small { display: block; font-size: var(--t-xs); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mw-settings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.mw-empty { color: var(--ink-2); font-size: var(--t-sm); padding: 8px 2px; }
+@media (max-width: 1440px) { .pl-body { grid-template-columns: minmax(0, 1fr); } .un-list { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } }
+@media (max-width: 1180px) {
+  .mw-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "cap" "plan" "focus" "bottom"; }
+  .mw-cap { justify-self: stretch; }
+}
+@media (max-width: 760px) {
+  .mw-bottom, .mw-settings { grid-template-columns: minmax(0, 1fr); }
+  .mw-cap { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .cap-list { justify-self: stretch; }
+  .mw-plan, .mw-focus, .mw-cap, .mw-bottom > section { padding: 16px; }
+  .pl-head { grid-template-columns: auto minmax(0, 1fr); }
+  .pl-nav { grid-column: 1 / -1; }
+  .pl-sel { flex: 1; }
+  .wf-row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .wf-row .tile { width: 44px; height: 44px; }
+}
+
 /* Scoring */
 .score-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 .weights { padding: 8px 16px 16px; display: grid; }
@@ -775,63 +905,65 @@ dialog { background: #10203F; }
   </section>
 
   <!-- PLAN -->
-  <section class="view" id="view-plan" hidden aria-labelledby="pTitle">
-    <div class="q-head">
-      <div class="q-title">
-        <h1 id="pTitle">Weekly plan</h1>
-        <p class="facts" id="planFacts"></p>
+  <section class="view mw" id="view-plan" hidden aria-labelledby="pTitle">
+    <div class="mw-hero">
+      <div class="ov-intro">
+        <h1 id="pTitle">My <span>Week</span></h1>
+        <p>Plan your week, protect your own time and move the right priorities forward.</p>
       </div>
-      <button class="btn" id="calBtn" type="button">
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <span id="calBtnLabel">Add Teams meetings</span></button>
+      <button class="btn" id="calBtn" type="button"><span class="ms" aria-hidden="true">event_available</span><span id="calBtnLabel">Add Teams meetings</span></button>
     </div>
-    <div class="wk-bar">
-      <div class="bandbar" role="group" aria-label="Choose a week">
-        <div class="band-track" id="weekTrack"><div class="band-ind" id="weekInd" aria-hidden="true"></div></div>
-      </div>
-      <div class="wk-nav">
-        <button class="btn btn-icon" type="button" data-week-step="-1" aria-label="Previous week"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button class="btn" type="button" data-week-today>This week</button>
-        <button class="btn btn-icon" type="button" data-week-step="1" aria-label="Next week"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-    </div>
-
-    <div class="tt-panel" id="ttPanel">
-      <div class="tt-top"><h2 id="ttTitle"></h2><div class="legend-v2" id="legend"></div></div>
-      <div class="timetable-scroll" id="ttScroll"></div>
-    </div>
-
-    <div class="plan-bento">
-      <section class="mod" id="attentionPanel">
-        <div class="mod-head"><h2>Needs a decision</h2><span class="small muted" id="attCount"></span></div>
-        <div class="attention" id="attention"></div>
+    <div class="mw-layout">
+      <section class="glass mw-cap" aria-labelledby="capTitle">
+        <div class="cap-ring" id="capRing"></div>
+        <div class="cap-list" id="capList"></div>
       </section>
-      <div class="plan-side">
-        <section class="mod" id="calMod"></section>
-        <details class="mod" id="capPanel">
-          <summary class="mod-head" style="cursor:pointer;list-style:none;align-items:center;padding-bottom:16px"><h2>Your capacity</h2>
-            <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </summary>
-          <div class="capacity" style="padding-top:0">
-            <div>
-              <p class="section-title" style="margin-bottom:8px">Most hours for change requests each day</p>
-              <div class="cap-days" id="capDays"></div>
-            </div>
-            <div class="cap-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-              <label for="dayStart">Day starts<input id="dayStart" type="time" step="900"></label>
-              <label for="dayEnd">Day ends<input id="dayEnd" type="time" step="900"></label>
-              <label for="mineStart">Your time starts<input id="mineStart" type="time" step="900"></label>
-              <label for="mineHours">Your time (hours)<input id="mineHours" type="number" min="0" max="4" step="0.5"></label>
-              <label for="maxBlock">Longest stretch on one request<input id="maxBlock" type="number" min="1" max="8" step="0.5"></label>
-              <label for="weeks">Plan ahead<select id="weeks"><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option></select></label>
-            </div>
-            <label class="cap-grid" style="grid-template-columns:minmax(0,1fr)" for="hiShare">
-              <span>Split between P1–P2 and P3–P4 work: <span class="split-out" id="splitOut"></span></span>
-              <input id="hiShare" type="range" min="50" max="90" step="5">
-            </label>
+      <section class="glass mw-focus" aria-labelledby="wfTitle" id="wfPanel"></section>
+      <section class="glass mw-plan" aria-labelledby="plTitle">
+        <div class="pl-head">
+          <span class="ms" aria-hidden="true">calendar_month</span>
+          <div><h2 id="plTitle">Weekly planner</h2><p id="plSub"></p></div>
+          <div class="pl-nav">
+            <button class="icon-btn" type="button" data-week-step="-1" aria-label="Previous week"><span class="ms" aria-hidden="true">chevron_left</span></button>
+            <label class="sr" for="weekSel">Week</label><select class="pl-sel" id="weekSel"></select>
+            <button class="icon-btn" type="button" data-week-step="1" aria-label="Next week"><span class="ms" aria-hidden="true">chevron_right</span></button>
           </div>
-        </details>
+        </div>
+        <div class="pl-body">
+          <div class="pl-cal" id="ttScroll"></div>
+          <aside class="pl-side" id="unsched" aria-labelledby="unTitle"></aside>
+        </div>
+      </section>
+      <div class="mw-bottom">
+        <section class="glass" id="ocPanel" aria-labelledby="ocTitle"></section>
+        <section class="glass" id="blPanel" aria-labelledby="blTitle"></section>
       </div>
+    </div>
+    <div class="mw-settings">
+      <section class="mod" id="calMod"></section>
+      <details class="mod" id="capPanel">
+        <summary class="mod-head" style="cursor:pointer;list-style:none;align-items:center;padding-bottom:16px"><h2>Your capacity</h2>
+          <span class="ms chev" aria-hidden="true">expand_more</span>
+        </summary>
+        <div class="capacity" style="padding-top:0">
+          <div>
+            <p class="section-title" style="margin-bottom:8px">Most hours for change requests each day</p>
+            <div class="cap-days" id="capDays"></div>
+          </div>
+          <div class="cap-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+            <label for="dayStart">Day starts<input id="dayStart" type="time" step="900"></label>
+            <label for="dayEnd">Day ends<input id="dayEnd" type="time" step="900"></label>
+            <label for="mineStart">Your time starts<input id="mineStart" type="time" step="900"></label>
+            <label for="mineHours">Your time (hours)<input id="mineHours" type="number" min="0" max="4" step="0.5"></label>
+            <label for="maxBlock">Longest stretch on one request<input id="maxBlock" type="number" min="1" max="8" step="0.5"></label>
+            <label for="weeks">Plan ahead<select id="weeks"><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option></select></label>
+          </div>
+          <label class="cap-grid" style="grid-template-columns:minmax(0,1fr)" for="hiShare">
+            <span>Split between Urgent/Priority and Later/Backlog work: <span class="split-out" id="splitOut"></span></span>
+            <input id="hiShare" type="range" min="50" max="90" step="5">
+          </label>
+        </div>
+      </details>
     </div>
   </section>
 
@@ -1604,127 +1736,140 @@ function slideIndicator(track, ind, btn, animate, color) {
   ind.style.clipPath = `inset(0 ${Math.max(0, W - L - w)}px 0 ${Math.max(0, L)}px round 11px)`;
   if (!animate) requestAnimationFrame(() => requestAnimationFrame(() => ind.classList.add('ready')));
 }
-function renderWeekStrip(weeks, animate) {
-  const track = $('#weekTrack');
-  const btns = $$('.seg-week', track);
-  if (btns.length !== weeks.length) { btns.forEach(b => b.remove()); track.insertAdjacentHTML('beforeend', weeks.map((_, i) => `<button type="button" class="seg-week" data-week="${i}" aria-pressed="false"></button>`).join('')); }
-  $$('.seg-week', track).forEach((b, i) => {
-    const wk = weeks[i]; const work = wk.filter(d => d.cap > 0);
-    const win = work.reduce((a, d) => a + (d.off ? 0 : S.plan.dEnd - S.plan.dStart), 0) || 1;
-    const meet = work.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0);
-    const hiH = work.reduce((a, d) => a + d.hi.reduce((x, y) => x + y.h, 0), 0), loH = work.reduce((a, d) => a + d.lo.reduce((x, y) => x + y.h, 0), 0);
-    const last = work.length ? work[work.length - 1].date : wk[4].date;
-    b.setAttribute('aria-pressed', String(S.ui.week === i));
-    b.setAttribute('aria-label', `${weekLabel(i, wk)}: ${fmtH(meet)} meetings, ${fmtH(hiH + loH)} planned`);
-    b.innerHTML = `<span class="wn">${weekLabel(i, wk)}</span><span class="wr">${wk[0].date.getDate()}–${last.getDate()} ${last.toLocaleDateString('en-GB', { month: 'short' })}</span>
-      <span class="mini" aria-hidden="true"><i class="m-meet" style="width:${meet / win * 100}%"></i><i class="m-hi" style="width:${hiH / win * 100}%"></i><i class="m-lo" style="width:${loH / win * 100}%"></i></span>`;
-  });
-  const shell = getComputedStyle(document.documentElement).getPropertyValue('--shell').trim();
-  slideIndicator(track, $('#weekInd'), track.querySelector(`[data-week="${S.ui.week}"]`), animate, shell);
+function weekLabelRange(wk) { const days = wk.filter(d => d.wd < 5); const a = days[0] || wk[0], b = days[days.length - 1] || wk[6]; return `${fmtDay(a.date)} to ${fmtDay(b.date)}`; }
+function statusPill(r) {
+  const p = S.plan.byId[r.id];
+  if (r.status === 'done') return '<span class="st-pill done">Done</span>';
+  if (p && p.rag === 'red') return '<span class="st-pill risk">At risk</span>';
+  if (p && p.rag === 'amber') return '<span class="st-pill tight">Tight</span>';
+  if (r.status === 'progress') return '<span class="st-pill prog">In progress</span>';
+  return '<span class="st-pill ok">On track</span>';
+}
+const PLAN_UI = { cap: null };
+function renderCapacityCard(total, alloc, meet, avail) {
+  const R = 70, C = 2 * Math.PI * R;
+  if (!$('#capArc')) {
+    $('#capRing').innerHTML = `<svg viewBox="0 0 168 168" aria-hidden="true"><defs><linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3DDC97"/><stop offset=".6" stop-color="#2EC5C9"/><stop offset="1" stop-color="#4FA3FF"/></linearGradient></defs>
+      <circle cx="84" cy="84" r="${R}" fill="none" stroke="rgba(160,190,255,.14)" stroke-width="14"/>
+      <circle id="capArc" cx="84" cy="84" r="${R}" fill="none" stroke="url(#capGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${C.toFixed(1)}"/></svg>
+      <div class="rc"><div><b id="capNum">0</b> of <span id="capTot">0</span></div><span>hours<br>allocated</span></div>`;
+  }
+  const pct = total ? Math.round(alloc / total * 100) : 0;
+  $('#capRing').setAttribute('role', 'img'); $('#capRing').setAttribute('aria-label', `${fmtH(alloc)} of ${fmtH(total)} allocated`);
+  $('#capTot').textContent = Math.round(total * 10) / 10;
+  const arc = $('#capArc'), num = $('#capNum'); const first = PLAN_UI.cap == null; const from = first ? 0 : PLAN_UI.cap;
+  tween(from, alloc, first ? 1000 : 500, v => { num.textContent = Math.round(v * 10) / 10; arc.setAttribute('stroke-dashoffset', (C * (1 - (total ? Math.min(1, v / total) : 0))).toFixed(1)); }, first ? 150 : 0);
+  PLAN_UI.cap = alloc;
+  $('#capList').innerHTML = `<h2 id="capTitle">Weekly capacity</h2>
+    <div class="cap-row">${msI('event')}<b>${fmtH(total)}</b><span>Total</span></div>
+    <div class="cap-row">${msI('stacks')}<b>${fmtH(alloc)}</b><span>Allocated (${pct}%)</span></div>
+    <div class="cap-row">${msI('groups')}<b>${fmtDur(meet)}</b><span>Meetings</span></div>
+    <div class="cap-row">${msI('timelapse')}<b>${fmtH(avail)}</b><span>Available</span></div>`;
 }
 function renderPlan(opts = {}) {
-  const st = S.settings; const plan = S.plan;
+  const plan = S.plan; if (!$('#ttScroll') || !plan) return;
   const weeks = weeksOf(plan);
   S.ui.week = clamp(S.ui.week || 0, 0, weeks.length - 1);
   const wk = weeks[S.ui.week];
-  const days = wk.filter(d => d.cap > 0 || d.meets.length);
+  const days = wk.filter(d => d.wd < 5 || d.cap > 0 || d.meets.length);
   const t0 = +today();
+  $('#calBtnLabel').textContent = S.cal && S.cal.events ? 'Update Teams meetings' : 'Add Teams meetings';
+  $('#weekSel').innerHTML = weeks.map((w, i) => `<option value="${i}"${i === S.ui.week ? ' selected' : ''}>${weekLabel(i, w)}: ${fmtShort(w[0].date)} to ${fmtShort(w[4].date)}</option>`).join('');
+  $$('[data-week-step]').forEach(b => { b.disabled = (+b.dataset.weekStep < 0 && S.ui.week === 0) || (+b.dataset.weekStep > 0 && S.ui.week === weeks.length - 1); });
+  $('#plSub').textContent = `Your plan for ${weekLabelRange(wk)}`;
 
-  // Previous block positions, for moving blocks to their new time instead of jumping
+  // Capacity
+  const work = days.filter(d => d.cap > 0 && !d.off);
+  const total = work.reduce((a, d) => a + d.cap, 0);
+  const alloc = days.reduce((a, d) => a + d.used, 0);
+  const meet = days.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0);
+  const avail = days.reduce((a, d) => a + (d.past || d.off ? 0 : Math.max(0, d.capEff - d.used)), 0);
+  renderCapacityCard(total, alloc, meet, avail);
+
+  // This week's focus
+  const hoursBy = {}; days.forEach(d => d.blocks.forEach(b => { if (b.r) hoursBy[b.r.id] = (hoursBy[b.r.id] || 0) + b.h; }));
+  const order = { P1: 0, P2: 1, P3: 2, P4: 3 };
+  const inWeek = Object.keys(hoursBy).map(findReq).filter(Boolean).sort((a, b) => order[a._tier] - order[b._tier] || b._score - a._score);
+  $('#wfPanel').innerHTML = `<div class="panel-h"><div><h2 id="wfTitle">This week’s focus</h2><p>What you’re delivering this week, highest priority first.</p></div><span class="count-chip">${inWeek.length} ${inWeek.length === 1 ? 'priority' : 'priorities'}</span></div>
+    <div class="wf-list">${inWeek.length ? inWeek.map(r => `<button type="button" class="wf-row" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">
+      ${tierTile(r)}<span style="min-width:0"><b>${esc(r.title)}</b><small>${esc([TIER_NAME[r._tier], r.requester].filter(Boolean).join(', '))}</small></span>
+      <span class="wf-meta"><span class="hrs">${msI('schedule')}${fmtH(hoursBy[r.id])}</span>${statusPill(r)}</span></button>`).join('') : '<p class="mw-empty">Nothing is planned for this week yet.</p>'}</div>`;
+
+  // Planner grid
   const prev = {};
   if (opts.flip && !reduceMotion()) $$('#ttScroll [data-key]').forEach(el => { prev[el.dataset.key] = el.getBoundingClientRect(); });
-
-  renderWeekStrip(weeks, !!opts.slide);
-  const calOn = !!(S.cal && S.cal.events);
-  $('#calBtnLabel').textContent = calOn ? 'Update Teams meetings' : 'Add Teams meetings';
-
-  // Facts for the selected week
-  const meetH = days.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0), planned = days.reduce((a, d) => a + d.used, 0), free = days.reduce((a, d) => a + Math.max(0, d.capEff - d.used), 0);
-  const offDays = days.filter(d => d.off).length;
-  $('#planFacts').innerHTML = `<b>${fmtDur(meetH)}</b> in meetings and <b>${fmtH(planned)}</b> of change work planned this week. ` + (free >= 0.5 ? `<b>${fmtH(free)}</b> is still free.` : 'Every working hour is spoken for.')
-    + (offDays ? ` You’re out of office for ${offDays} day${offDays === 1 ? '' : 's'}.` : '')
-    + (calOn ? '' : S.examples ? ' Meetings shown are examples.' : ' Add your Teams meetings so work lands around them.');
-
-  $('#ttTitle').textContent = `${weekLabel(S.ui.week, wk)}, ${fmtShort(wk[0].date)} to ${fmtShort(wk[6].date)}`;
-  $('#legend').innerHTML = `<span><i style="background:var(--meet-fill);border:1px solid var(--meet-line)"></i>Meetings</span>`
-    + TIERS.map(t => `<span><i style="background:color-mix(in srgb, ${TIER_VAR(t)} 30%, var(--surface));border:1px solid ${TIER_VAR(t)}"></i>${TIER_NAME[t]}</span>`).join('')
-    + `<span><i style="background:repeating-linear-gradient(135deg,var(--surface) 0 3px,var(--surface-2) 3px 6px);border:1px dashed var(--ink-2)"></i>Your time</span>`;
-
-  if (!days.length) {
-    $('#ttScroll').innerHTML = `<div class="empty"><p>No working hours set for this week. Add hours to at least one day under Your capacity.</p></div>`;
-  } else {
-    const all = days.flatMap(d => d.blocks);
-    const startH = Math.floor(Math.min(plan.dStart, ...all.map(b => b.start)));
-    const endH = Math.ceil(Math.max(plan.dEnd, ...all.map(b => b.start + b.h)));
-    const hours = Math.max(1, endH - startH);
-    const pph = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pph')) || 54;
-    const height = hours * pph;
-    const y = h => (h - startH) * pph;
-    let g = `<div class="tt-corner"></div>`;
-    g += days.map(d => {
-      const isToday = +d.date === t0;
-      const free = Math.max(0, d.capEff - d.used);
-      let load;
-      if (d.off) load = `<span class="dh-load">${esc(d.offTitle || 'Out of office')}</span>`;
-      else if (d.cap <= 0) load = `<span class="dh-load">Not a working day</span>`;
-      else if (d.past) load = `<span class="dh-load">Done</span>`;
-      else load = `<span class="dh-load"><b>${fmtDur(d.meetH)}</b> meetings, <b>${fmtH(d.used)}</b> planned${free >= 0.5 ? `, ${fmtH(free)} free` : ''}${d.clash ? `<br><span class="warn">A meeting overlaps your time</span>` : ''}</span>`;
-      return `<div class="tt-dayhead${isToday ? ' today' : ''}"><span class="dh-top"><span class="dh-num">${d.date.getDate()}</span><span class="dh-name">${d.date.toLocaleDateString('en-GB', { weekday: 'short' })}</span>${isToday ? '<span class="dh-tag">Today</span>' : ''}</span>${load}</div>`;
+  const all = days.flatMap(d => d.blocks);
+  const startH = Math.floor(Math.min(8, plan.dStart, ...all.map(b => b.start)));
+  const endH = Math.ceil(Math.max(plan.dEnd, ...all.map(b => b.start + b.h)));
+  const hours = Math.max(1, endH - startH); const pph = 50; const height = hours * pph;
+  const y = h => (h - startH) * pph;
+  let g = '<div class="pc-corner"></div>' + days.map(d => {
+    const isT = +d.date === t0; const pct = d.capEff ? Math.min(100, d.used / d.capEff * 100) : 0;
+    return `<div class="pc-dh${isT ? ' today' : ''}">${d.date.toLocaleDateString('en-GB', { weekday: 'short' })}<small>${d.date.getDate()} ${d.date.toLocaleDateString('en-GB', { month: 'short' })}${isT ? ', today' : ''}</small>${d.cap > 0 && !d.off && !d.past ? `<span class="load" title="${fmtH(d.used)} of ${fmtH(d.capEff)} planned"><i style="width:${pct}%"></i></span>` : ''}</div>`;
+  }).join('');
+  g += `<div class="pc-gut" style="height:${height}px">${Array.from({ length: hours + 1 }, (_, i) => `<span style="top:${i * pph}px">${clock(startH + i)}</span>`).join('')}</div>`;
+  g += days.map(d => {
+    const isT = +d.date === t0; const seq = {};
+    const blocks = d.blocks.slice().sort((a, b) => a.start - b.start).map(b => {
+      const top = y(b.start) + 2, h = Math.max(16, b.h * pph - 4);
+      const size = h < 30 ? ' tiny' : h < 62 ? ' short' : '';
+      const dur = `<span class="pb-d">${msI('schedule')}${durText(b.h)}</span>`;
+      const range = `${clock(b.start)}–${clock(b.start + b.h)}`;
+      if (b.mine) return `<div class="pb mine${size}" data-key="${d.key}|mine" style="top:${top}px;height:${h}px" aria-label="Your time, ${range}"><span class="pb-t">${msI('self_improvement')}<b>Your time</b></span>${size ? '' : `<span class="pb-s">Protected</span>`}${size === ' tiny' ? '' : dur}</div>`;
+      if (b.meet) { const k = `${d.key}|m|${b.m.t}|${b.m.s}`; return `<div class="pb meet${size}" data-key="${esc(k)}" style="top:${top}px;height:${h}px" title="${esc(b.m.t)}, ${range}${b.m.tentative ? ' (tentative)' : ''}"><span class="pb-t">${msI(b.m.teams ? 'videocam' : 'groups')}<b>${esc(b.m.t)}</b></span>${size ? '' : `<span class="pb-s">${b.m.teams ? 'Teams meeting' : 'Meeting'}</span>`}${size === ' tiny' ? '' : dur}</div>`; }
+      const r = b.r; const n = (seq[r.id] = (seq[r.id] || 0) + 1);
+      return `<button type="button" class="pb${size}" data-key="${d.key}|${r.id}|${n}" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)};top:${top}px;height:${h}px" title="${esc(r.title)}, ${range}">
+        <span class="pb-t">${msI(iconFor(REQ_ICONS, r.title + ' ' + (r.description || ''), 'task_alt'))}<b>${esc(r.title)}</b></span>${size ? '' : `<span class="pb-s">${TIER_NAME[r._tier]}${r.requester ? `, ${esc(r.requester)}` : ''}</span>`}${size === ' tiny' ? '' : dur}</button>`;
     }).join('');
-    g += `<div class="tt-gutter" style="height:${height}px">${Array.from({ length: hours + 1 }, (_, i) => `<span style="top:${i * pph}px">${clock(startH + i)}</span>`).join('')}</div>`;
-    g += days.map(d => {
-      const isToday = +d.date === t0;
-      const off = [];
-      if (plan.dStart > startH) off.push(`<div class="offhours" style="top:0;height:${y(plan.dStart)}px"></div>`);
-      if (plan.dEnd < endH) off.push(`<div class="offhours" style="top:${y(plan.dEnd)}px;bottom:0"></div>`);
-      const seq = {};
-      const blocks = d.blocks.slice().sort((a, b) => a.start - b.start).map(b => {
-        const top = y(b.start) + 1, h = Math.max(14, b.h * pph - 3);
-        const size = h < 30 ? ' tiny' : h < 46 ? ' short' : '';
-        const range = `${clock(b.start)}–${clock(b.start + b.h)}`;
-        if (b.mine) return `<div class="blk mine${size}" data-key="${d.key}|mine" style="top:${top}px;height:${h}px" aria-label="Your time, ${range}"><span class="bt">Your time</span><span class="bm"><span class="t">${range}</span></span></div>`;
-        if (b.meet) { const k = `${d.key}|m|${b.m.t}|${b.m.s}`; return `<div class="blk meet${size}" data-key="${esc(k)}" style="top:${top}px;height:${h}px" title="${esc(b.m.t)}, ${range}${b.m.tentative ? ' (tentative)' : ''}"><span class="bt">${b.m.teams ? MEET_ICON : ''}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.m.t)}</span></span><span class="bm"><span class="t">${range}${b.m.tentative ? ', tentative' : ''}</span></span></div>`; }
-        const r = b.r; const n = (seq[r.id] = (seq[r.id] || 0) + 1);
-        return `<button type="button" class="blk${size}" data-key="${d.key}|${r.id}|${n}" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)};top:${top}px;height:${h}px" title="${esc(r.title)}, ${range}">
-          <span class="bt">${esc(r.title)}</span><span class="bm"><b>${r._tier}</b><span class="t">${range}</span></span></button>`;
-      }).join('');
-      const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
-      const nowLine = isToday && nowH >= startH && nowH <= endH ? `<div class="now-line" id="nowLine" style="top:${y(nowH)}px" aria-hidden="true"></div>` : '';
-      return `<div class="tt-col${isToday ? ' today' : ''}${d.off ? ' ooo' : ''}" style="height:${height}px">${off.join('')}${d.off ? `<span class="ooo-label">${esc(d.offTitle || 'Out of office')}</span>` : ''}${blocks}${nowLine}</div>`;
-    }).join('');
-    $('#ttScroll').innerHTML = `<div class="timetable" style="--cols:${days.length}">${g}</div>`;
-    S.ui.ttRange = { startH, pph };
-
-    // Motion
-    if (!reduceMotion()) {
-      if (opts.slide) {
-        const dir = opts.dir || 1;
-        $('#ttScroll .timetable').animate([{ opacity: 0, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
-        $$('#ttScroll .tt-col').forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 40 + i * 45, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' }));
-      } else if (opts.flip) {
-        $$('#ttScroll [data-key]').forEach(el => {
-          const was = prev[el.dataset.key]; const now = el.getBoundingClientRect();
-          if (was) { const dx = was.left - now.left, dy = was.top - now.top; if (Math.abs(dx) > 1 || Math.abs(dy) > 1) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }); }
-          else el.animate([{ opacity: 0, transform: 'scale(0.96)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
-        });
-      }
-    } else if (opts.slide) {
-      $('#ttScroll .timetable').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease' });
+    const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
+    const nowLine = isT && nowH >= startH && nowH <= endH ? `<div class="now-line" id="nowLine" style="top:${y(nowH)}px" aria-hidden="true"></div>` : '';
+    return `<div class="pc-col${isT ? ' today' : ''}${d.off ? ' ooo' : ''}" style="height:${height}px">${d.off ? `<span class="ooo-label">${esc(d.offTitle || 'Out of office')}</span>` : ''}${blocks}${nowLine}</div>`;
+  }).join('');
+  $('#ttScroll').innerHTML = `<div class="pc-grid" style="--cols:${days.length};--pph2:${pph}px">${g}</div>`;
+  S.ui.ttRange = { startH, pph };
+  if (!reduceMotion()) {
+    if (opts.slide) {
+      $('#ttScroll .pc-grid').animate([{ opacity: 0, transform: `translateX(${(opts.dir || 1) * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+      $$('#ttScroll .pc-col').forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 40 + i * 45, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' }));
+    } else if (opts.flip) {
+      $$('#ttScroll [data-key]').forEach(el => {
+        const was = prev[el.dataset.key]; const now = el.getBoundingClientRect();
+        if (was) { const dx = was.left - now.left, dy = was.top - now.top; if (Math.abs(dx) > 1 || Math.abs(dy) > 1) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }); }
+        else if (Object.keys(prev).length) el.animate([{ opacity: 0, transform: 'scale(0.96)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+      });
     }
   }
 
-  // Needs a decision
-  const att = S.requests.filter(r => plan.byId[r.id] && plan.byId[r.id].rag !== 'green').sort((a, b) => (plan.byId[a.id].rag === 'red' ? 0 : 1) - (plan.byId[b.id].rag === 'red' ? 0 : 1));
-  const heavy = plan.days.filter(d => !d.past && !d.off && d.cap > 0 && d.meetH >= 5).slice(0, 4);
-  const clashes = plan.days.filter(d => !d.past && d.clash).slice(0, 3);
-  $('#attCount').textContent = (att.length + heavy.length + clashes.length) || '';
-  let ah = att.map(r => { const p = plan.byId[r.id]; return `<button type="button" class="att-row" data-open="${esc(r.id)}">
-      ${pillHtml(r)}<span style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc(p.note)}</span></span>
-      <span class="rag ${p.rag}">${p.rag === 'red' ? 'Off track' : 'Tight'}</span></button>`; }).join('');
-  ah += heavy.map(d => `<div class="att-day"><span class="when">${fmtShort(d.date)}</span><span class="small"><b>${fmtH(d.meetH)} of meetings</b> <span class="muted">leaves ${fmtH(d.capEff)} for change work. Decline one or move it to protect the day.</span></span></div>`).join('');
-  ah += clashes.map(d => `<div class="att-day"><span class="when">${fmtShort(d.date)}</span><span class="small"><b>A meeting overlaps your time</b> <span class="muted">${esc(d.meets.find(m => m.s < hm(st.mineStart) + (+st.mineHours || 0) && m.e > hm(st.mineStart))?.t || '')}. Move it if you can.</span></span></div>`).join('');
-  $('#attention').innerHTML = ah ? ah + `<p class="small muted" style="padding:10px 16px 14px">To fix a request: decline it, put it on hold, agree a later date, or give yourself more hours under Your capacity.</p>`
-    : `<p class="mod-empty">Everything open finishes before its delivery date, and your own time is clear.</p>`;
+  // Unscheduled
+  const un = S.requests.filter(r => (ACTIVE.has(r.status) || r.status === 'hold') && !hoursBy[r.id]).sort((a, b) => order[a._tier] - order[b._tier] || b._score - a._score);
+  const unH = un.reduce((a, r) => a + (+r.hours || 0), 0);
+  $('#unsched').innerHTML = `<h3 id="unTitle">${msI('stacks')}Not in this week</h3><p>On hold, later work and anything that didn’t fit (${fmtH(unH)})</p>
+    <div class="un-list">${un.slice(0, 5).map(r => {
+      const why = r.status === 'hold' ? 'On hold' : plan.byId[r.id] && plan.byId[r.id].left > 0 ? 'Doesn’t fit yet' : TIER_NAME[r._tier];
+      const can = r.status === 'hold' || r._tier === 'P3' || r._tier === 'P4';
+      return `<div class="un-item" data-k="un|${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">${tierTile(r)}
+        <button type="button" class="un-open" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><small>${esc(why)}</small></button>
+        <span class="hrs">${fmtH(+r.hours || 0)}</span>
+        ${can ? `<button type="button" class="un-pull" data-pull="${esc(r.id)}" aria-label="Bring ${esc(r.title)} forward" title="${r.status === 'hold' ? 'Take off hold' : 'Raise to Priority'}">${msI('add')}</button>` : '<span></span>'}</div>`;
+    }).join('') || '<p class="mw-empty">Everything open is already in this week.</p>'}</div>
+    ${un.length > 5 ? `<p class="mw-empty">and ${un.length - 5} more in <a href="#queue" style="color:var(--p3)">Priorities</a></p>` : ''}
+    <button class="btn un-add" type="button" data-action="add">${msI('add')}Add a request</button>`;
+
+  // Weekly outcomes
+  const mon = iso(wk[0].date), sun = iso(wk[6].date);
+  const doneHere = S.requests.filter(r => r.status === 'done' && r.doneAt && r.doneAt >= mon && r.doneAt <= sun);
+  const outs = [...new Map(inWeek.filter(r => r._tier === 'P1' || r._tier === 'P2').concat(doneHere).map(r => [r.id, r])).values()].slice(0, 6);
+  $('#ocPanel').innerHTML = `<div class="panel-h"><div><h2 id="ocTitle">Weekly outcomes</h2><p>What success looks like this week. Tick them off as they land.</p></div><span class="count-chip">${outs.filter(r => r.status === 'done').length} of ${outs.length}</span></div>
+    <div class="oc-list">${outs.map(r => `<button type="button" class="oc-row" role="checkbox" aria-checked="${r.status === 'done'}" data-outcome="${esc(r.id)}"><span class="oc-box"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.6L11 4.4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="oc-txt">${esc(r.title)} delivered</span></button>`).join('') || '<p class="mw-empty">Outcomes appear when Urgent or Priority work is planned this week.</p>'}</div>`;
+
+  // Blockers / waiting on
+  const holds = S.requests.filter(r => r.status === 'hold');
+  const waits = S.requests.filter(r => ACTIVE.has(r.status) && r._missing.length);
+  const bl = holds.map(r => ({ r, kind: 'hold' })).concat(waits.map(r => ({ r, kind: 'wait' })));
+  $('#blPanel').innerHTML = `<div class="panel-h"><div><h2 id="blTitle">Blockers and waiting on</h2><p>What could hold up delivery this week.</p></div><span class="count-chip">${bl.length} item${bl.length === 1 ? '' : 's'}</span></div>
+    <div class="bl-list">${bl.slice(0, 4).map(({ r, kind }) => `<button type="button" class="bl-item" data-open="${esc(r.id)}" style="--c:${kind === 'hold' ? 'var(--p1)' : 'var(--p2)'}"><i aria-hidden="true"></i>
+      <span style="min-width:0"><b>${esc(r.title)}</b><small>${kind === 'hold' ? esc(r.notes ? r.notes.slice(0, 70) : 'On hold until you pick it back up') : `Ask ${esc(r.requester || 'the requester')} about ${esc(r._missing.slice(0, 2).join(' and '))}`}</small></span>
+      <span class="st-pill ${kind === 'hold' ? 'risk' : 'tight'}">${kind === 'hold' ? 'On hold' : 'Waiting on'}</span></button>`).join('') || '<p class="mw-empty">Nothing is blocked, and every request has the answers it needs.</p>'}</div>`;
 
   renderCalMod();
   placeNowLine();
@@ -2203,6 +2348,27 @@ document.addEventListener('click', e => {
   if (t.dataset.action === 'add') { addRequest(); return; }
   if (t.matches('.demo-chip')) { openImport(); return; }
   if (t.matches('[data-done]')) { markDone(t.dataset.done); return; }
+  if (t.matches('[data-outcome]')) {
+    const r = findReq(t.dataset.outcome); if (!r) return;
+    if (r.status === 'done') { r.status = 'progress'; r.progress = Math.min(r.progress || 90, 90); r.doneAt = null; Store.saveRequest(r); t.setAttribute('aria-checked', 'false'); setTimeout(() => renderAll({ flip: true }), 220); toast(`Reopened: ${r.title}`); }
+    else { t.setAttribute('aria-checked', 'true'); setTimeout(() => markDone(r.id), 220); }
+    return;
+  }
+  if (t.matches('[data-pull]')) {
+    const r = findReq(t.dataset.pull); if (!r) return;
+    const row = t.closest('.un-item');
+    const go = () => {
+      let msg;
+      if (r.status === 'hold') { r.status = 'accepted'; msg = `Took ${r.title} off hold.`; }
+      else { r.pin = 'P2'; msg = `Raised ${r.title} to Priority.`; }
+      Store.saveRequest(r); renderAll({ flip: true });
+      const wk = weekDays(S.ui.week || 0); const here = wk.some(d => d.blocks.some(b => b.r === r));
+      const first = S.plan.days.find(d => d.blocks.some(b => b.r === r));
+      toast(here ? `${msg} It’s now in this week’s plan.` : first ? `${msg} This week is full, so it starts ${fmtDay(first.date)}.` : `${msg} There’s no free time for it in the next ${S.settings.weeks} weeks.`);
+    };
+    if (row && !reduceMotion()) row.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(-18px)' }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }).finished.then(go); else go();
+    return;
+  }
   if (t.matches('[data-road]')) { if (OV.tab === t.dataset.road) return; OV.tab = t.dataset.road; renderRoad(e.detail === 0 ? null : 'tab'); return; }
   if (t.matches('[data-area]')) { const a = t.dataset.area; OV.area = OV.area === a ? null : a; $$('#ovAreas .area').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.area === OV.area))); renderRoad(e.detail === 0 ? null : 'area'); return; }
   if (t.matches('[data-mini-step]')) { const n = Math.floor(S.plan.days.length / 7); const next = clamp(OV.week + +t.dataset.miniStep, 0, n - 1); if (next === OV.week) return; OV.week = next; renderMiniWeek(e.detail === 0 ? 0 : +t.dataset.miniStep); return; }
@@ -2302,6 +2468,7 @@ $('#view-plan').addEventListener('change', e => {
   else if (el.id === 'mineHours') st.mineHours = clamp(+el.value || 0, 0, 4);
   else if (el.id === 'maxBlock') st.maxBlock = clamp(+el.value || 3, 0.5, 8);
   else if (el.id === 'weeks') { st.weeks = +el.value; S.ui.week = Math.min(S.ui.week || 0, st.weeks - 1); }
+  else if (el.id === 'weekSel') { const old = S.ui.week || 0; S.ui.week = +el.value; renderPlan({ slide: true, dir: S.ui.week > old ? 1 : -1 }); return; }
   else return;
   renderAll(); Store.saveSettings();
 });
@@ -2315,7 +2482,6 @@ $('#view-scoring').addEventListener('input', e => {
   renderAll(); Store.saveSettings();
 });
 window.addEventListener('hashchange', route);
-window.addEventListener('resize', () => { if (!$('#view-plan').hidden) slideIndicator($('#weekTrack'), $('#weekInd'), $(`#weekTrack [data-week="${S.ui.week}"]`), false); });
 $('#calDlg').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 $('#calDlg').addEventListener('change', e => { if (e.target.id === 'calFile' && e.target.files.length) readCal(Array.from(e.target.files)); });
 $('#calDlg').addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); $('#calDrop')?.classList.add('over'); });
