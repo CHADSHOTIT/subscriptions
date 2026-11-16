@@ -11,53 +11,59 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0&display=block">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* Layout: teal shell rail on top; Queue = ranked list + value/effort matrix; Week plan = timetable columns (morning = high priority, your time, afternoon = lighter work). */
+/* Layout: clean-blue app. Light grey ground, white grouped cards, one cobalt accent for actions.
+   Bands: Urgent red, Priority orange, Later blue, Backlog grey. The Urgent tile is the one bold block. */
 :root {
-  --ground: #F1F4F2;
+  --ground: #F2F2F7;
   --surface: #FFFFFF;
-  --surface-2: #E6ECE9;
-  --ink: #13211F;
-  --ink-2: #51625E;
-  --line: #D3DCD8;
-  --shell: #0F3B3A;
-  --shell-2: #174A48;
-  --shell-ink: #E6F0EC;
-  --shell-ink-2: #A9C3BC;
-  --signal: #F2C230;
-  --signal-ink: #1C1A0E;
-  --p1: #C4372B;
-  --p2: #B9740A;
-  --p3: #2A7489;
-  --p4: #74827F;
-  --ok: #2C7D45;
-  --focus: #1F6FD1;
-  --font: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --surface-2: #E9E9EF;
+  --ink: #1C1C1E;
+  --ink-2: #6C6C70;
+  --line: #E1E1E6;
+  --shell: #FFFFFF;
+  --shell-2: #EAF1FE;
+  --shell-ink: #1C1C1E;
+  --shell-ink-2: #6C6C70;
+  --signal: #0A63F6;
+  --signal-ink: #FFFFFF;
+  --p1: #E5342A;
+  --p2: #E07800;
+  --p3: #0A63F6;
+  --p4: #7C7C82;
+  --ok: #1F8A4C;
+  --focus: #0A63F6;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
   --t-xs: .75rem; --t-sm: .8125rem; --t-base: .9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem; --t-xl: 1.625rem;
-  --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
-  --t-2xl: 2rem; --t-band: 2.75rem;
-  --meet-fill: #E9ECF1; --meet-line: #CDD3DD; --meet-icon: #4B5A86; --meet-fill-strong: #8D97AC;
-  --p1-hi: #FF8E7F; --p2-hi: #F4B650; --shell-line: rgba(230, 240, 236, .12);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px;
+  --t-2xl: 2rem; --t-band: 2.5rem;
+  --meet-fill: #EEEEF3; --meet-line: #D8D8DE; --meet-icon: #48484A; --meet-fill-strong: #AEAEB2;
+  --p1-hi: #E5342A; --p2-hi: #E07800; --shell-line: #E5E5EA;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .02);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --pph: 54px;
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
-  --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
-  --signal: #F2C230; --signal-ink: #1C1A0E;
-  --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
-  --meet-fill: #1E2A33; --meet-line: #2E3C48; --meet-icon: #A9B8E0; --meet-fill-strong: #6E7C94;
+  --ground: #000000; --surface: #1C1C1E; --surface-2: #2C2C2E; --ink: #F2F2F7; --ink-2: #98989F; --line: #38383A;
+  --shell: #1C1C1E; --shell-2: #0A2A57; --shell-ink: #F2F2F7; --shell-ink-2: #98989F; --shell-line: #38383A;
+  --signal: #0A84FF; --signal-ink: #FFFFFF;
+  --p1: #FF453A; --p2: #FF9F0A; --p3: #409CFF; --p4: #98989D; --ok: #30D158; --focus: #409CFF;
+  --p1-hi: #FF453A; --p2-hi: #FF9F0A;
+  --meet-fill: #2C2C2E; --meet-line: #3A3A3C; --meet-icon: #C7C7CC; --meet-fill-strong: #636366;
+  --card-shadow: none;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
-  --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
-  --signal: #F2C230; --signal-ink: #1C1A0E;
-  --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
-  --meet-fill: #1E2A33; --meet-line: #2E3C48; --meet-icon: #A9B8E0; --meet-fill-strong: #6E7C94;
+  --ground: #000000; --surface: #1C1C1E; --surface-2: #2C2C2E; --ink: #F2F2F7; --ink-2: #98989F; --line: #38383A;
+  --shell: #1C1C1E; --shell-2: #0A2A57; --shell-ink: #F2F2F7; --shell-ink-2: #98989F; --shell-line: #38383A;
+  --signal: #0A84FF; --signal-ink: #FFFFFF;
+  --p1: #FF453A; --p2: #FF9F0A; --p3: #409CFF; --p4: #98989D; --ok: #30D158; --focus: #409CFF;
+  --p1-hi: #FF453A; --p2-hi: #FF9F0A;
+  --meet-fill: #2C2C2E; --meet-line: #3A3A3C; --meet-icon: #C7C7CC; --meet-fill-strong: #636366;
+  --card-shadow: none;
   color-scheme: dark; }
 
 * { box-sizing: border-box; }
@@ -128,8 +134,8 @@ p { margin: 0; }
 .now .tt { font-size: 1.75rem; font-weight: 650; letter-spacing: -0.025em; line-height: 1.12; text-wrap: balance; }
 .now .meta { margin-top: 6px; font-size: var(--t-sm); color: var(--shell-ink-2); }
 .now .clock { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
-.now .left { font-size: 2.75rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.045em; line-height: .85; }
-.now .left small { display: block; margin-top: 8px; font-size: var(--t-sm); font-weight: 600; font-stretch: 100%; letter-spacing: 0; color: var(--shell-ink-2); }
+.now .left { font-size: 2.75rem; font-weight: 700; letter-spacing: -0.045em; line-height: .85; }
+.now .left small { display: block; margin-top: 8px; font-size: var(--t-sm); font-weight: 600; letter-spacing: 0; color: var(--shell-ink-2); }
 .now .range { font-size: var(--t-sm); color: var(--shell-ink-2); text-align: right; }
 .now .prog { height: 6px; border-radius: 3px; background: var(--shell-line); overflow: hidden; }
 .now .prog i { display: block; height: 100%; border-radius: 3px; background: var(--tier); transform-origin: left; transition: transform .6s var(--ease-out); }
@@ -169,7 +175,7 @@ p { margin: 0; }
 .ask-card .acts .btn-accept { background: var(--ink); color: var(--ground); border-color: var(--ink); }
 @media (hover: hover) and (pointer: fine) { .ask-card .acts .btn-accept:hover { background: color-mix(in srgb, var(--ink) 88%, var(--ground)); border-color: var(--ink); } }
 .week-num { display: flex; align-items: end; gap: 12px; }
-.week-num b { font-size: 3.25rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.05em; line-height: .8; }
+.week-num b { font-size: 3.25rem; font-weight: 700; letter-spacing: -0.05em; line-height: .8; }
 .week-num span { font-size: var(--t-sm); color: var(--ink-2); padding-bottom: 2px; }
 .week-days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .week-days div { display: grid; gap: 6px; justify-items: center; font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; }
@@ -233,7 +239,7 @@ main { padding-block: 32px 64px; }
 .band-ind.ready { transition: clip-path .34s var(--ease-out), --band .34s ease; }
 .seg-band { position: relative; z-index: 1; flex: 1 0 auto; min-width: 128px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; text-align: left; padding: 10px 16px; border: 0; border-radius: 11px; background: transparent; cursor: pointer; color: var(--ink-2); transition: color .2s ease, background-color .2s ease, transform .12s var(--ease-out); }
 .seg-band:active { transform: scale(0.97); }
-.seg-band .code { grid-row: span 2; font-size: var(--t-xl); font-weight: 700; font-stretch: 78%; letter-spacing: -0.03em; line-height: 1; color: var(--tier); transition: opacity .2s ease; opacity: .7; }
+.seg-band .code { grid-row: span 2; font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--tier); transition: opacity .2s ease; opacity: .7; }
 .seg-band .nm { font-size: var(--t-sm); font-weight: 600; }
 .seg-band .ct { font-size: var(--t-xs); }
 .seg-band[aria-pressed="true"] { color: var(--ink); }
@@ -254,7 +260,7 @@ main { padding-block: 32px 64px; }
 /* Band modules */
 .band { --tier: var(--p4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); min-width: 0; }
 .band-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 18px 20px; }
-.band-code { font-size: var(--t-band); font-weight: 700; font-stretch: 75%; letter-spacing: -0.045em; line-height: .82; color: var(--tier); }
+.band-code { font-size: var(--t-band); font-weight: 700; letter-spacing: -0.045em; line-height: .82; color: var(--tier); }
 .band-name { font-size: var(--t-lg); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
 .band-meta { font-size: var(--t-sm); color: var(--ink-2); }
 .band-load { font-size: var(--t-sm); color: var(--ink-2); text-align: right; white-space: nowrap; }
@@ -274,7 +280,7 @@ main { padding-block: 32px 64px; }
 .card-p1 .when { font-size: var(--t-sm); color: var(--shell-ink-2); display: grid; gap: 2px; }
 .card-p1 .when b { color: var(--shell-ink); font-weight: 600; }
 .card-p1 .when b.late { color: var(--p1-hi); }
-.big-n { font-size: 2.25rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.04em; line-height: .85; color: var(--tier); }
+.big-n { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.04em; line-height: .85; color: var(--tier); }
 .band-p1 .why .chip { border-color: var(--shell-line); color: var(--shell-ink-2); }
 .band-p1 .why .chip.flag-must { border-color: color-mix(in srgb, var(--p1-hi) 50%, transparent); color: var(--p1-hi); }
 .band-p1 .why .chip.flag-info { border-color: color-mix(in srgb, var(--p2-hi) 50%, transparent); color: var(--p2-hi); }
@@ -297,7 +303,7 @@ details.band[open] .chev-b { transform: rotate(180deg); }
 .item .rk { font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); }
 .item .t { font-weight: 600; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item .sub { font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item .sc { font-size: var(--t-xl); font-weight: 700; font-stretch: 78%; letter-spacing: -0.03em; color: var(--tier); text-align: right; line-height: 1; }
+.item .sc { font-size: var(--t-xl); font-weight: 700; letter-spacing: -0.03em; color: var(--tier); text-align: right; line-height: 1; }
 .why { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { display: inline-block; font-size: var(--t-xs); font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
 .chip.flag-info { border-color: color-mix(in srgb, var(--p2) 50%, var(--line)); color: var(--p2); }
@@ -427,7 +433,7 @@ details.panel[open] > summary .chev { transform: rotate(180deg); }
 .tt-panel .timetable { grid-template-columns: 60px repeat(var(--cols), minmax(148px, 1fr)); min-width: calc(60px + var(--cols) * 148px); }
 .tt-panel .tt-dayhead { padding: 12px 12px 10px; gap: 6px; background: var(--surface); z-index: 2; }
 .dh-top { display: flex; align-items: baseline; gap: 8px; }
-.dh-num { font-size: 1.75rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.04em; line-height: .9; }
+.dh-num { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.04em; line-height: .9; }
 .dh-name { font-size: var(--t-sm); color: var(--ink-2); font-weight: 600; }
 .dh-tag { margin-left: auto; font-size: var(--t-xs); font-weight: 700; color: var(--p3); }
 .tt-dayhead.today .dh-num { color: var(--p3); }
@@ -572,7 +578,63 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   .demo-chip span { display: none; }
 }
 
+/* ---- Clean blue: grouped white cards, blue actions ---- */
+body::before { background: var(--ground); }
+::selection { background: color-mix(in srgb, var(--signal) 28%, transparent); }
+.rail { border-right: 1px solid var(--line); }
+.rail .tab[aria-current="page"] { background: var(--shell-2); color: var(--signal); }
+.rail .tab[aria-current="page"] .ms, .tabbar .tab[aria-current="page"] .ms { color: var(--signal); }
+@media (hover: hover) and (pointer: fine) { .rail .tab:hover { background: var(--ground); color: var(--ink); } }
+.tabbar .tab .tab-ic::before { display: none; }
+.tabbar .tab[aria-current="page"] { color: var(--signal); }
+.btn-ghost-dark { color: var(--ink); border-color: var(--line); background: var(--surface); }
+@media (hover: hover) and (pointer: fine) { .btn-ghost-dark:hover { background: var(--ground); border-color: var(--line); } .btn-primary:hover { background: color-mix(in srgb, var(--signal) 88%, black); border-color: transparent; } }
+.btn-primary { border-color: transparent; }
+.mod, .band, .card-app, .tt-panel, .panel, details.band { border-color: transparent; box-shadow: var(--card-shadow); }
+.bandbar { background: var(--surface-2); }
+.band-ind { background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+.band-p1 { --tier: var(--p1); background: var(--surface); color: var(--ink); }
+.band-p1 .band-meta, .band-p1 .band-load, .band-calm { color: var(--ink-2); }
+.band-p1 .band-load b { color: var(--ink); }
+.card-p1 { background: var(--ground); border-color: transparent; }
+.card-p1 .sub, .card-p1 .when { color: var(--ink-2); }
+.card-p1 .when b { color: var(--ink); }
+.card-p1 .when b.late { color: var(--p1); }
+@media (hover: hover) and (pointer: fine) { .card-p1:hover { border-color: color-mix(in srgb, var(--p1) 35%, transparent); } }
+.band-p1 .why .chip { border-color: var(--line); color: var(--ink-2); }
+.band-p1 .why .chip.flag-must { border-color: color-mix(in srgb, var(--p1) 45%, var(--line)); color: var(--p1); }
+.band-p1 .why .chip.flag-info { border-color: color-mix(in srgb, var(--p2) 50%, var(--line)); color: var(--p2); }
+.now { --tier: var(--signal); background: var(--surface); color: var(--ink); box-shadow: var(--card-shadow); }
+.now .lbl, .now .meta, .now .range, .now .left small { color: var(--ink-2); }
+.now .lbl { color: var(--tier); }
+.now .prog { background: var(--surface-2); }
+.now.meet { --tier: var(--ink-2); }
+.now.mine { --tier: var(--ok); background: var(--surface); }
+.now.calm { border: 0; }
+.ask-card .acts .btn-accept { background: var(--signal); color: var(--signal-ink); border-color: transparent; }
+@media (hover: hover) and (pointer: fine) { .ask-card .acts .btn-accept:hover { background: color-mix(in srgb, var(--signal) 88%, black); border-color: transparent; } }
+.icon-btn.primary { background: var(--signal); border-color: transparent; color: var(--signal-ink); }
+.demo-chip { border-color: color-mix(in srgb, var(--ink) 22%, transparent); color: var(--ink-2); }
+.demo-chip::before { background: var(--p2); }
+@media (hover: hover) and (pointer: fine) { .demo-chip:hover { color: var(--ink); border-color: var(--ink-2); } }
+.wordmark { color: var(--ink); }
+
+/* Priority home: four counts, the Urgent tile is the one bold block */
+.prio-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.prio-tile { --tier: var(--p4); display: grid; gap: 14px; align-content: space-between; min-height: 148px; text-align: left; padding: 16px; border: 0; border-radius: 22px; background: var(--surface); color: var(--ink); box-shadow: var(--card-shadow); cursor: pointer; transition: transform .16s var(--ease-out), box-shadow .2s ease; }
+.prio-tile:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .prio-tile:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, .08); } }
+.pt-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; font-size: var(--t-base); }
+.pt-name .ms { color: var(--tier); font-size: 22px; }
+.pt-n { font-size: 3.25rem; font-weight: 700; letter-spacing: -0.05em; line-height: .85; color: var(--ink); }
+.pt-sub { display: block; margin-top: 8px; font-size: var(--t-xs); color: var(--ink-2); line-height: 1.35; }
+.prio-tile.hot { background: var(--p1); color: #fff; }
+.prio-tile.hot .pt-n, .prio-tile.hot .pt-name .ms { color: #fff; }
+.prio-tile.hot .pt-sub { color: rgba(255, 255, 255, .85); }
+@media (max-width: 760px) { .prio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .prio-tile { min-height: 132px; } .pt-n { font-size: 2.75rem; } }
+
 @media (prefers-reduced-motion: reduce) {
+  .prio-tile:active { transform: none; }
   *, *::before, *::after { transition-property: opacity, background-color, border-color, color !important; }
   .btn:active, .blk:active, .seg-band:active, .seg-week:active, .card-p1:active, .icon-btn:active { transform: none; }
   .card-p1:hover { transform: none !important; }
@@ -583,7 +645,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 
 <nav class="rail" aria-label="Main">
   <div class="wordmark">Triage Desk</div>
-  <a class="tab" href="#today" data-view="today"><span class="tab-ic"><span class="ms" aria-hidden="true">today</span></span><span>Today</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Queue</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a>
+  <a class="tab" href="#priority" data-view="priority"><span class="tab-ic"><span class="ms" aria-hidden="true">flag</span></span><span>Priority</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Requests</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Weekly plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a>
   <div class="rail-foot">
     <button class="demo-chip" type="button" hidden title="These are example requests. Import your forms to replace them. Nothing is saved until you do.">Example data<span>, import yours</span></button>
     <button class="btn btn-ghost-dark" type="button" data-action="add"><span class="ms" aria-hidden="true">add</span>Add request</button>
@@ -603,13 +665,15 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 
 <main class="wrap">
   <!-- TODAY -->
-  <section class="view" id="view-today" aria-labelledby="tTitle">
-    <div class="today-head"><span class="greet" id="tGreet"></span><h1 id="tTitle">Today</h1></div>
+  <section class="view" id="view-priority" aria-labelledby="tTitle">
+    <div class="today-head"><span class="greet" id="tGreet"></span><h1 id="tTitle">Priorities</h1></div>
+    <div class="prio-grid" id="prioGrid" aria-label="Open requests by priority"></div>
     <div class="today-grid">
       <div class="today-col">
+        <div class="sec-title" style="margin-bottom:-8px"><h2>Up next</h2></div>
         <div id="nowCard"></div>
         <div>
-          <div class="sec-title"><h2 id="tlTitle">Later today</h2><a href="#plan">Week plan</a></div>
+          <div class="sec-title"><h2 id="tlTitle">Later today</h2><a href="#plan">Weekly plan</a></div>
           <div class="tl" id="timeline"></div>
         </div>
       </div>
@@ -624,7 +688,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   <section class="view" id="view-queue" aria-labelledby="qTitle">
     <div class="q-head">
       <div class="q-title">
-        <h1 id="qTitle">Change queue</h1>
+        <h1 id="qTitle">Requests</h1>
         <p class="facts" id="facts"></p>
       </div>
       <div class="q-tools">
@@ -664,7 +728,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   <section class="view" id="view-plan" hidden aria-labelledby="pTitle">
     <div class="q-head">
       <div class="q-title">
-        <h1 id="pTitle">Week plan</h1>
+        <h1 id="pTitle">Weekly plan</h1>
         <p class="facts" id="planFacts"></p>
       </div>
       <button class="btn" id="calBtn" type="button">
@@ -771,7 +835,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   </section>
 </main>
 </div>
-<nav class="tabbar" aria-label="Main"><a class="tab" href="#today" data-view="today"><span class="tab-ic"><span class="ms" aria-hidden="true">today</span></span><span>Today</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Queue</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a></nav>
+<nav class="tabbar" aria-label="Main"><a class="tab" href="#priority" data-view="priority"><span class="tab-ic"><span class="ms" aria-hidden="true">flag</span></span><span>Priority</span></a><a class="tab" href="#queue" data-view="queue"><span class="tab-ic"><span class="ms" aria-hidden="true">inbox</span></span><span>Requests</span></a><a class="tab" href="#plan" data-view="plan"><span class="tab-ic"><span class="ms" aria-hidden="true">calendar_view_week</span></span><span>Weekly plan</span></a><a class="tab" href="#scoring" data-view="scoring"><span class="tab-ic"><span class="ms" aria-hidden="true">tune</span></span><span>Settings</span></a></nav>
 
 <dialog class="modal" id="importDlg" aria-labelledby="impTitle">
   <div class="modal-inner">
@@ -820,7 +884,8 @@ const uid = () => 'r' + Date.now().toString(36) + Math.random().toString(36).sli
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
 
 const TIERS = ['P1', 'P2', 'P3', 'P4'];
-const TIER_NAME = { P1: 'Do now', P2: 'Plan next', P3: 'Schedule in', P4: 'Backlog' };
+const TIER_NAME = { P1: 'Urgent', P2: 'Priority', P3: 'Later', P4: 'Backlog' };
+const TIER_ICON = { P1: 'local_fire_department', P2: 'flag', P3: 'schedule', P4: 'inventory_2' };
 const TIER_VAR = t => `var(--${t.toLowerCase()})`;
 const STATUSES = [['new', 'New'], ['accepted', 'Accepted'], ['progress', 'In progress'], ['hold', 'On hold'], ['done', 'Done'], ['declined', 'Declined']];
 const STATUS_LABEL = Object.fromEntries(STATUSES);
@@ -1321,14 +1386,14 @@ function dueHtml(r) {
   const txt = n < 0 ? `${-n} day${n === -1 ? '' : 's'} late` : n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n < 14 ? `In ${n} days` : fmtShort(fromIso(r.due));
   return `<span class="due ${cls}" title="${esc(fmtDay(fromIso(r.due)))}">${txt}</span>`;
 }
-function pillHtml(r) { return `<span class="pill${r.pin ? ' pinned' : ''}" style="--tier:${TIER_VAR(r._tier)}" title="${esc(TIER_NAME[r._tier])}${r.pin ? ' (set by you)' : ''}">${r._tier}</span>`; }
+function pillHtml(r) { return `<span class="pill${r.pin ? ' pinned' : ''}" style="--tier:${TIER_VAR(r._tier)}" title="${r._tier}${r.pin ? ', set by you' : ''}">${TIER_NAME[r._tier]}</span>`; }
 function flagsHtml(r) {
   let s = '';
   if (r.compliance) s += '<span class="chip flag-must">Mandatory</span>';
   if (r._missing.length) s += '<span class="chip flag-info">Needs info</span>';
   return s;
 }
-const SEGMENTS = [['all', 'All', 'Every band'], ...TIERS.map(t => [t, t, TIER_NAME[t]])];
+const SEGMENTS = [['all', 'All', 'Everything'], ...TIERS.map(t => [t, t, TIER_NAME[t]])];
 function buildBandbar() {
   const track = $('#bandTrack');
   track.insertAdjacentHTML('beforeend', SEGMENTS.map(([k, code, name]) => `<button type="button" class="seg-band" data-band="${k}" aria-pressed="false" style="--tier:${k === 'all' ? 'var(--ink)' : TIER_VAR(k)}">
@@ -1429,7 +1494,7 @@ function renderToday() {
   const day = S.plan.days.find(d => !d.past && +d.date >= t0 && d.blocks.some(b => b.r || b.meet));
   const label = !day ? 'Today' : +day.date === t0 ? 'Today' : +day.date === t0 + DAY ? 'Tomorrow' : fmtDay(day.date);
   const blocks = day ? day.blocks.slice().sort((a, b) => a.start - b.start) : [];
-  $('#todayMod').innerHTML = `<div class="mod-head"><h2>${label}</h2><a href="#plan">Week plan</a></div>`
+  $('#todayMod').innerHTML = `<div class="mod-head"><h2>${label}</h2><a href="#plan">Weekly plan</a></div>`
     + (blocks.length ? `<div class="slots">${blocks.map(b => b.mine
         ? `<div class="slot mine"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot"></i><span>Your time</span></span></div>`
         : b.meet ? `<div class="slot mine" title="${esc(b.m.t)}"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot" style="background:var(--meet-fill-strong);border:0"></i><span>${esc(b.m.t)}</span></span></div>`
@@ -1531,7 +1596,7 @@ function renderPlan(opts = {}) {
 
   $('#ttTitle').textContent = `${weekLabel(S.ui.week, wk)}, ${fmtShort(wk[0].date)} to ${fmtShort(wk[6].date)}`;
   $('#legend').innerHTML = `<span><i style="background:var(--meet-fill);border:1px solid var(--meet-line)"></i>Meetings</span>`
-    + TIERS.map(t => `<span><i style="background:color-mix(in srgb, ${TIER_VAR(t)} 30%, var(--surface));border:1px solid ${TIER_VAR(t)}"></i>${t}</span>`).join('')
+    + TIERS.map(t => `<span><i style="background:color-mix(in srgb, ${TIER_VAR(t)} 30%, var(--surface));border:1px solid ${TIER_VAR(t)}"></i>${TIER_NAME[t]}</span>`).join('')
     + `<span><i style="background:repeating-linear-gradient(135deg,var(--surface) 0 3px,var(--surface-2) 3px 6px);border:1px dashed var(--ink-2)"></i>Your time</span>`;
 
   if (!days.length) {
@@ -1617,7 +1682,7 @@ function placeNowLine() {
   const el = $('#nowLine'); if (!el || !S.ui.ttRange) return;
   const n = new Date(); el.style.top = ((n.getHours() + n.getMinutes() / 60 - S.ui.ttRange.startH) * S.ui.ttRange.pph) + 'px';
 }
-setInterval(() => { placeNowLine(); if (!$('#view-today').hidden) renderTodayView(); }, 60000);
+setInterval(() => { placeNowLine(); if (!$('#view-priority').hidden) renderTodayView(); }, 60000);
 function renderCalMod() {
   const c = S.cal;
   if (c && c.events) {
@@ -1929,14 +1994,24 @@ function renderTodayView() {
     const title = focus.mine ? 'Step away from the queue' : esc(itemTitle(focus));
     const meta = focus.mine ? `Back at ${clock(endH)}. Everything else can wait.` : focus.meet ? (focus.m.teams ? 'Teams meeting' : 'Meeting') : `${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')}. ${whenText(r).txt}.`;
     const acts = r ? `<div class="acts"><button class="btn btn-primary" type="button" data-done="${esc(r.id)}"><span class="ms fill" aria-hidden="true">check_circle</span>Mark done</button><button class="btn btn-ghost-dark" type="button" data-open="${esc(r.id)}">Details</button></div>` : '';
-    card = `<div class="now ${kind}" style="${r ? `--tier:${r._tier === 'P1' ? 'var(--p1-hi)' : r._tier === 'P2' ? 'var(--p2-hi)' : TIER_VAR(r._tier)}` : ''}"><div class="body">
-      <span class="lbl">${isNow ? '<i class="live" aria-hidden="true"></i>' : ''}${label}${r ? `<span class="pill">${r._tier} ${TIER_NAME[r._tier]}</span>` : focus.meet && focus.m.teams ? '<span class="ms fill" aria-hidden="true" style="margin-left:auto;color:var(--tier)">videocam</span>' : ''}</span>
+    card = `<div class="now ${kind}"><div class="body">
+      <span class="lbl">${isNow ? '<i class="live" aria-hidden="true"></i>' : ''}${label}${r ? `<span class="pill" style="--tier:${TIER_VAR(r._tier)}">${TIER_NAME[r._tier]}</span>` : focus.meet && focus.m.teams ? '<span class="ms fill" aria-hidden="true" style="margin-left:auto;color:var(--tier)">videocam</span>' : ''}</span>
       <div><div class="tt">${title}</div><div class="meta">${meta}</div></div>
       <div class="clock"><span class="left">${bigLeft(Math.max(0, leftH), isNow ? 'left' : 'to go')}</span><span class="range">${clock(focus.start)}–${clock(endH)}<br>${durText(focus.h)}</span></div>
       ${isNow ? `<span class="prog" role="progressbar" aria-label="Time elapsed" aria-valuenow="${Math.round(prog * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="transform:scaleX(${prog.toFixed(3)})"></i></span>` : ''}
       ${acts}</div></div>`;
   }
   $('#nowCard').innerHTML = card;
+
+  const open = S.requests.filter(r => ACTIVE.has(r.status) || r.status === 'hold');
+  $('#prioGrid').innerHTML = TIERS.map(t => {
+    const rs = open.filter(r => r._tier === t); const h = rs.reduce((a, r) => a + (+r.hours || 0), 0);
+    const dues = rs.map(r => fromIso(r.due)).filter(Boolean).sort((a, b) => a - b);
+    const sub = rs.length ? `${fmtH(h)} of your time${dues[0] ? `<br>Next due ${fmtShort(dues[0])}` : ''}` : 'Nothing here';
+    return `<button type="button" class="prio-tile${t === 'P1' && rs.length ? ' hot' : ''}" data-goband="${t}" style="--tier:${TIER_VAR(t)}" aria-label="${rs.length} ${TIER_NAME[t]}, view requests">
+      <span class="pt-name">${TIER_NAME[t]}<span class="ms fill" aria-hidden="true">${TIER_ICON[t]}</span></span>
+      <span><span class="pt-n">${rs.length}</span><span class="pt-sub">${sub}</span></span></button>`;
+  }).join('');
 
   const rest = items.filter(b => b !== focus && b.start + b.h > nowH);
   $('#tlTitle').textContent = 'Later today';
@@ -1949,12 +2024,12 @@ function renderTodayView() {
 
   // New requests to decide on
   const fresh = S.requests.filter(r => r.status === 'new').sort((a, b) => b._score - a._score);
-  $('#askCard').innerHTML = `<div class="sec-title"><h2>${fresh.length ? `${fresh.length} to decide on` : 'All decided'}</h2><a href="#queue">Queue</a></div>`
+  $('#askCard').innerHTML = `<div class="sec-title"><h2>${fresh.length ? `${fresh.length} to decide on` : 'All decided'}</h2><a href="#queue">All requests</a></div>`
     + (fresh.length ? fresh.slice(0, 3).map(r => `<div class="ask-card" data-k="ask|${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">
         <span style="min-width:0"><button type="button" class="tt" data-open="${esc(r.id)}" style="all:unset;cursor:pointer;font-weight:600;display:block">${esc(r.title)}</button><span class="sub">${esc(r.requester || 'No requester')}, ${(t => t[0].toLowerCase() + t.slice(1))(whenText(r).txt)}</span></span>
         <span class="big-n" aria-label="Score ${r._score}">${r._score}</span>
         <span class="acts"><button class="btn" type="button" data-decide="${esc(r.id)}" data-to="hold">Not now</button><button class="btn btn-accept" type="button" data-decide="${esc(r.id)}" data-to="accepted">Accept</button></span></div>`).join('')
-      + (fresh.length > 3 ? `<p class="small muted">and ${fresh.length - 3} more in the Queue</p>` : '')
+      + (fresh.length > 3 ? `<p class="small muted">and ${fresh.length - 3} more in Requests</p>` : '')
       : `<p class="small muted">Every request has an answer. New ones appear here when you import.</p>`);
 
   // This week, one big number
@@ -1963,7 +2038,7 @@ function renderTodayView() {
   const meetH = wkDays.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0), planned = wkDays.reduce((a, d) => a + d.used, 0);
   const work = wkDays.filter(d => d.cap > 0).slice(0, 5);
   const win = S.plan.dEnd - S.plan.dStart || 8;
-  $('#weekCard').innerHTML = `<div class="sec-title"><h2>This week</h2><a href="#plan">Plan</a></div>
+  $('#weekCard').innerHTML = `<div class="sec-title"><h2>This week</h2><a href="#plan">Weekly plan</a></div>
     <div class="week-num"><b>${fmtH(planned)}</b><span>of change work planned,<br>${fmtDur(meetH)} in meetings</span></div>
     <div class="week-days" aria-hidden="true">${work.map(d => { const hiH = d.hi.reduce((a, b) => a + b.h, 0), loH = d.lo.reduce((a, b) => a + b.h, 0); return `<div class="${d.key === iso(today()) ? 'today-d' : ''}"><span class="bar">${d.off ? `<i style="height:100%;background:repeating-linear-gradient(135deg,var(--surface) 0 4px,var(--surface-2) 4px 8px)"></i>` : `<i style="height:${loH / win * 100}%;background:var(--p3)"></i><i style="height:${hiH / win * 100}%;background:var(--p2)"></i><i style="height:${d.meetH / win * 100}%;background:var(--meet-fill-strong)"></i>`}</span>${d.date.toLocaleDateString('en-GB', { weekday: 'narrow' })}</div>`; }).join('')}</div>
     <p class="small muted">${free >= 0.5 ? `${fmtH(free)} still free for new work.` : 'No free time left this week.'}</p>`;
@@ -1985,7 +2060,7 @@ async function markDone(id) {
   const body = $('#nowCard .body');
   if (body && !reduceMotion()) await body.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-12px)' }], { duration: 180, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }).finished;
   r.status = 'done'; Store.saveRequest(r);
-  flipWithin($('#view-today'), () => { computeAll(); renderQueue(); renderPlan(); $$('.demo-chip').forEach(c => c.hidden = !S.examples); renderTodayView(); });
+  flipWithin($('#view-priority'), () => { computeAll(); renderQueue(); renderPlan(); $$('.demo-chip').forEach(c => c.hidden = !S.examples); renderTodayView(); });
   const nb = $('#nowCard .body');
   if (nb && !reduceMotion()) nb.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
   toast(`Marked done: ${r.title}`);
@@ -1994,20 +2069,20 @@ async function decide(id, to, cardEl) {
   const r = findReq(id); if (!r) return;
   if (cardEl && !reduceMotion()) await cardEl.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${to === 'accepted' ? 24 : -24}px)` }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }).finished;
   r.status = to; Store.saveRequest(r);
-  flipWithin($('#view-today'), () => { computeAll(); renderQueue(); renderPlan(); renderTodayView(); });
+  flipWithin($('#view-priority'), () => { computeAll(); renderQueue(); renderPlan(); renderTodayView(); });
   toast(to === 'accepted' ? `Accepted: ${r.title}. It’s in your plan.` : `On hold: ${r.title}`);
 }
 
 /* ---------- Routing ---------- */
-const VIEWS = ['today', 'queue', 'plan', 'scoring'];
+const VIEWS = ['priority', 'queue', 'plan', 'scoring'];
 function route() {
-  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'today';
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'priority';
   for (const x of VIEWS) $('#view-' + x).hidden = x !== v;
   $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.view === v ? 'page' : 'false'));
   if (v === 'scoring') renderScoring();
   if (v === 'plan') { renderPlan(); }
   if (v === 'queue') placeIndicator(false);
-  if (v === 'today') renderTodayView();
+  if (v === 'priority') renderTodayView();
   window.scrollTo(0, 0);
 }
 
@@ -2028,6 +2103,7 @@ document.addEventListener('click', e => {
   if (t.dataset.action === 'add') { addRequest(); return; }
   if (t.matches('.demo-chip')) { openImport(); return; }
   if (t.matches('[data-done]')) { markDone(t.dataset.done); return; }
+  if (t.matches('[data-goband]')) { S.filter.band = t.dataset.goband; S.ui.open[t.dataset.goband] = true; location.hash = '#queue'; renderQueue(true); return; }
   if (t.matches('[data-decide]')) { decide(t.dataset.decide, t.dataset.to, t.closest('.ask-card')); return; }
   if (t.id === 'calBtn' || t.matches('[data-cal-open]')) { openCal(); return; }
   if (t.matches('[data-cal-tab]')) { calImp.tab = t.dataset.calTab; renderCalDlg(); return; }
