@@ -42,7 +42,8 @@ Confirmed and built:
 - Missing answers count as middle values and are flagged "Needs info" with who to ask.
 - Statuses: New, Accepted, In progress, On hold, Done, Declined. The user can force a request into a band.
 - Weekly plan: per-day capacity, working hours, a protected "Your time" block, a high/low priority split, longest stretch on one request, meetings and out-of-office days from the calendar, warnings when work will miss its date or a meeting overlaps protected time.
-- Home screen (Priority): counts per band, what is up next, new requests to accept or put on hold, the week in one number.
+- Overview (home): this week's focus ring (average progress of the top focus items), active priorities, items this week, at risk, due in 30 days, delivery areas by team (filter the roadmap), a Now / Next / Later roadmap by delivery date with progress, a mini week calendar, and the week's focus items with mark-done.
+- Each request has a progress percentage the user sets; Done means 100%.
 - Data is private to the user (artifact database under the user's own path; browser storage in the standalone copy). CSV export of the ranked list and a downloadable intake-form template.
 
 Technical constraints:
@@ -57,10 +58,11 @@ Undecided:
 
 ## Brand Commitments
 
-- Name: Triage Desk.
+- Name in the app: "Digital Priorities Command Centre" (the user's reference design). The underlying project is Triage Desk.
 - Band names are fixed in the user's words: Urgent, Priority, Later, Backlog.
-- Tabs: Priority (home), Requests, Weekly plan, Settings.
-- The user chose a phone-style app and an Apple-like "clean blue" palette (light grey ground, white cards, cobalt blue actions; Urgent red, Priority orange, Later blue, Backlog grey). Treat that palette as binding until the user changes it.
+- Navigation: Overview (home), My week, Priorities, Settings.
+- Look: the user supplied a reference design (dark navy "command centre" dashboard with frosted glass panels, light cards for work items, an electric-blue accent, a ring gauge for this week's focus, a stats strip, delivery areas, a Now / Next / Later priority roadmap, a mini week calendar and a "This week's focus" bar). Treat that reference as binding; it replaces the earlier "clean blue" palette.
+- The reference carried the user's employer name and logo and a bridge photograph. Do not put a real organisation's name or logo into a published page, and do not fabricate a photograph; the user may add their own name and photo to their own copy.
 - Voice: plain, direct British English. Controls say what they do.
 
 ## Evidence on Hand
