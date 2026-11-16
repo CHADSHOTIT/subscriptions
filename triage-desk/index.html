@@ -37,22 +37,26 @@
   --t-xs: .75rem; --t-sm: .8125rem; --t-base: .9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem; --t-xl: 1.625rem;
   --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
   --t-2xl: 2rem; --t-band: 2.75rem;
+  --meet-fill: #E9ECF1; --meet-line: #CDD3DD; --meet-icon: #4B5A86; --meet-fill-strong: #8D97AC;
   --p1-hi: #FF8E7F; --p2-hi: #F4B650; --shell-line: rgba(230, 240, 236, .12);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
-  --pph: 46px;
+  --pph: 54px;
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
   --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
   --signal: #F2C230; --signal-ink: #1C1A0E;
   --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
+  --meet-fill: #1E2A33; --meet-line: #2E3C48; --meet-icon: #A9B8E0; --meet-fill-strong: #6E7C94;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
   --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
   --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
   --signal: #F2C230; --signal-ink: #1C1A0E;
   --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
+  --meet-fill: #1E2A33; --meet-line: #2E3C48; --meet-icon: #A9B8E0; --meet-fill-strong: #6E7C94;
   color-scheme: dark; }
 
 * { box-sizing: border-box; }
@@ -96,6 +100,7 @@ p { margin: 0; }
 
 main { padding-block: 24px 64px; }
 .view { display: grid; gap: 20px; }
+.view > * { min-width: 0; }
 .view-head { display: flex; align-items: end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
 .view-head h1 { font-size: var(--t-xl); font-weight: 700; }
 .view-head p { color: var(--ink-2); max-width: 62ch; margin-top: 4px; }
@@ -302,6 +307,74 @@ details.panel[open] > summary .chev { transform: rotate(180deg); }
 .legend { display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: var(--t-sm); color: var(--ink-2); align-items: center; }
 .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: color-mix(in srgb, var(--tier) 30%, var(--surface)); border: 1px solid var(--tier); }
 
+/* Week plan v2 */
+.wk-bar { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+.wk-bar .bandbar { flex: 1 1 520px; min-width: 0; }
+.seg-week { position: relative; z-index: 1; flex: 1 0 auto; min-width: 136px; display: grid; gap: 6px; text-align: left; padding: 10px 14px; border: 0; border-radius: 11px; background: transparent; cursor: pointer; color: var(--ink-2); transition: color .2s ease, background-color .2s ease, transform .16s var(--ease-out); }
+.seg-week:active { transform: scale(0.97); }
+.seg-week .wn { font-size: var(--t-sm); font-weight: 600; }
+.seg-week .wr { font-size: var(--t-xs); }
+.seg-week[aria-pressed="true"] { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .seg-week[aria-pressed="false"]:hover { background: color-mix(in srgb, var(--shell) 6%, transparent); color: var(--ink); } }
+.mini { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--ink-2) 14%, transparent); gap: 1px; }
+.mini i { display: block; height: 100%; }
+.mini .m-meet { background: var(--meet-fill-strong); }
+.mini .m-hi { background: var(--p1); }
+.mini .m-lo { background: var(--p3); }
+.wk-nav { display: flex; gap: 6px; align-items: center; }
+.btn-icon { width: 40px; padding: 0; }
+
+.tt-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.tt-top { display: flex; justify-content: space-between; align-items: center; gap: 10px 20px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tt-top h2 { font-size: var(--t-lg); font-weight: 600; letter-spacing: -0.015em; }
+.tt-panel .timetable-scroll { border: 0; border-radius: 0; }
+.tt-panel .timetable { grid-template-columns: 60px repeat(var(--cols), minmax(148px, 1fr)); min-width: calc(60px + var(--cols) * 148px); }
+.tt-panel .tt-dayhead { padding: 12px 12px 10px; gap: 6px; background: var(--surface); z-index: 2; }
+.dh-top { display: flex; align-items: baseline; gap: 8px; }
+.dh-num { font-size: 1.75rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.04em; line-height: .9; }
+.dh-name { font-size: var(--t-sm); color: var(--ink-2); font-weight: 600; }
+.dh-tag { margin-left: auto; font-size: var(--t-xs); font-weight: 700; color: var(--p3); }
+.tt-dayhead.today .dh-num { color: var(--p3); }
+.dh-load { font-size: var(--t-xs); color: var(--ink-2); line-height: 1.35; }
+.dh-load b { color: var(--ink); font-weight: 600; }
+.dh-load .warn { color: var(--p1); font-weight: 600; }
+.tt-panel .tt-col { background-image:
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--pph) - 1px), color-mix(in srgb, var(--line) 85%, transparent) calc(var(--pph) - 1px), color-mix(in srgb, var(--line) 85%, transparent) var(--pph)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--pph) / 2 - 1px), color-mix(in srgb, var(--line) 35%, transparent) calc(var(--pph) / 2 - 1px), color-mix(in srgb, var(--line) 35%, transparent) calc(var(--pph) / 2)); }
+.tt-col.today { background-color: color-mix(in srgb, var(--p3) 4%, var(--surface)); }
+.tt-col .offhours { position: absolute; left: 0; right: 0; background: color-mix(in srgb, var(--ink-2) 6%, transparent); pointer-events: none; }
+.tt-col.ooo { background: repeating-linear-gradient(135deg, var(--surface) 0 8px, var(--surface-2) 8px 16px); }
+.tt-col.ooo .blk.meet { opacity: .45; }
+.ooo-label { position: absolute; top: 38%; left: 10px; right: 10px; font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); text-align: center; }
+.blk { will-change: transform; }
+.blk.meet { --tier: var(--ink-2); background: var(--meet-fill); border: 1px solid var(--meet-line); cursor: default; z-index: 1; }
+.blk.meet .bt { display: flex; gap: 6px; align-items: center; }
+.blk.meet .bt svg { flex: none; color: var(--meet-icon); }
+.blk.meet .bm { color: var(--ink-2); }
+.blk.meet.tiny .bt { display: flex; }
+.now-line { position: absolute; left: -1px; right: 0; height: 2px; background: var(--p1); z-index: 3; pointer-events: none; }
+.now-line::before { content: ""; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--p1); box-shadow: 0 0 0 3px var(--surface); }
+.legend-v2 { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: var(--t-xs); color: var(--ink-2); align-items: center; }
+.legend-v2 i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+.plan-bento { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.plan-side { display: grid; gap: 16px; min-width: 0; }
+.att-day { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); align-items: center; }
+.att-day .when { font-size: var(--t-sm); font-weight: 700; }
+.cal-status { padding: 0 18px 16px; display: grid; gap: 12px; }
+.cal-status p { font-size: var(--t-sm); color: var(--ink-2); }
+.cal-status b { color: var(--ink); }
+.cal-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: var(--t-sm); }
+.cal-steps li::marker { font-weight: 700; color: var(--ink-2); }
+.cal-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface-2); width: max-content; max-width: 100%; overflow-x: auto; }
+.cal-tabs button { border: 0; background: transparent; padding: 8px 12px; border-radius: 9px; font-weight: 600; font-size: var(--t-sm); color: var(--ink-2); cursor: pointer; transition: background-color .2s ease, color .2s ease; white-space: nowrap; }
+.cal-tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(8, 20, 19, .08), 0 2px 6px rgba(8, 20, 19, .06); }
+.cal-found { display: grid; gap: 6px; padding: 14px 16px; border-radius: 12px; background: color-mix(in srgb, var(--ok) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--ok) 30%, var(--line)); }
+.cal-found b { font-size: var(--t-md); }
+.note { font-size: var(--t-xs); color: var(--ink-2); }
+
+@media (max-width: 1080px) { .plan-bento { grid-template-columns: minmax(0, 1fr); } }
+
 /* Scoring */
 .score-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 .weights { padding: 8px 16px 16px; display: grid; }
@@ -408,7 +481,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-property: opacity, background-color, border-color, color !important; }
-  .btn:active, .blk:active, .seg-band:active, .card-p1:active { transform: none; }
+  .btn:active, .blk:active, .seg-band:active, .seg-week:active, .card-p1:active { transform: none; }
   .card-p1:hover { transform: none !important; }
   .enter { animation-name: band-fade; }
   @starting-style { .sheet[open], .modal[open] { transform: none; } }
@@ -479,43 +552,63 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 
   <!-- PLAN -->
   <section class="view" id="view-plan" hidden aria-labelledby="pTitle">
-    <div class="view-head">
-      <div>
+    <div class="q-head">
+      <div class="q-title">
         <h1 id="pTitle">Week plan</h1>
-        <p>Your open requests spread across the coming weeks. High priority work fills the mornings, your own time is protected, and lower priority work keeps moving in the afternoons.</p>
+        <p class="facts" id="planFacts"></p>
       </div>
-      <div class="legend" id="legend"></div>
+      <button class="btn" id="calBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span id="calBtnLabel">Add Teams meetings</span></button>
+    </div>
+    <div class="wk-bar">
+      <div class="bandbar" role="group" aria-label="Choose a week">
+        <div class="band-track" id="weekTrack"><div class="band-ind" id="weekInd" aria-hidden="true"></div></div>
+      </div>
+      <div class="wk-nav">
+        <button class="btn btn-icon" type="button" data-week-step="-1" aria-label="Previous week"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="btn" type="button" data-week-today>This week</button>
+        <button class="btn btn-icon" type="button" data-week-step="1" aria-label="Next week"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
     </div>
 
-    <details class="panel" id="capPanel" open>
-      <summary class="panel-head"><h2>Your capacity</h2>
-        <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </summary>
-      <div class="capacity">
-        <div>
-          <p class="section-title" style="margin-bottom:8px">Hours for change requests each day</p>
-          <div class="cap-days" id="capDays"></div>
-        </div>
-        <div class="cap-grid">
-          <label for="dayStart">Day starts<input id="dayStart" type="time" step="900"></label>
-          <label for="mineStart">Your time starts<input id="mineStart" type="time" step="900"></label>
-          <label for="mineHours">Your time (hours)<input id="mineHours" type="number" min="0" max="4" step="0.5"></label>
-          <label for="maxBlock">Longest stretch on one request<input id="maxBlock" type="number" min="1" max="8" step="0.5"></label>
-          <label for="weeks">Plan ahead<select id="weeks"><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option></select></label>
-        </div>
-        <label class="cap-grid" style="grid-template-columns:minmax(0,1fr)" for="hiShare">
-          <span>Split between P1–P2 and P3–P4 work: <span class="split-out" id="splitOut"></span></span>
-          <input id="hiShare" type="range" min="50" max="90" step="5">
-        </label>
-      </div>
-    </details>
-
-    <div class="panel" id="attentionPanel">
-      <div class="panel-head"><h2>Needs a decision</h2><span class="small muted" id="attCount"></span></div>
-      <div class="attention" id="attention"></div>
+    <div class="tt-panel" id="ttPanel">
+      <div class="tt-top"><h2 id="ttTitle"></h2><div class="legend-v2" id="legend"></div></div>
+      <div class="timetable-scroll" id="ttScroll"></div>
     </div>
 
-    <div id="weeksOut" class="view"></div>
+    <div class="plan-bento">
+      <section class="mod" id="attentionPanel">
+        <div class="mod-head"><h2>Needs a decision</h2><span class="small muted" id="attCount"></span></div>
+        <div class="attention" id="attention"></div>
+      </section>
+      <div class="plan-side">
+        <section class="mod" id="calMod"></section>
+        <details class="mod" id="capPanel">
+          <summary class="mod-head" style="cursor:pointer;list-style:none;align-items:center;padding-bottom:16px"><h2>Your capacity</h2>
+            <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </summary>
+          <div class="capacity" style="padding-top:0">
+            <div>
+              <p class="section-title" style="margin-bottom:8px">Most hours for change requests each day</p>
+              <div class="cap-days" id="capDays"></div>
+            </div>
+            <div class="cap-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+              <label for="dayStart">Day starts<input id="dayStart" type="time" step="900"></label>
+              <label for="dayEnd">Day ends<input id="dayEnd" type="time" step="900"></label>
+              <label for="mineStart">Your time starts<input id="mineStart" type="time" step="900"></label>
+              <label for="mineHours">Your time (hours)<input id="mineHours" type="number" min="0" max="4" step="0.5"></label>
+              <label for="maxBlock">Longest stretch on one request<input id="maxBlock" type="number" min="1" max="8" step="0.5"></label>
+              <label for="weeks">Plan ahead<select id="weeks"><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option></select></label>
+            </div>
+            <label class="cap-grid" style="grid-template-columns:minmax(0,1fr)" for="hiShare">
+              <span>Split between P1–P2 and P3–P4 work: <span class="split-out" id="splitOut"></span></span>
+              <input id="hiShare" type="range" min="50" max="90" step="5">
+            </label>
+          </div>
+        </details>
+      </div>
+    </div>
   </section>
 
   <!-- SCORING -->
@@ -576,6 +669,15 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   </div>
 </dialog>
 
+<dialog class="modal" id="calDlg" aria-labelledby="calTitle">
+  <div class="modal-inner">
+    <div class="sheet-head"><div><h2 id="calTitle" style="font-size:var(--t-lg)">Add your Teams meetings</h2><p class="small muted">Teams meetings live in your Outlook calendar. Export it as an .ics file and drop it here.</p></div>
+      <button class="btn btn-quiet" type="button" data-close aria-label="Close"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="modal-body" id="calBody"></div>
+    <div class="sheet-foot" id="calFoot"></div>
+  </div>
+</dialog>
+
 <dialog class="sheet" id="detail" aria-labelledby="dTitle">
   <div class="sheet-inner" id="detailInner"></div>
 </dialog>
@@ -598,6 +700,7 @@ const daysUntil = s => { const d = fromIso(s); return d ? Math.round((d - today(
 const fmtDay = d => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const fmtShort = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const fmtH = h => (Math.round(h * 10) / 10) + 'h';
+const fmtDur = h => h > 0 && h < 1 ? Math.round(h * 60) + 'm' : fmtH(h);
 const hm = t => { const [h, m] = String(t || '09:00').split(':').map(Number); return (h || 0) + (m || 0) / 60; };
 const clock = x => { const h = Math.floor(x + 1e-6), m = Math.round((x - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
 const uid = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -624,12 +727,12 @@ const DEFAULTS = {
   boost: 15,
   thresholds: { P1: 70, P2: 52, P3: 35 },
   dayHours: [6, 6, 6, 6, 4, 0, 0],
-  dayStart: '09:00', mineStart: '12:30', mineHours: 1,
+  dayStart: '09:00', dayEnd: '17:30', mineStart: '12:30', mineHours: 1,
   hiShare: 70, maxBlock: 3, weeks: 4,
 };
 const clone = o => JSON.parse(JSON.stringify(o));
 
-const S = { requests: [], settings: clone(DEFAULTS), examples: false, filter: { band: 'all', q: '', status: 'open' }, ui: { open: { P2: true, P3: true, P4: false } }, plan: null };
+const S = { requests: [], settings: clone(DEFAULTS), examples: false, filter: { band: 'all', q: '', status: 'open' }, ui: { open: { P2: true, P3: true, P4: false }, week: 0 }, cal: null, plan: null };
 
 /* ---------- Scoring ---------- */
 function dateUrgency(due) {
@@ -669,7 +772,134 @@ function computeAll() {
   S.plan = buildPlan();
 }
 
+/* ---------- Calendar (.ics from Outlook / Teams) ---------- */
+const OFF_RE = /\b(annual leave|holiday|out of office|ooo|day off|bank holiday|leave|vacation|pto|sick)\b/i;
+function icsUnescape(v) { return String(v || '').replace(/\\n/gi, ' ').replace(/\\,/g, ',').replace(/\;/g, ';').replace(/\\\\/g, '\\').trim(); }
+function icsDate(v, pm = {}) {
+  v = String(v || '').trim();
+  let m = v.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (m || pm.VALUE === 'DATE') { m = m || v.match(/^(\d{4})(\d{2})(\d{2})/); return { date: new Date(+m[1], +m[2] - 1, +m[3]), allDay: true }; }
+  m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})?(Z)?/);
+  if (!m) return null;
+  const a = [+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)];
+  return { date: m[7] ? new Date(Date.UTC(...a)) : new Date(...a), allDay: false };
+}
+function icsDuration(v) {
+  const m = String(v || '').match(/^([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/);
+  if (!m) return 0;
+  return ((+m[2] || 0) * 7 * DAY + (+m[3] || 0) * DAY + (+m[4] || 0) * 36e5 + (+m[5] || 0) * 6e4 + (+m[6] || 0) * 1e3) * (m[1] === '-' ? -1 : 1);
+}
+function parseICS(text) {
+  const lines = String(text).replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '').split(/\r?\n/);
+  const out = []; let cur = null, depth = 0;
+  for (const ln of lines) {
+    if (ln === 'BEGIN:VEVENT') { cur = { p: {}, ex: [] }; continue; }
+    if (ln === 'END:VEVENT') { if (cur) out.push(cur); cur = null; continue; }
+    if (!cur) continue;
+    if (/^BEGIN:/.test(ln)) { depth++; continue; } if (/^END:/.test(ln)) { depth--; continue; } if (depth > 0) continue; // skip VALARM
+    const i = ln.indexOf(':'); if (i < 0) continue;
+    const [name, ...params] = ln.slice(0, i).split(';'); const pm = {};
+    params.forEach(x => { const k = x.indexOf('='); if (k > 0) pm[x.slice(0, k).toUpperCase()] = x.slice(k + 1).replace(/"/g, ''); });
+    const key = name.toUpperCase(), val = ln.slice(i + 1);
+    if (key === 'EXDATE') { val.split(',').forEach(v => { const d = icsDate(v, pm); if (d) cur.ex.push(iso(d.date)); }); continue; }
+    cur.p[key] = { v: val, pm };
+  }
+  return out;
+}
+function parseRule(v) { const r = {}; String(v || '').split(';').forEach(x => { const [k, val] = x.split('='); if (k) r[k.toUpperCase()] = val; }); return r; }
+const DOW = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+function mondayOf(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function ruleHits(day, rule, s0) {
+  const iv = Math.max(1, +rule.INTERVAL || 1);
+  const by = rule.BYDAY ? rule.BYDAY.split(',').map(x => { const m = x.match(/^([+-]?\d+)?([A-Z]{2})$/); return m ? { n: m[1] ? +m[1] : null, d: DOW[m[2]] } : null; }).filter(Boolean) : null;
+  const dd = Math.round((day - s0) / DAY);
+  switch (rule.FREQ) {
+    case 'DAILY': return dd % iv === 0 && (!by || by.some(b => b.d === day.getDay()));
+    case 'WEEKLY': { const wk = Math.round((mondayOf(day) - mondayOf(s0)) / (7 * DAY)); return wk % iv === 0 && (by ? by.some(b => b.d === day.getDay()) : day.getDay() === s0.getDay()); }
+    case 'MONTHLY': {
+      const mo = (day.getFullYear() - s0.getFullYear()) * 12 + day.getMonth() - s0.getMonth(); if (mo % iv) return false;
+      if (rule.BYMONTHDAY) return rule.BYMONTHDAY.split(',').map(Number).includes(day.getDate());
+      if (by) return by.some(b => { if (b.d !== day.getDay()) return false; if (b.n == null) return true; const nth = Math.ceil(day.getDate() / 7); const last = new Date(day.getFullYear(), day.getMonth() + 1, 0).getDate(); const fromEnd = Math.ceil((last - day.getDate() + 1) / 7); return b.n > 0 ? nth === b.n : fromEnd === -b.n; });
+      return day.getDate() === s0.getDate();
+    }
+    case 'YEARLY': return (day.getFullYear() - s0.getFullYear()) % iv === 0 && day.getMonth() === s0.getMonth() && day.getDate() === s0.getDate();
+  }
+  return false;
+}
+function expandICS(text, from, to) {
+  const raw = parseICS(text);
+  const overrides = new Set();
+  for (const e of raw) if (e.p['RECURRENCE-ID']) { const d = icsDate(e.p['RECURRENCE-ID'].v, e.p['RECURRENCE-ID'].pm); if (d) overrides.add((e.p.UID?.v || '') + '|' + iso(d.date)); }
+  const res = [];
+  const push = (e, start, end, allDay) => {
+    const title = icsUnescape(e.p.SUMMARY?.v) || 'Busy';
+    const text = (title + ' ' + icsUnescape(e.p.LOCATION?.v) + ' ' + icsUnescape(e.p.DESCRIPTION?.v) + ' ' + (e.p['X-MICROSOFT-SKYPETEAMSMEETINGURL']?.v || ''));
+    const busy = (e.p['X-MICROSOFT-CDO-BUSYSTATUS']?.v || '').toUpperCase();
+    const teams = /teams\.microsoft\.com|microsoft teams/i.test(text);
+    if (allDay) {
+      const off = busy === 'OOF' || OFF_RE.test(title);
+      for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) if (d >= from && d < to) res.push({ d: iso(d), allDay: true, off, t: title });
+      return;
+    }
+    if (busy === 'FREE') return;
+    let d0 = new Date(start); d0.setHours(0, 0, 0, 0);
+    for (let d = d0; d < end; d = addDays(d, 1)) {
+      if (d < from || d >= to) continue;
+      const ds = Math.max(+start, +d), de = Math.min(+end, +addDays(d, 1));
+      if (de <= ds) continue;
+      const sH = (ds - d) / 36e5, eH = (de - d) / 36e5;
+      res.push({ d: iso(d), s: Math.round(sH * 60) / 60, e: Math.round(eH * 60) / 60, t: title, teams, tentative: busy === 'TENTATIVE' });
+    }
+  };
+  for (const e of raw) {
+    if ((e.p.STATUS?.v || '').toUpperCase() === 'CANCELLED') continue;
+    if (/^cancel+ed:/i.test(icsUnescape(e.p.SUMMARY?.v))) continue;
+    const st = e.p.DTSTART && icsDate(e.p.DTSTART.v, e.p.DTSTART.pm); if (!st) continue;
+    let endMs;
+    if (e.p.DTEND) { const en = icsDate(e.p.DTEND.v, e.p.DTEND.pm); endMs = en ? +en.date : +st.date + 36e5; }
+    else if (e.p.DURATION) endMs = +st.date + icsDuration(e.p.DURATION.v);
+    else endMs = +st.date + (st.allDay ? DAY : 0);
+    const dur = Math.max(st.allDay ? DAY : 0, endMs - st.date);
+    if (!e.p.RRULE || e.p['RECURRENCE-ID']) { push(e, st.date, new Date(+st.date + dur), st.allDay); continue; }
+    const rule = parseRule(e.p.RRULE.v);
+    const until = rule.UNTIL ? icsDate(rule.UNTIL) : null;
+    const limit = until ? Math.min(+to, +until.date + DAY) : +to;
+    const count = rule.COUNT ? +rule.COUNT : Infinity;
+    const s0 = new Date(st.date); s0.setHours(0, 0, 0, 0);
+    let n = 0;
+    for (let day = new Date(s0); +day < limit && n < count; day.setDate(day.getDate() + 1)) {
+      if (!ruleHits(day, rule, s0)) continue;
+      n++;
+      const key = iso(day);
+      if (day < addDays(from, -1) || e.ex.includes(key) || overrides.has((e.p.UID?.v || '') + '|' + key)) continue;
+      const inst = new Date(st.date); inst.setFullYear(day.getFullYear(), day.getMonth(), day.getDate());
+      if (until && inst > until.date) break;
+      push(e, inst, new Date(+inst + dur), st.allDay);
+    }
+  }
+  return res.sort((a, b) => a.d.localeCompare(b.d) || (a.s || 0) - (b.s || 0));
+}
+function exampleMeetings() {
+  const out = []; const t0 = today();
+  for (let i = 0; i < 56; i++) {
+    const d = addDays(t0, i); const wd = (d.getDay() + 6) % 7; const k = iso(d);
+    if (wd > 4) continue;
+    out.push({ d: k, s: 9, e: 9.25, t: 'Team stand-up', teams: true, example: true });
+    if (wd === 1) out.push({ d: k, s: 14, e: 15, t: 'Programme board', teams: true, example: true });
+    if (wd === 2) out.push({ d: k, s: 15.5, e: 16.5, t: '1:1 with your manager', teams: true, example: true });
+    if (wd === 3) out.push({ d: k, s: 10, e: 11.5, t: 'Change advisory board', teams: true, example: true });
+    if (wd === 4 && i > 7 && i < 14) out.push({ d: k, allDay: true, off: true, t: 'Annual leave', example: true });
+  }
+  return out;
+}
+function calendarEvents() { return S.cal && S.cal.events ? S.cal.events : (S.examples ? exampleMeetings() : []); }
+
 /* ---------- Week plan ---------- */
+function mergeIv(list) {
+  const a = list.filter(x => x.e > x.s).sort((x, y) => x.s - y.s); const out = [];
+  for (const x of a) { const last = out[out.length - 1]; if (last && x.s <= last.e) last.e = Math.max(last.e, x.e); else out.push({ s: x.s, e: x.e }); }
+  return out;
+}
 function buildPlan() {
   const st = S.settings;
   const dueT = x => fromIso(x.r.due)?.getTime() ?? Infinity;
@@ -677,16 +907,37 @@ function buildPlan() {
   const items = S.requests.filter(r => ACTIVE.has(r.status) && (+r.hours || 0) > 0).map(r => ({ r, left: +r.hours, finish: null }));
   const hi = items.filter(x => x.r._tier === 'P1' || x.r._tier === 'P2').sort(sorter);
   const lo = items.filter(x => x.r._tier === 'P3' || x.r._tier === 'P4').sort(sorter);
-  const start = today();
+  const start = mondayOf(today());
+  const t0 = today();
+  const dStart = hm(st.dayStart), dEnd = Math.max(dStart + 1, hm(st.dayEnd || '17:30'));
+  const ys = hm(st.mineStart), yh = Math.max(0, +st.mineHours || 0), ye = ys + yh;
+  const floorHalf = h => Math.floor(h * 2 + 1e-6) / 2;
+  const byDay = {};
+  for (const ev of calendarEvents()) (byDay[ev.d] = byDay[ev.d] || []).push(ev);
   const days = [];
-  const dStart = hm(st.dayStart), ys = hm(st.mineStart), yh = Math.max(0, +st.mineHours || 0), ye = ys + yh;
-  const snap = h => Math.floor(h * 2 + 1e-6) / 2;
   for (let i = 0; i < (+st.weeks || 4) * 7; i++) {
-    const date = addDays(start, i); const wd = (date.getDay() + 6) % 7;
+    const date = addDays(start, i); const wd = (date.getDay() + 6) % 7; const key = iso(date);
+    const evs = byDay[key] || [];
+    const meets = evs.filter(m => !m.allDay);
+    const off = evs.some(m => m.allDay && m.off);
+    const past = date < t0;
     const cap = Math.max(0, +st.dayHours[wd] || 0);
-    const day = { date, wd, cap, hi: [], lo: [], blocks: [], used: 0 };
+    const day = { date, key, wd, cap, meets, off, offTitle: (evs.find(m => m.allDay && m.off) || {}).t, past, blocks: [], hi: [], lo: [], used: 0, meetH: 0, capEff: 0, clash: false };
     days.push(day);
-    if (cap <= 0) continue;
+    const inWin = meets.map(m => ({ s: Math.max(dStart, m.s), e: Math.min(dEnd, m.e) }));
+    day.meetH = mergeIv(inWin).reduce((a, x) => a + x.e - x.s, 0);
+    day.clash = yh > 0 && meets.some(m => m.s < ye && m.e > ys);
+    meets.forEach(m => day.blocks.push({ meet: true, m, start: m.s, h: m.e - m.s }));
+    if (cap > 0 && yh > 0 && !off) day.blocks.push({ mine: true, start: ys, h: yh });
+    if (cap <= 0 || off || past) continue;
+    const busy = mergeIv(inWin.concat(yh > 0 ? [{ s: ys, e: ye }] : []));
+    const nowD = new Date(); const fromH = +date === +t0 ? Math.max(dStart, Math.ceil((nowD.getHours() + nowD.getMinutes() / 60) * 2) / 2) : dStart;
+    const slots = []; let c = fromH;
+    for (const b of busy) { if (b.e <= c) continue; if (b.s > c) slots.push({ s: c, e: b.s }); c = Math.max(c, b.e); }
+    if (c < dEnd) slots.push({ s: c, e: dEnd });
+    const room = slots.reduce((a, x) => a + floorHalf(x.e - x.s), 0);
+    const capEff = Math.min(cap, room); day.capEff = capEff;
+    if (capEff < 0.5) continue;
     const spent = {};
     const take = (list, budget, bucket) => {
       let moved = true;
@@ -694,8 +945,8 @@ function buildPlan() {
         moved = false;
         for (const x of list) {
           if (x.left <= 0) continue;
-          const room = (+st.maxBlock || 3) - (spent[x.r.id] || 0);
-          const h = snap(Math.min(x.left, budget, room));
+          const roomI = (+st.maxBlock || 3) - (spent[x.r.id] || 0);
+          const h = floorHalf(Math.min(x.left, budget, roomI));
           if (h < 0.5) continue;
           const prev = bucket.find(b => b.x === x);
           if (prev) prev.h += h; else bucket.push({ x, h });
@@ -707,26 +958,24 @@ function buildPlan() {
       return budget;
     };
     const urgentHi = hi.some(x => x.left > 0 && x.r.due && (fromIso(x.r.due) - date) <= 2 * DAY);
-    const hiBudget = urgentHi ? cap : snap(cap * (+st.hiShare || 70) / 100);
+    const hiBudget = urgentHi ? capEff : floorHalf(capEff * (+st.hiShare || 70) / 100);
     let rest = take(hi, hiBudget, day.hi);
-    rest = take(lo, cap - hiBudget + rest, day.lo);
+    rest = take(lo, capEff - hiBudget + rest, day.lo);
     take(hi, rest, day.hi);
-    // place on the clock: high priority first, then lower priority; skip your time
-    let cur = dStart;
+    let k = 0, cur = slots.length ? slots[0].s : dStart;
     const place = (b, kind) => {
-      let remaining = b.h;
-      while (remaining > 1e-6) {
-        if (yh > 0 && cur >= ys && cur < ye) cur = ye;
-        const end = cur + remaining;
-        if (yh > 0 && cur < ys && end > ys) { const seg = ys - cur; day.blocks.push({ r: b.x.r, start: cur, h: seg, kind }); remaining -= seg; cur = ye; }
-        else { day.blocks.push({ r: b.x.r, start: cur, h: remaining, kind }); cur = end; remaining = 0; }
+      let rem = b.h;
+      while (rem > 1e-6 && k < slots.length) {
+        const avail = floorHalf(slots[k].e - cur);
+        if (avail < 0.5) { k++; cur = k < slots.length ? slots[k].s : cur; continue; }
+        const piece = Math.min(rem, avail);
+        day.blocks.push({ r: b.x.r, start: cur, h: piece, kind });
+        cur += piece; rem -= piece;
       }
     };
     day.hi.forEach(b => place(b, 'hi'));
     day.lo.forEach(b => place(b, 'lo'));
-    if (yh > 0) day.blocks.push({ mine: true, start: ys, h: yh });
     day.used = day.hi.concat(day.lo).reduce((a, b) => a + b.h, 0);
-    day.end = Math.max(dStart + cap + (yh > 0 && ys < dStart + cap + yh ? yh : 0), ...day.blocks.map(b => b.start + b.h));
   }
   const byId = {};
   for (const x of items) {
@@ -734,14 +983,14 @@ function buildPlan() {
     let rag = 'green', note = '';
     if (x.left > 0) { rag = 'red'; note = `Doesn’t fit in the next ${st.weeks} weeks (${fmtH(x.left)} left over)`; }
     else if (due && x.finish > due) { rag = 'red'; const late = Math.round((x.finish - due) / DAY); note = `Finishes ${fmtDay(x.finish)}, ${late} day${late === 1 ? '' : 's'} after it’s due`; }
-    else if (due && due < today()) { rag = 'red'; note = 'Delivery date has passed'; }
+    else if (due && due < t0) { rag = 'red'; note = 'Delivery date has passed'; }
     else if (due && (due - x.finish) <= 2 * DAY) { rag = 'amber'; note = `Tight: finishes ${fmtDay(x.finish)}, due ${fmtDay(due)}`; }
     else note = x.finish ? `Done by ${fmtDay(x.finish)}` : '';
     byId[x.r.id] = { finish: x.finish, left: x.left, rag, note };
   }
   const finishes = items.filter(x => x.left <= 0).map(x => x.finish);
   const spill = items.some(x => x.left > 0);
-  return { days, byId, clears: spill ? null : (finishes.length ? new Date(Math.max(...finishes)) : null), spill };
+  return { days, byId, dStart, dEnd, clears: spill ? null : (finishes.length ? new Date(Math.max(...finishes)) : null), spill };
 }
 
 /* ---------- Parsing imports ---------- */
@@ -905,12 +1154,12 @@ const Store = {
     if (this.mode === 'db') {
       const snap = await withTimeout(this.col().get(), 10000);
       if (!snap) throw new Error('timeout');
-      let settings = null; const requests = [];
+      let settings = null, calendar = null; const requests = [];
       for (const d of snap.docs) {
         const v = clone(d.data() || {});
-        if (d.id === 'settings') settings = v; else if (d.id.startsWith('r')) requests.push(v);
+        if (d.id === 'settings') settings = v; else if (d.id === 'calendar') calendar = v; else if (d.id.startsWith('r')) requests.push(v);
       }
-      return { settings, requests };
+      return { settings, requests, calendar };
     }
     if (this.mode === 'local') {
       try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : { settings: null, requests: [] }; } catch (e) { return { settings: null, requests: [] }; }
@@ -933,8 +1182,9 @@ const Store = {
   saveLocal() {
     if (this.mode !== 'local') return;
     clearTimeout(this.timers.local);
-    this.timers.local = setTimeout(() => { try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: S.settings, requests: S.examples ? [] : S.requests.map(r => this.strip(r)) })); } catch (e) { toast('Your browser blocked saving. Export a CSV to keep your list.'); } }, 250);
+    this.timers.local = setTimeout(() => { try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: S.settings, requests: S.examples ? [] : S.requests.map(r => this.strip(r)), calendar: S.cal })); } catch (e) { toast('Your browser blocked saving. Export a CSV to keep your list.'); } }, 250);
   },
+  saveCalendar() { if (this.mode === 'db') { this.write('calendar', S.cal ? clone(S.cal) : null); } else this.saveLocal(); },
   async saveAll() {
     if (this.mode === 'db') { for (const r of S.requests) await this.write(r.id, this.strip(r)); await this.write('settings', clone(S.settings)); }
     else this.saveLocal();
@@ -1063,12 +1313,13 @@ function renderQueue(animate = false) {
 }
 function renderToday() {
   const t0 = +today();
-  const day = S.plan.days.find(d => d.blocks.some(b => !b.mine));
+  const day = S.plan.days.find(d => !d.past && +d.date >= t0 && d.blocks.some(b => b.r || b.meet));
   const label = !day ? 'Today' : +day.date === t0 ? 'Today' : +day.date === t0 + DAY ? 'Tomorrow' : fmtDay(day.date);
   const blocks = day ? day.blocks.slice().sort((a, b) => a.start - b.start) : [];
   $('#todayMod').innerHTML = `<div class="mod-head"><h2>${label}</h2><a href="#plan">Week plan</a></div>`
     + (blocks.length ? `<div class="slots">${blocks.map(b => b.mine
         ? `<div class="slot mine"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot"></i><span>Your time</span></span></div>`
+        : b.meet ? `<div class="slot mine" title="${esc(b.m.t)}"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot" style="background:var(--meet-fill-strong);border:0"></i><span>${esc(b.m.t)}</span></span></div>`
         : `<button type="button" class="slot" data-open="${esc(b.r.id)}" style="--tier:${TIER_VAR(b.r._tier)}"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot"></i><span>${esc(b.r.title)}</span></span></button>`).join('')}</div>`
       : `<p class="mod-empty">Nothing planned. Add hours under Week plan, or import requests to fill the day.</p>`);
 }
@@ -1108,56 +1359,215 @@ function renderMatrix(list) {
 function renderCapacity() {
   const st = S.settings; const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   $('#capDays').innerHTML = names.map((n, i) => `<label for="cap${i}">${n}<input id="cap${i}" type="number" min="0" max="12" step="0.5" value="${st.dayHours[i]}" data-cap="${i}"></label>`).join('');
-  $('#dayStart').value = st.dayStart; $('#mineStart').value = st.mineStart; $('#mineHours').value = st.mineHours;
+  $('#dayStart').value = st.dayStart; $('#dayEnd').value = st.dayEnd || '17:30'; $('#mineStart').value = st.mineStart; $('#mineHours').value = st.mineHours;
   $('#maxBlock').value = st.maxBlock; $('#weeks').value = String(st.weeks); $('#hiShare').value = st.hiShare;
   $('#splitOut').textContent = `${st.hiShare}% to P1–P2, ${100 - st.hiShare}% to P3–P4`;
 }
-function renderPlan() {
+const MEET_ICON = '<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="9" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 7l4-2.5v7l-4-2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+function weeksOf(plan) { const w = []; for (let i = 0; i < plan.days.length; i += 7) w.push(plan.days.slice(i, i + 7)); return w; }
+function weekLabel(i, wk) { return i === 0 ? 'This week' : i === 1 ? 'Next week' : `Week of ${fmtShort(wk[0].date)}`; }
+function slideIndicator(track, ind, btn, animate, color) {
+  if (!btn || !track.clientWidth) return;
+  const W = track.clientWidth - 8, L = btn.offsetLeft - 4, w = btn.offsetWidth;
+  if (!animate) ind.classList.remove('ready');
+  if (color) ind.style.setProperty('--band', color);
+  ind.style.clipPath = `inset(0 ${Math.max(0, W - L - w)}px 0 ${Math.max(0, L)}px round 11px)`;
+  if (!animate) requestAnimationFrame(() => requestAnimationFrame(() => ind.classList.add('ready')));
+}
+function renderWeekStrip(weeks, animate) {
+  const track = $('#weekTrack');
+  const btns = $$('.seg-week', track);
+  if (btns.length !== weeks.length) { btns.forEach(b => b.remove()); track.insertAdjacentHTML('beforeend', weeks.map((_, i) => `<button type="button" class="seg-week" data-week="${i}" aria-pressed="false"></button>`).join('')); }
+  $$('.seg-week', track).forEach((b, i) => {
+    const wk = weeks[i]; const work = wk.filter(d => d.cap > 0);
+    const win = work.reduce((a, d) => a + (d.off ? 0 : S.plan.dEnd - S.plan.dStart), 0) || 1;
+    const meet = work.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0);
+    const hiH = work.reduce((a, d) => a + d.hi.reduce((x, y) => x + y.h, 0), 0), loH = work.reduce((a, d) => a + d.lo.reduce((x, y) => x + y.h, 0), 0);
+    const last = work.length ? work[work.length - 1].date : wk[4].date;
+    b.setAttribute('aria-pressed', String(S.ui.week === i));
+    b.setAttribute('aria-label', `${weekLabel(i, wk)}: ${fmtH(meet)} meetings, ${fmtH(hiH + loH)} planned`);
+    b.innerHTML = `<span class="wn">${weekLabel(i, wk)}</span><span class="wr">${wk[0].date.getDate()}–${last.getDate()} ${last.toLocaleDateString('en-GB', { month: 'short' })}</span>
+      <span class="mini" aria-hidden="true"><i class="m-meet" style="width:${meet / win * 100}%"></i><i class="m-hi" style="width:${hiH / win * 100}%"></i><i class="m-lo" style="width:${loH / win * 100}%"></i></span>`;
+  });
+  const shell = getComputedStyle(document.documentElement).getPropertyValue('--shell').trim();
+  slideIndicator(track, $('#weekInd'), track.querySelector(`[data-week="${S.ui.week}"]`), animate, shell);
+}
+function renderPlan(opts = {}) {
   const st = S.settings; const plan = S.plan;
-  $('#legend').innerHTML = TIERS.map(t => `<span><i style="--tier:${TIER_VAR(t)}"></i>${t} ${TIER_NAME[t]}</span>`).join('') + `<span><i style="--tier:var(--ink-2);background:repeating-linear-gradient(135deg,var(--surface) 0 3px,var(--surface-2) 3px 6px);border-style:dashed"></i>Your time</span>`;
-  const att = S.requests.filter(r => plan.byId[r.id] && plan.byId[r.id].rag !== 'green').sort((a, b) => (plan.byId[a.id].rag === 'red' ? 0 : 1) - (plan.byId[b.id].rag === 'red' ? 0 : 1));
-  $('#attCount').textContent = att.length ? `${att.length} request${att.length === 1 ? '' : 's'}` : '';
-  $('#attention').innerHTML = att.length ? att.map(r => { const p = plan.byId[r.id]; return `<button type="button" class="att-row" data-open="${esc(r.id)}">
-      ${pillHtml(r)}<span style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc(p.note)}</span></span>
-      <span class="rag ${p.rag}">${p.rag === 'red' ? 'Off track' : 'Tight'}</span></button>`; }).join('')
-    : `<p class="small muted" style="padding:14px 16px">Everything open finishes before its delivery date at your current capacity.</p>`;
-  if (att.length) $('#attention').insertAdjacentHTML('beforeend', `<p class="small muted" style="padding:10px 16px 14px">To fix one: decline it, put it on hold, agree a later date, or give yourself more hours on a day above.</p>`);
+  const weeks = weeksOf(plan);
+  S.ui.week = clamp(S.ui.week || 0, 0, weeks.length - 1);
+  const wk = weeks[S.ui.week];
+  const days = wk.filter(d => d.cap > 0 || d.meets.length);
+  const t0 = +today();
 
-  const weeks = []; for (let i = 0; i < plan.days.length; i += 7) weeks.push(plan.days.slice(i, i + 7));
-  const dStart = hm(st.dayStart);
-  const t0 = today();
-  const dueByDay = {};
-  for (const r of S.requests) if (ACTIVE.has(r.status) && r.due) (dueByDay[r.due] = dueByDay[r.due] || []).push(r);
-  $('#weeksOut').innerHTML = weeks.map((wk, wi) => {
-    const days = wk.filter(d => d.cap > 0);
-    const used = wk.reduce((a, d) => a + d.used, 0), cap = wk.reduce((a, d) => a + d.cap, 0);
-    if (!days.length) return '';
-    if (!used) { const t = wi === 0 ? 'This week' : wi === 1 ? 'Next week' : `Week of ${fmtShort(wk[0].date)}`; return `<section class="week"><div class="week-head"><h2>${t}</h2><span class="small muted">0h planned of ${fmtH(cap)} available</span></div><p class="panel small muted" style="padding:14px 16px">Nothing planned yet. This week is free for new requests or catch-up.</p></section>`; }
-    const end = Math.ceil(Math.max(...days.map(d => d.end || dStart + 1)));
-    const startH = Math.floor(dStart);
-    const hours = end - startH;
-    const height = hours * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pph'));
-    const first = wk[0].date;
-    const title = wi === 0 ? 'This week' : wi === 1 ? 'Next week' : `Week of ${fmtShort(first)}`;
+  // Previous block positions, for moving blocks to their new time instead of jumping
+  const prev = {};
+  if (opts.flip && !reduceMotion()) $$('#ttScroll [data-key]').forEach(el => { prev[el.dataset.key] = el.getBoundingClientRect(); });
+
+  renderWeekStrip(weeks, !!opts.slide);
+  const calOn = !!(S.cal && S.cal.events);
+  $('#calBtnLabel').textContent = calOn ? 'Update Teams meetings' : 'Add Teams meetings';
+
+  // Facts for the selected week
+  const meetH = days.reduce((a, d) => a + (d.off ? 0 : d.meetH), 0), planned = days.reduce((a, d) => a + d.used, 0), free = days.reduce((a, d) => a + Math.max(0, d.capEff - d.used), 0);
+  const offDays = days.filter(d => d.off).length;
+  $('#planFacts').innerHTML = `<b>${fmtDur(meetH)}</b> in meetings and <b>${fmtH(planned)}</b> of change work planned this week. ` + (free >= 0.5 ? `<b>${fmtH(free)}</b> is still free.` : 'Every working hour is spoken for.')
+    + (offDays ? ` You’re out of office for ${offDays} day${offDays === 1 ? '' : 's'}.` : '')
+    + (calOn ? '' : S.examples ? ' Meetings shown are examples.' : ' Add your Teams meetings so work lands around them.');
+
+  $('#ttTitle').textContent = `${weekLabel(S.ui.week, wk)}, ${fmtShort(wk[0].date)} to ${fmtShort(wk[6].date)}`;
+  $('#legend').innerHTML = `<span><i style="background:var(--meet-fill);border:1px solid var(--meet-line)"></i>Meetings</span>`
+    + TIERS.map(t => `<span><i style="background:color-mix(in srgb, ${TIER_VAR(t)} 30%, var(--surface));border:1px solid ${TIER_VAR(t)}"></i>${t}</span>`).join('')
+    + `<span><i style="background:repeating-linear-gradient(135deg,var(--surface) 0 3px,var(--surface-2) 3px 6px);border:1px dashed var(--ink-2)"></i>Your time</span>`;
+
+  if (!days.length) {
+    $('#ttScroll').innerHTML = `<div class="empty"><p>No working hours set for this week. Add hours to at least one day under Your capacity.</p></div>`;
+  } else {
+    const all = days.flatMap(d => d.blocks);
+    const startH = Math.floor(Math.min(plan.dStart, ...all.map(b => b.start)));
+    const endH = Math.ceil(Math.max(plan.dEnd, ...all.map(b => b.start + b.h)));
+    const hours = Math.max(1, endH - startH);
+    const pph = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pph')) || 54;
+    const height = hours * pph;
+    const y = h => (h - startH) * pph;
     let g = `<div class="tt-corner"></div>`;
     g += days.map(d => {
-      const isToday = +d.date === +t0;
-      const dues = dueByDay[iso(d.date)] || [];
-      return `<div class="tt-dayhead${isToday ? ' today' : ''}"><span class="d">${isToday ? 'Today, ' : ''}${fmtDay(d.date)}</span>
-        <span class="load"><span class="meter" aria-hidden="true"><i style="width:${d.cap ? Math.min(100, d.used / d.cap * 100) : 0}%"></i></span>${fmtH(d.used)} of ${fmtH(d.cap)}</span>
-        ${dues.length ? `<span class="dues">${dues.map(r => `<span class="chip" style="border-color:${TIER_VAR(r._tier)};color:${TIER_VAR(r._tier)}" title="${esc(r.title)}">Due: ${esc(r.title.length > 18 ? r.title.slice(0, 17) + '…' : r.title)}</span>`).join('')}</span>` : ''}</div>`;
+      const isToday = +d.date === t0;
+      const free = Math.max(0, d.capEff - d.used);
+      let load;
+      if (d.off) load = `<span class="dh-load">${esc(d.offTitle || 'Out of office')}</span>`;
+      else if (d.cap <= 0) load = `<span class="dh-load">Not a working day</span>`;
+      else if (d.past) load = `<span class="dh-load">Done</span>`;
+      else load = `<span class="dh-load"><b>${fmtDur(d.meetH)}</b> meetings, <b>${fmtH(d.used)}</b> planned${free >= 0.5 ? `, ${fmtH(free)} free` : ''}${d.clash ? `<br><span class="warn">A meeting overlaps your time</span>` : ''}</span>`;
+      return `<div class="tt-dayhead${isToday ? ' today' : ''}"><span class="dh-top"><span class="dh-num">${d.date.getDate()}</span><span class="dh-name">${d.date.toLocaleDateString('en-GB', { weekday: 'short' })}</span>${isToday ? '<span class="dh-tag">Today</span>' : ''}</span>${load}</div>`;
     }).join('');
-    g += `<div class="tt-gutter" style="height:${height}px">${Array.from({ length: hours + 1 }, (_, i) => `<span style="top:${i / hours * 100}%">${clock(startH + i)}</span>`).join('')}</div>`;
-    g += days.map(d => `<div class="tt-col" style="height:${height}px">${d.blocks.map(b => {
-      const top = (b.start - startH) / hours * height, h = b.h / hours * height - 3;
-      if (b.mine) return `<div class="blk mine${h < 44 ? ' short' : ''}" style="top:${top}px;height:${h}px" aria-label="Your time, ${clock(b.start)} to ${clock(b.start + b.h)}"><span class="bt">Your time</span><span class="bm">${clock(b.start)}–${clock(b.start + b.h)}</span></div>`;
-      const r = b.r;
-      return `<button type="button" class="blk${h < 30 ? ' tiny' : h < 44 ? ' short' : ''}" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)};top:${top}px;height:${h}px" title="${esc(r.title)}, ${clock(b.start)} to ${clock(b.start + b.h)}">
-        <span class="bt">${esc(r.title)}</span><span class="bm"><b>${r._tier}</b><span class="t">${clock(b.start)}–${clock(b.start + b.h)}</span></span></button>`;
-    }).join('')}</div>`).join('');
-    return `<section class="week" aria-label="${esc(title)}"><div class="week-head"><h2>${title}</h2><span class="small muted">${fmtH(used)} planned of ${fmtH(cap)} available</span></div>
-      <div class="timetable-scroll"><div class="timetable" style="--cols:${days.length}">${g}</div></div></section>`;
-  }).join('') || `<div class="panel empty"><p>No working hours set. Add hours to at least one day under Your capacity to build a plan.</p></div>`;
+    g += `<div class="tt-gutter" style="height:${height}px">${Array.from({ length: hours + 1 }, (_, i) => `<span style="top:${i * pph}px">${clock(startH + i)}</span>`).join('')}</div>`;
+    g += days.map(d => {
+      const isToday = +d.date === t0;
+      const off = [];
+      if (plan.dStart > startH) off.push(`<div class="offhours" style="top:0;height:${y(plan.dStart)}px"></div>`);
+      if (plan.dEnd < endH) off.push(`<div class="offhours" style="top:${y(plan.dEnd)}px;bottom:0"></div>`);
+      const seq = {};
+      const blocks = d.blocks.slice().sort((a, b) => a.start - b.start).map(b => {
+        const top = y(b.start) + 1, h = Math.max(14, b.h * pph - 3);
+        const size = h < 30 ? ' tiny' : h < 46 ? ' short' : '';
+        const range = `${clock(b.start)}–${clock(b.start + b.h)}`;
+        if (b.mine) return `<div class="blk mine${size}" data-key="${d.key}|mine" style="top:${top}px;height:${h}px" aria-label="Your time, ${range}"><span class="bt">Your time</span><span class="bm"><span class="t">${range}</span></span></div>`;
+        if (b.meet) { const k = `${d.key}|m|${b.m.t}|${b.m.s}`; return `<div class="blk meet${size}" data-key="${esc(k)}" style="top:${top}px;height:${h}px" title="${esc(b.m.t)}, ${range}${b.m.tentative ? ' (tentative)' : ''}"><span class="bt">${b.m.teams ? MEET_ICON : ''}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.m.t)}</span></span><span class="bm"><span class="t">${range}${b.m.tentative ? ', tentative' : ''}</span></span></div>`; }
+        const r = b.r; const n = (seq[r.id] = (seq[r.id] || 0) + 1);
+        return `<button type="button" class="blk${size}" data-key="${d.key}|${r.id}|${n}" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)};top:${top}px;height:${h}px" title="${esc(r.title)}, ${range}">
+          <span class="bt">${esc(r.title)}</span><span class="bm"><b>${r._tier}</b><span class="t">${range}</span></span></button>`;
+      }).join('');
+      const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
+      const nowLine = isToday && nowH >= startH && nowH <= endH ? `<div class="now-line" id="nowLine" style="top:${y(nowH)}px" aria-hidden="true"></div>` : '';
+      return `<div class="tt-col${isToday ? ' today' : ''}${d.off ? ' ooo' : ''}" style="height:${height}px">${off.join('')}${d.off ? `<span class="ooo-label">${esc(d.offTitle || 'Out of office')}</span>` : ''}${blocks}${nowLine}</div>`;
+    }).join('');
+    $('#ttScroll').innerHTML = `<div class="timetable" style="--cols:${days.length}">${g}</div>`;
+    S.ui.ttRange = { startH, pph };
+
+    // Motion
+    if (!reduceMotion()) {
+      if (opts.slide) {
+        const dir = opts.dir || 1;
+        $('#ttScroll .timetable').animate([{ opacity: 0, transform: `translateX(${dir * 28}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+        $$('#ttScroll .tt-col').forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 40 + i * 45, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' }));
+      } else if (opts.flip) {
+        $$('#ttScroll [data-key]').forEach(el => {
+          const was = prev[el.dataset.key]; const now = el.getBoundingClientRect();
+          if (was) { const dx = was.left - now.left, dy = was.top - now.top; if (Math.abs(dx) > 1 || Math.abs(dy) > 1) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }); }
+          else el.animate([{ opacity: 0, transform: 'scale(0.96)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+        });
+      }
+    } else if (opts.slide) {
+      $('#ttScroll .timetable').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease' });
+    }
+  }
+
+  // Needs a decision
+  const att = S.requests.filter(r => plan.byId[r.id] && plan.byId[r.id].rag !== 'green').sort((a, b) => (plan.byId[a.id].rag === 'red' ? 0 : 1) - (plan.byId[b.id].rag === 'red' ? 0 : 1));
+  const heavy = plan.days.filter(d => !d.past && !d.off && d.cap > 0 && d.meetH >= 5).slice(0, 4);
+  const clashes = plan.days.filter(d => !d.past && d.clash).slice(0, 3);
+  $('#attCount').textContent = (att.length + heavy.length + clashes.length) || '';
+  let ah = att.map(r => { const p = plan.byId[r.id]; return `<button type="button" class="att-row" data-open="${esc(r.id)}">
+      ${pillHtml(r)}<span style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc(p.note)}</span></span>
+      <span class="rag ${p.rag}">${p.rag === 'red' ? 'Off track' : 'Tight'}</span></button>`; }).join('');
+  ah += heavy.map(d => `<div class="att-day"><span class="when">${fmtShort(d.date)}</span><span class="small"><b>${fmtH(d.meetH)} of meetings</b> <span class="muted">leaves ${fmtH(d.capEff)} for change work. Decline one or move it to protect the day.</span></span></div>`).join('');
+  ah += clashes.map(d => `<div class="att-day"><span class="when">${fmtShort(d.date)}</span><span class="small"><b>A meeting overlaps your time</b> <span class="muted">${esc(d.meets.find(m => m.s < hm(st.mineStart) + (+st.mineHours || 0) && m.e > hm(st.mineStart))?.t || '')}. Move it if you can.</span></span></div>`).join('');
+  $('#attention').innerHTML = ah ? ah + `<p class="small muted" style="padding:10px 16px 14px">To fix a request: decline it, put it on hold, agree a later date, or give yourself more hours under Your capacity.</p>`
+    : `<p class="mod-empty">Everything open finishes before its delivery date, and your own time is clear.</p>`;
+
+  renderCalMod();
+  placeNowLine();
+}
+function placeNowLine() {
+  const el = $('#nowLine'); if (!el || !S.ui.ttRange) return;
+  const n = new Date(); el.style.top = ((n.getHours() + n.getMinutes() / 60 - S.ui.ttRange.startH) * S.ui.ttRange.pph) + 'px';
+}
+setInterval(placeNowLine, 60000);
+function renderCalMod() {
+  const c = S.cal;
+  if (c && c.events) {
+    const t0 = iso(today()); const hz = iso(addDays(mondayOf(today()), S.settings.weeks * 7)); const upcoming = c.events.filter(e => !e.allDay && e.d >= t0 && e.d < hz);
+    const hrs = upcoming.reduce((a, e) => a + (e.e - e.s), 0); const teams = upcoming.filter(e => e.teams).length;
+    $('#calMod').innerHTML = `<div class="mod-head"><h2>Outlook and Teams</h2><span class="small" style="color:var(--ok);font-weight:600">Connected</span></div>
+      <div class="cal-status"><p><b>${upcoming.length} meetings</b> in the next ${S.settings.weeks} weeks, ${fmtH(hrs)} in total${teams ? `, ${teams} on Teams` : ''}. From ${esc(c.file || 'your calendar file')}, added ${esc(c.importedAt ? fmtDay(new Date(c.importedAt)) : '')}.</p>
+      <p>Your calendar changes during the week, so add a fresh file when it does. The new file replaces this one.</p>
+      <div class="toolbar"><button class="btn" type="button" data-cal-open>Update meetings</button><span id="calRm"><button class="btn btn-quiet" type="button" data-cal-rm>Remove</button></span></div></div>`;
+  } else {
+    $('#calMod').innerHTML = `<div class="mod-head"><h2>Outlook and Teams</h2><span class="small muted">Not connected</span></div>
+      <div class="cal-status"><p>Bring in your Teams meetings and the plan only puts change work in the gaps between them. Out-of-office days are left free.</p>
+      <div class="toolbar"><button class="btn btn-primary" type="button" data-cal-open>Add Teams meetings</button></div></div>`;
+  }
+}
+
+/* Calendar import dialog */
+const calImp = { text: null, file: '', events: null, err: '', tab: 'web' };
+function openCal() { calImp.text = null; calImp.events = null; calImp.err = ''; renderCalDlg(); const d = $('#calDlg'); if (!d.open) d.showModal(); }
+function renderCalDlg() {
+  const body = $('#calBody'), foot = $('#calFoot');
+  const steps = {
+    web: `<ol class="cal-steps"><li>In Outlook on the web or the new Outlook, open Settings, then Calendar, then Shared calendars.</li><li>Under Publish a calendar, pick your calendar, choose “Can view titles and locations”, then Publish.</li><li>Open the ICS link it shows. Your browser downloads a .ics file.</li><li>Drop that file below.</li></ol><p class="note">Anyone with that link can see your meeting titles. You can unpublish it from the same screen once you’ve downloaded the file.</p>`,
+    desktop: `<ol class="cal-steps"><li>In classic Outlook for Windows, open your calendar.</li><li>Choose File, then Save Calendar.</li><li>Select More Options, set the date range to cover the next eight weeks, and keep detail at “Limited details”.</li><li>Save, then drop the .ics file below.</li></ol>`,
+    mac: `<ol class="cal-steps"><li>In Outlook for Mac, open your calendar and switch to list view.</li><li>Select the meetings for the coming weeks and drag them onto your desktop. Each becomes a .ics file.</li><li>Or use Outlook on the web, which exports the whole calendar at once.</li></ol>`,
+  };
+  let h = `<div class="cal-tabs" role="tablist" aria-label="Your version of Outlook">
+      ${[['web', 'Outlook on the web'], ['desktop', 'Outlook for Windows'], ['mac', 'Outlook for Mac']].map(([k, l]) => `<button type="button" role="tab" data-cal-tab="${k}" aria-selected="${calImp.tab === k}">${l}</button>`).join('')}</div>
+    <div id="calSteps">${steps[calImp.tab]}</div>`;
+  if (calImp.events) {
+    const t0 = iso(today()); const hz = iso(addDays(mondayOf(today()), S.settings.weeks * 7)); const up = calImp.events.filter(e => !e.allDay && e.d >= t0 && e.d < hz);
+    const teams = up.filter(e => e.teams).length, offs = new Set(calImp.events.filter(e => e.allDay && e.off && e.d >= t0 && e.d < hz).map(e => e.d)).size;
+    h += `<div class="cal-found"><b>${up.length} meeting${up.length === 1 ? '' : 's'} in the next ${S.settings.weeks} weeks</b><span class="small">${teams ? `${teams} are Teams calls. ` : ''}${fmtH(up.reduce((a, e) => a + e.e - e.s, 0))} in total, from ${esc(calImp.file)}.${offs ? ` ${offs} day${offs === 1 ? '' : 's'} out of office.` : ''}</span></div>`;
+  } else {
+    h += `<label class="drop" id="calDrop" for="calFile">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="24" height="22" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 12.5h24M10.5 3v6M21.5 3v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <b>Drop your .ics file here, or choose it</b><p>Only meeting times and titles are used. Free and cancelled meetings are skipped.</p><span class="btn">Choose file</span>
+      <input id="calFile" type="file" accept=".ics,text/calendar" class="sr" multiple></label>`;
+  }
+  if (calImp.err) h += `<p class="error">${esc(calImp.err)}</p>`;
+  body.innerHTML = h;
+  foot.innerHTML = calImp.events
+    ? `<button class="btn btn-quiet" type="button" data-cal-again>Choose another file</button><span class="toolbar"><button class="btn" type="button" data-close>Cancel</button><button class="btn btn-primary" type="button" data-cal-use>Use these meetings</button></span>`
+    : `<span></span><button class="btn" type="button" data-close>Cancel</button>`;
+}
+async function readCal(files) {
+  try {
+    const from = mondayOf(today()), to = addDays(from, 8 * 7 + 1);
+    let events = []; const names = [];
+    for (const f of files) { const text = await f.text(); if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error(`${f.name} isn’t a calendar file. Export it again as .ics.`); events = events.concat(expandICS(text, from, to)); names.push(f.name); }
+    const seen = new Set(); events = events.filter(e => { const k = `${e.d}|${e.s}|${e.e}|${e.t}|${e.allDay}`; if (seen.has(k)) return false; seen.add(k); return true; });
+    calImp.events = events; calImp.file = names.length > 1 ? `${names.length} files` : names[0]; calImp.err = '';
+    if (!events.length) { calImp.events = null; calImp.err = `No meetings found in the next eight weeks in ${names.join(', ')}. Check the export covered upcoming dates.`; }
+  } catch (e) { calImp.events = null; calImp.err = e.message || 'Couldn’t read that file. Export it again as .ics and retry.'; }
+  renderCalDlg();
+}
+function useCal() {
+  S.cal = { events: calImp.events.map(e => { const o = { ...e }; delete o.example; return o; }), file: calImp.file, importedAt: Date.now() };
+  $('#calDlg').close();
+  computeAll(); renderQueue(); renderPlan({ flip: true });
+  Store.saveCalendar();
+  const hz = iso(addDays(mondayOf(today()), S.settings.weeks * 7)), t0 = iso(today());
+  toast(`Added ${S.cal.events.filter(e => !e.allDay && e.d >= t0 && e.d < hz).length} meetings. Your plan now works around them.`);
 }
 
 /* ---------- Rendering: Scoring ---------- */
@@ -1173,7 +1583,7 @@ function renderScoring() {
   $('#storeMode').textContent = Store.mode === 'db' ? 'Saved to your account, private to you' : Store.mode === 'local' ? 'Saved in this browser only' : 'Not saved: storage is blocked here';
 }
 
-function renderAll() { computeAll(); renderQueue(); renderPlan(); $('#demoChip').hidden = !S.examples; }
+function renderAll(opts) { computeAll(); renderQueue(); renderPlan(opts || { flip: true }); $('#demoChip').hidden = !S.examples; }
 
 /* ---------- Detail sheet ---------- */
 let openId = null;
@@ -1367,6 +1777,7 @@ function route() {
   for (const x of VIEWS) $('#view-' + x).hidden = x !== v;
   $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.view === v ? 'page' : 'false'));
   if (v === 'scoring') renderScoring();
+  if (v === 'plan') { renderPlan(); }
 }
 
 /* ---------- Toast ---------- */
@@ -1385,6 +1796,22 @@ document.addEventListener('click', e => {
   if (t.id === 'importBtn' || t.dataset.action === 'import') { openImport(); return; }
   if (t.id === 'addBtn' || t.dataset.action === 'add') { addRequest(); return; }
   if (t.id === 'demoChip') { openImport(); return; }
+  if (t.id === 'calBtn' || t.matches('[data-cal-open]')) { openCal(); return; }
+  if (t.matches('[data-cal-tab]')) { calImp.tab = t.dataset.calTab; renderCalDlg(); return; }
+  if (t.matches('[data-cal-again]')) { calImp.events = null; calImp.err = ''; renderCalDlg(); return; }
+  if (t.matches('[data-cal-use]')) { useCal(); return; }
+  if (t.matches('[data-cal-rm]')) { $('#calRm').innerHTML = `<span class="small">Remove your meetings from the plan?</span> <button class="btn btn-danger" type="button" data-cal-rm-yes>Remove</button> <button class="btn btn-quiet" type="button" data-cal-rm-no>Keep</button>`; return; }
+  if (t.matches('[data-cal-rm-no]')) { renderCalMod(); return; }
+  if (t.matches('[data-cal-rm-yes]')) { S.cal = null; Store.saveCalendar(); computeAll(); renderQueue(); renderPlan({ flip: true }); toast('Meetings removed from the plan'); return; }
+  if (t.matches('[data-week]') || t.matches('[data-week-step]') || t.matches('[data-week-today]')) {
+    const n = weeksOf(S.plan).length; const old = S.ui.week || 0;
+    const next = t.matches('[data-week]') ? +t.dataset.week : t.matches('[data-week-today]') ? 0 : clamp(old + +t.dataset.weekStep, 0, n - 1);
+    if (next === old) return;
+    S.ui.week = next;
+    const keyboard = e.detail === 0; // keyboard-triggered changes switch instantly
+    renderPlan(keyboard ? {} : { slide: true, dir: next > old ? 1 : -1 });
+    return;
+  }
   if (t.dataset.action === 'clear-filters') { S.filter.band = 'all'; S.filter.q = ''; S.filter.status = 'open'; $('#search').value = ''; $('#statusFilter').value = 'open'; renderQueue(true); return; }
   if (t.matches('[data-band]')) { const k = t.dataset.band; if (S.filter.band === k) return; S.filter.band = k; if (k !== 'all') S.ui.open[k] = true; renderQueue(true); return; }
   if (t.matches('[data-close]')) { t.closest('dialog').close(); return; }
@@ -1442,11 +1869,13 @@ $('#importDlg').addEventListener('change', e => {
 });
 ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => {
   if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+  if ($('#calDlg').open) return;
   e.preventDefault(); if (!$('#importDlg').open) openImport(); $('#drop')?.classList.add('over');
 }));
 document.addEventListener('dragleave', e => { if (e.target.id === 'drop') e.target.classList.remove('over'); });
 document.addEventListener('drop', e => {
-  if (!e.dataTransfer?.files?.length) return; e.preventDefault(); $('#drop')?.classList.remove('over');
+  if (!e.dataTransfer?.files?.length || $('#calDlg').open) return; e.preventDefault(); $('#drop')?.classList.remove('over');
+  if (/\.ics$/i.test(e.dataTransfer.files[0].name)) { if ($('#importDlg').open) $('#importDlg').close(); openCal(); readCal(Array.from(e.dataTransfer.files)); return; }
   if (!$('#importDlg').open) openImport(); readFile(e.dataTransfer.files[0]);
 });
 $('#search').addEventListener('input', e => { S.filter.q = e.target.value; renderQueue(); });
@@ -1455,10 +1884,11 @@ $('#view-plan').addEventListener('change', e => {
   const el = e.target; const st = S.settings;
   if (el.dataset.cap != null) st.dayHours[+el.dataset.cap] = clamp(+el.value || 0, 0, 12);
   else if (el.id === 'dayStart') st.dayStart = el.value || '09:00';
+  else if (el.id === 'dayEnd') st.dayEnd = el.value || '17:30';
   else if (el.id === 'mineStart') st.mineStart = el.value || '12:30';
   else if (el.id === 'mineHours') st.mineHours = clamp(+el.value || 0, 0, 4);
   else if (el.id === 'maxBlock') st.maxBlock = clamp(+el.value || 3, 0.5, 8);
-  else if (el.id === 'weeks') st.weeks = +el.value;
+  else if (el.id === 'weeks') { st.weeks = +el.value; S.ui.week = Math.min(S.ui.week || 0, st.weeks - 1); }
   else return;
   renderAll(); Store.saveSettings();
 });
@@ -1472,6 +1902,11 @@ $('#view-scoring').addEventListener('input', e => {
   renderAll(); Store.saveSettings();
 });
 window.addEventListener('hashchange', () => { route(); if (location.hash === '#queue' || !location.hash) placeIndicator(false); });
+window.addEventListener('resize', () => { if (!$('#view-plan').hidden) slideIndicator($('#weekTrack'), $('#weekInd'), $(`#weekTrack [data-week="${S.ui.week}"]`), false); });
+$('#calDlg').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$('#calDlg').addEventListener('change', e => { if (e.target.id === 'calFile' && e.target.files.length) readCal(Array.from(e.target.files)); });
+$('#calDlg').addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); $('#calDrop')?.classList.add('over'); });
+$('#calDlg').addEventListener('drop', e => { e.preventDefault(); e.stopPropagation(); $('#calDrop')?.classList.remove('over'); if (e.dataTransfer?.files?.length) readCal(Array.from(e.dataTransfer.files)); });
 document.addEventListener('toggle', e => { const t = e.target.dataset && e.target.dataset.bandMod; if (t) S.ui.open[t] = e.target.open; }, true);
 
 /* ---------- Boot ---------- */
@@ -1491,6 +1926,7 @@ renderCapacity(); renderAll(); route();
   try {
     const data = await Store.load();
     applySettings(data.settings);
+    if (data.calendar && Array.isArray(data.calendar.events)) S.cal = data.calendar;
     if (data.requests && data.requests.length) { S.requests = data.requests.map(normalise); S.examples = false; }
   } catch (e) { toast('Couldn’t load your saved requests. Showing examples for now.'); }
   renderCapacity(); renderAll(); route();
