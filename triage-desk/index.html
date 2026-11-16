@@ -1,0 +1,1336 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Triage Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* Layout: teal shell rail on top; Queue = ranked list + value/effort matrix; Week plan = timetable columns (morning = high priority, your time, afternoon = lighter work). */
+:root {
+  --ground: #F1F4F2;
+  --surface: #FFFFFF;
+  --surface-2: #E6ECE9;
+  --ink: #13211F;
+  --ink-2: #51625E;
+  --line: #D3DCD8;
+  --shell: #0F3B3A;
+  --shell-2: #174A48;
+  --shell-ink: #E6F0EC;
+  --shell-ink-2: #A9C3BC;
+  --signal: #F2C230;
+  --signal-ink: #1C1A0E;
+  --p1: #C4372B;
+  --p2: #B9740A;
+  --p3: #2A7489;
+  --p4: #74827F;
+  --ok: #2C7D45;
+  --focus: #1F6FD1;
+  --font: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --t-xs: .75rem; --t-sm: .8125rem; --t-base: .9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem; --t-xl: 1.625rem;
+  --r-sm: 6px; --r-md: 10px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --pph: 46px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
+  --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
+  --signal: #F2C230; --signal-ink: #1C1A0E;
+  --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --ground: #0D1716; --surface: #13201F; --surface-2: #1A2B29; --ink: #E3ECE9; --ink-2: #9AAFAA; --line: #263A37;
+  --shell: #0A2827; --shell-2: #123735; --shell-ink: #E3EEEA; --shell-ink-2: #93B0A8;
+  --signal: #F2C230; --signal-ink: #1C1A0E;
+  --p1: #EE6B5D; --p2: #E3A13E; --p3: #5BB2C7; --p4: #93A19E; --ok: #5DBB7A; --focus: #7FB2FF;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font); font-size: var(--t-base); line-height: 1.45; font-variant-numeric: tabular-nums; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--shell); }
+::selection { background: color-mix(in srgb, var(--signal) 55%, transparent); color: var(--ink); }
+input, select, textarea, button { font: inherit; color: inherit; caret-color: var(--focus); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+* { scrollbar-color: color-mix(in srgb, var(--ink-2) 45%, transparent) transparent; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Shell */
+.shell { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--shell); color: var(--shell-ink); }
+.shell .wrap { display: flex; align-items: center; gap: 20px; min-height: 60px; flex-wrap: wrap; padding-block: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: var(--t-md); letter-spacing: -0.01em; white-space: nowrap; }
+.brand svg { display: block; }
+.tabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+.tab { color: var(--shell-ink-2); text-decoration: none; padding: 8px 12px; border-radius: var(--r-sm); font-weight: 500; white-space: nowrap; position: relative; transition: color .15s ease, background-color .15s ease; }
+.tab[aria-current="page"] { color: var(--shell-ink); }
+.tab[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 2px; background: var(--signal); }
+@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--shell-ink); background: var(--shell-2); } }
+.shell-actions { display: flex; gap: 8px; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: var(--t-sm); cursor: pointer; text-decoration: none; transition: transform .12s var(--ease-out), background-color .15s ease, border-color .15s ease; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--signal); color: var(--signal-ink); border-color: var(--signal); }
+.btn-ghost-dark { background: transparent; color: var(--shell-ink); border-color: color-mix(in srgb, var(--shell-ink) 30%, transparent); }
+.btn-danger { color: var(--p1); }
+.btn-quiet { background: transparent; border-color: transparent; color: var(--ink-2); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { border-color: var(--ink-2); }
+  .btn-primary:hover { background: color-mix(in srgb, var(--signal) 88%, white); border-color: var(--signal); }
+  .btn-ghost-dark:hover { background: var(--shell-2); border-color: color-mix(in srgb, var(--shell-ink) 50%, transparent); }
+  .btn-quiet:hover { background: var(--surface-2); border-color: transparent; color: var(--ink); }
+}
+.btn svg { flex: none; }
+
+main { padding-block: 24px 64px; }
+.view { display: grid; gap: 20px; }
+.view-head { display: flex; align-items: end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
+.view-head h1 { font-size: var(--t-xl); font-weight: 700; }
+.view-head p { color: var(--ink-2); max-width: 62ch; margin-top: 4px; }
+
+.notice { display: flex; gap: 12px 16px; align-items: center; flex-wrap: wrap; justify-content: space-between; background: color-mix(in srgb, var(--signal) 22%, var(--surface)); border: 1px solid color-mix(in srgb, var(--signal) 60%, var(--line)); border-radius: var(--r-md); padding: 12px 16px; }
+.notice p { max-width: 70ch; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.panel-head h2 { font-size: var(--t-md); font-weight: 600; }
+.muted { color: var(--ink-2); }
+.small { font-size: var(--t-sm); }
+
+/* Tier distribution bar (also the filter) */
+.dist { display: grid; gap: 10px; }
+.dist-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--surface-2); gap: 2px; }
+.dist-bar span { display: block; height: 100%; transition: flex-grow .25s var(--ease-out); }
+.tier-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.tier-filter { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; text-align: left; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); cursor: pointer; transition: border-color .15s ease, background-color .15s ease, transform .12s var(--ease-out); }
+.tier-filter:active { transform: scale(0.98); }
+.tier-filter .code { grid-row: span 2; align-self: center; font-weight: 700; font-size: var(--t-lg); color: var(--tier); }
+.tier-filter .name { font-weight: 600; font-size: var(--t-sm); }
+.tier-filter .meta { font-size: var(--t-xs); color: var(--ink-2); }
+.tier-filter[aria-pressed="true"] { border-color: var(--tier); background: color-mix(in srgb, var(--tier) 9%, var(--surface)); }
+@media (hover: hover) and (pointer: fine) { .tier-filter:hover { border-color: var(--tier); } }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 28px; font-size: var(--t-sm); color: var(--ink-2); }
+.facts b { color: var(--ink); font-weight: 600; }
+.facts .warn b { color: var(--p1); }
+
+/* Queue layout */
+.queue-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.field-inline { min-height: 38px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 0 10px; }
+.search { flex: 1 1 200px; min-width: 0; }
+
+.rows { display: grid; }
+.row-head, .row { display: grid; grid-template-columns: 40px 64px minmax(0, 1fr) 92px 112px 64px 100px; gap: 12px; align-items: center; padding: 10px 16px; }
+.row-head { font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--line); letter-spacing: .01em; }
+.row { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; transition: background-color .15s ease; }
+.row:last-child { border-bottom: 0; border-radius: 0 0 var(--r-md) var(--r-md); }
+@media (hover: hover) and (pointer: fine) { .row:hover { background: var(--surface-2); } }
+.rank { font-weight: 600; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 12px; font-size: var(--t-xs); font-weight: 700; color: var(--tier); background: color-mix(in srgb, var(--tier) 14%, var(--surface)); white-space: nowrap; }
+.pill.pinned::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.req-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.req-sub { font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
+.chip { display: inline-block; font-size: var(--t-xs); font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.chip.flag-info { border-color: color-mix(in srgb, var(--p2) 50%, var(--line)); color: var(--p2); }
+.chip.flag-must { border-color: color-mix(in srgb, var(--p1) 45%, var(--line)); color: var(--p1); }
+.score { display: grid; gap: 4px; }
+.score b { font-size: var(--t-sm); }
+.meter { height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--tier); border-radius: 2px; }
+.due { font-size: var(--t-sm); }
+.due.late { color: var(--p1); font-weight: 600; }
+.due.soon { color: var(--p2); font-weight: 600; }
+.status { font-size: var(--t-sm); color: var(--ink-2); }
+.empty { padding: 40px 20px; text-align: center; display: grid; gap: 12px; justify-items: center; }
+.empty p { max-width: 46ch; color: var(--ink-2); }
+
+/* Matrix */
+.matrix svg { display: block; width: 100%; height: auto; }
+.matrix .dot { cursor: pointer; transition: r .15s var(--ease-out); }
+.matrix .dot:focus-visible { outline: none; stroke: var(--focus); stroke-width: 3; }
+@media (hover: hover) and (pointer: fine) { .matrix .dot:hover { r: 8; } }
+.matrix-note { padding: 0 16px 16px; font-size: var(--t-sm); color: var(--ink-2); }
+
+/* Week plan */
+.capacity { padding: 16px; display: grid; gap: 16px; }
+.cap-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.cap-days label, .cap-grid label { display: grid; gap: 4px; font-size: var(--t-xs); font-weight: 600; color: var(--ink-2); }
+.cap-days input, .cap-grid input, .cap-grid select { min-height: 36px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 0 8px; width: 100%; color: var(--ink); font-weight: 500; font-size: var(--t-sm); }
+.cap-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.cap-grid input[type="range"] { padding: 0; accent-color: var(--shell); min-height: 36px; }
+.split-out { color: var(--ink); font-weight: 600; }
+details.panel > summary { list-style: none; cursor: pointer; }
+details.panel > summary::-webkit-details-marker { display: none; }
+details.panel > summary .chev { transition: transform .2s var(--ease-out); }
+details.panel[open] > summary .chev { transform: rotate(180deg); }
+
+.attention { display: grid; }
+.att-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); width: 100%; text-align: left; background: transparent; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; }
+.att-row:last-child { border-bottom: 0; }
+@media (hover: hover) and (pointer: fine) { .att-row:hover { background: var(--surface-2); } }
+.rag { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); font-weight: 700; white-space: nowrap; }
+.rag::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.rag.red { color: var(--p1); } .rag.amber { color: var(--p2); } .rag.green { color: var(--ok); }
+
+.week { display: grid; gap: 10px; }
+.week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.week-head h2 { font-size: var(--t-lg); font-weight: 700; }
+.timetable-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+.timetable { display: grid; grid-template-columns: 56px repeat(var(--cols), minmax(150px, 1fr)); min-width: calc(56px + var(--cols) * 150px); }
+.tt-corner, .tt-dayhead { border-bottom: 1px solid var(--line); padding: 10px; position: sticky; top: 0; background: var(--surface); }
+.tt-dayhead { border-left: 1px solid var(--line); display: grid; gap: 4px; }
+.tt-dayhead .d { font-weight: 700; }
+.tt-dayhead .load { display: flex; align-items: center; gap: 8px; font-size: var(--t-xs); color: var(--ink-2); }
+.tt-dayhead .load .meter { flex: 1; }
+.tt-dayhead .load .meter i { background: var(--shell); }
+.tt-dayhead.today .d { color: var(--p3); }
+.tt-dayhead .dues { display: flex; gap: 4px; flex-wrap: wrap; }
+.tt-gutter { position: relative; }
+.tt-gutter span { position: absolute; right: 8px; transform: translateY(-50%); font-size: var(--t-xs); color: var(--ink-2); }
+.tt-gutter span:first-child { transform: none; }
+.tt-col { position: relative; border-left: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--pph) - 1px), color-mix(in srgb, var(--line) 70%, transparent) calc(var(--pph) - 1px), color-mix(in srgb, var(--line) 70%, transparent) var(--pph)); }
+.tt-col.off { background: var(--surface-2); }
+.blk { position: absolute; left: 6px; right: 6px; border-radius: var(--r-sm); padding: 5px 8px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--tier) 35%, transparent); background: color-mix(in srgb, var(--tier) 13%, var(--surface)); text-align: left; cursor: pointer; display: grid; align-content: start; gap: 1px; transition: background-color .15s ease, transform .12s var(--ease-out); }
+.blk:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) { .blk:hover { background: color-mix(in srgb, var(--tier) 22%, var(--surface)); } }
+.blk .bt { font-weight: 600; font-size: var(--t-sm); line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.blk .bm { font-size: var(--t-xs); color: var(--ink-2); display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.blk .bm b { color: var(--tier); }
+.blk.short .bt { -webkit-line-clamp: 1; }
+.blk.tiny { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 8px; gap: 6px; }
+.blk.tiny .bt { display: block; white-space: nowrap; text-overflow: ellipsis; font-size: var(--t-xs); }
+.blk.tiny .bm .t { display: none; }
+.blk.mine { --tier: var(--ink-2); cursor: default; border-style: dashed; border-color: color-mix(in srgb, var(--ink-2) 50%, transparent); background: repeating-linear-gradient(135deg, var(--surface) 0 7px, var(--surface-2) 7px 14px); }
+.blk.mine .bt { color: var(--ink); }
+.legend { display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: var(--t-sm); color: var(--ink-2); align-items: center; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: color-mix(in srgb, var(--tier) 30%, var(--surface)); border: 1px solid var(--tier); }
+
+/* Scoring */
+.score-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.weights { padding: 8px 16px 16px; display: grid; }
+.weight { display: grid; grid-template-columns: minmax(0, 1fr) 160px 28px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.weight:last-child { border-bottom: 0; }
+.weight .wl b { display: block; font-weight: 600; }
+.weight .wl span { font-size: var(--t-sm); color: var(--ink-2); }
+.weight input { accent-color: var(--shell); width: 100%; }
+.weight output { font-weight: 700; text-align: right; }
+.thresholds { padding: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.thresholds label { display: grid; gap: 4px; font-size: var(--t-sm); font-weight: 600; }
+.thresholds input { min-height: 36px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 0 8px; }
+.prose { padding: 16px; display: grid; gap: 10px; max-width: 68ch; }
+.prose ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.data-actions { padding: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* Dialogs */
+dialog { border: 0; padding: 0; color: var(--ink); background: var(--surface); }
+dialog::backdrop { background: rgba(8, 20, 19, .45); }
+.sheet { margin: 0 0 0 auto; height: 100%; max-height: 100%; width: min(560px, 100%); border-left: 1px solid var(--line); box-shadow: -12px 0 40px rgba(8, 20, 19, .18); }
+.sheet[open] { transform: translateX(0); transition: transform .3s var(--ease-drawer); }
+@starting-style { .sheet[open] { transform: translateX(40px); opacity: 0; } }
+.sheet[open] { opacity: 1; transition: transform .3s var(--ease-drawer), opacity .2s ease; }
+.sheet-inner { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.sheet-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; padding: max(16px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 16px 20px; border-bottom: 1px solid var(--line); }
+.sheet-body { overflow-y: auto; padding: 20px max(20px, env(safe-area-inset-right, 0px)) 20px 20px; display: grid; gap: 20px; align-content: start; }
+.sheet-foot { display: flex; justify-content: space-between; gap: 8px; padding: 12px max(20px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) 20px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.big-score { display: flex; align-items: center; gap: 16px; }
+.big-score .n { font-size: 2.5rem; font-weight: 700; line-height: 1; color: var(--tier); letter-spacing: -0.03em; }
+.breakdown { display: grid; gap: 6px; }
+.bd { display: grid; grid-template-columns: 130px minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: var(--t-sm); }
+.bd .meter { height: 8px; border-radius: 4px; }
+.bd .meter i { background: var(--tier); }
+.bd span:last-child { text-align: right; font-weight: 600; }
+.form { display: grid; gap: 14px; }
+.form label, .form .lbl { display: grid; gap: 5px; font-size: var(--t-sm); font-weight: 600; }
+.form input[type="text"], .form input[type="date"], .form input[type="number"], .form select, .form textarea { min-height: 38px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 6px 10px; font-weight: 400; font-size: var(--t-base); width: 100%; }
+.form textarea { min-height: 80px; resize: vertical; }
+.form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form .hint { font-weight: 400; color: var(--ink-2); font-size: var(--t-xs); }
+.factor { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.seg button { width: 34px; height: 32px; border: 0; border-left: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; font-size: var(--t-sm); transition: background-color .12s ease; }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--shell); color: var(--shell-ink); }
+.seg button.unset { color: var(--ink-2); font-weight: 400; }
+.check { display: flex !important; grid-template-columns: none; align-items: center; gap: 10px !important; }
+.check input { width: 18px; height: 18px; accent-color: var(--shell); }
+.section-title { font-size: var(--t-sm); font-weight: 700; color: var(--ink-2); }
+.confirm-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.modal { width: min(760px, calc(100% - 32px)); max-height: calc(100% - 48px); border-radius: var(--r-md); box-shadow: 0 20px 60px rgba(8, 20, 19, .25); }
+.modal[open] { transition: transform .22s var(--ease-out), opacity .18s ease; }
+@starting-style { .modal[open] { transform: scale(0.97); opacity: 0; } }
+.modal-inner { display: grid; grid-template-rows: auto 1fr auto; max-height: calc(100vh - 48px); }
+.modal-body { overflow-y: auto; padding: 20px; display: grid; gap: 16px; }
+.drop { border: 2px dashed var(--line); border-radius: var(--r-md); padding: 32px 20px; text-align: center; display: grid; gap: 10px; justify-items: center; transition: border-color .15s ease, background-color .15s ease; }
+.drop.over { border-color: var(--p3); background: color-mix(in srgb, var(--p3) 8%, var(--surface)); }
+.drop p { color: var(--ink-2); max-width: 52ch; }
+.map-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); }
+.map { width: 100%; border-collapse: collapse; font-size: var(--t-sm); min-width: 520px; }
+.map th, .map td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.map th { font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; background: var(--surface-2); }
+.map tr:last-child td { border-bottom: 0; }
+.map select { min-height: 32px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); padding: 0 6px; width: 100%; }
+.map .sample { color: var(--ink-2); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.radio-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: var(--t-sm); }
+.radio-row label { display: flex; gap: 6px; align-items: center; }
+.radio-row input { accent-color: var(--shell); }
+.error { color: var(--p1); font-weight: 600; }
+
+.toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); opacity: 0; pointer-events: none; background: var(--shell); color: var(--shell-ink); padding: 10px 16px; border-radius: var(--r-md); font-weight: 600; font-size: var(--t-sm); box-shadow: 0 8px 24px rgba(8, 20, 19, .25); transition: transform .25s var(--ease-out), opacity .2s ease; z-index: 50; max-width: calc(100% - 32px); }
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 1080px) {
+  .queue-grid { grid-template-columns: minmax(0, 1fr); }
+  .score-layout { grid-template-columns: minmax(0, 1fr); }
+  .cap-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .row-head { display: none; }
+  .row { grid-template-columns: 30px 56px minmax(0, 1fr) auto; grid-template-areas: "rank tier title title" ". sub sub sub" ". score due hours"; row-gap: 6px; }
+  .row .c-rank { grid-area: rank; } .row .c-tier { grid-area: tier; } .row .c-title { grid-area: title; }
+  .row .c-score { grid-area: score; } .row .c-due { grid-area: due; } .row .c-hours { grid-area: hours; text-align: right; } .row .c-status { display: none; }
+  .row .c-title .req-sub { display: none; }
+  .row .c-sub { grid-area: sub; display: flex !important; }
+  .tier-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cap-days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .thresholds { grid-template-columns: 1fr; }
+  .weight { grid-template-columns: minmax(0, 1fr) 110px 24px; }
+  .form .two { grid-template-columns: 1fr; }
+  .bd { grid-template-columns: 110px minmax(0, 1fr) 36px; }
+  .shell-actions .btn span { display: none; }
+  .shell .wrap { gap: 10px 14px; }
+  .tabs { order: 3; flex-basis: 100%; }
+}
+.c-sub { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-property: opacity, background-color, border-color, color !important; }
+  .btn:active, .blk:active, .tier-filter:active { transform: none; }
+  @starting-style { .sheet[open], .modal[open] { transform: none; } }
+}
+</style>
+
+<header class="shell">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="2" y="3" width="18" height="4" rx="2" fill="var(--signal)"/><rect x="2" y="9" width="13" height="4" rx="2" fill="var(--signal)" opacity=".75"/><rect x="2" y="15" width="8" height="4" rx="2" fill="var(--signal)" opacity=".5"/></svg>
+      Triage Desk
+    </div>
+    <nav class="tabs" aria-label="Views">
+      <a class="tab" href="#queue" data-view="queue">Queue</a>
+      <a class="tab" href="#plan" data-view="plan">Week plan</a>
+      <a class="tab" href="#scoring" data-view="scoring">Scoring rules</a>
+    </nav>
+    <div class="shell-actions">
+      <button class="btn btn-ghost-dark" id="addBtn" type="button" aria-label="Add request">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Add request</span></button>
+      <button class="btn btn-primary" id="importBtn" type="button" aria-label="Import forms">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Import forms</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="exampleNotice" class="notice" hidden style="margin-bottom:20px">
+    <p><b>These are example requests.</b> Import the Excel or CSV export from your intake form to replace them with your own. Nothing here is saved until you do.</p>
+    <button class="btn btn-primary" type="button" data-action="import">Import forms</button>
+  </div>
+
+  <!-- QUEUE -->
+  <section class="view" id="view-queue" aria-labelledby="qTitle">
+    <div class="view-head">
+      <div>
+        <h1 id="qTitle">Change queue</h1>
+        <p>Every open request, ranked by score. Pick a priority band to filter the list.</p>
+      </div>
+    </div>
+    <div class="dist">
+      <div class="dist-bar" id="distBar" aria-hidden="true"></div>
+      <div class="tier-filters" id="tierFilters"></div>
+      <div class="facts" id="facts"></div>
+    </div>
+    <div class="queue-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="toolbar" style="flex:1">
+            <label class="sr" for="search">Search requests</label>
+            <input class="field-inline search" id="search" type="search" placeholder="Search title, requester or team">
+            <label class="sr" for="statusFilter">Status</label>
+            <select class="field-inline" id="statusFilter">
+              <option value="open">Open requests</option>
+              <option value="all">All requests</option>
+              <option value="new">New</option>
+              <option value="accepted">Accepted</option>
+              <option value="progress">In progress</option>
+              <option value="hold">On hold</option>
+              <option value="done">Done</option>
+              <option value="declined">Declined</option>
+            </select>
+          </div>
+        </div>
+        <div class="rows" id="rows" role="list"></div>
+      </div>
+      <div class="panel matrix">
+        <div class="panel-head"><h2>Value against effort</h2></div>
+        <div id="matrix"></div>
+        <p class="matrix-note">Top left is where quick wins sit. Bottom right is worth a second conversation with the requester.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="view-plan" hidden aria-labelledby="pTitle">
+    <div class="view-head">
+      <div>
+        <h1 id="pTitle">Week plan</h1>
+        <p>Your open requests spread across the coming weeks. High priority work fills the mornings, your own time is protected, and lower priority work keeps moving in the afternoons.</p>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <details class="panel" id="capPanel" open>
+      <summary class="panel-head"><h2>Your capacity</h2>
+        <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary>
+      <div class="capacity">
+        <div>
+          <p class="section-title" style="margin-bottom:8px">Hours for change requests each day</p>
+          <div class="cap-days" id="capDays"></div>
+        </div>
+        <div class="cap-grid">
+          <label for="dayStart">Day starts<input id="dayStart" type="time" step="900"></label>
+          <label for="mineStart">Your time starts<input id="mineStart" type="time" step="900"></label>
+          <label for="mineHours">Your time (hours)<input id="mineHours" type="number" min="0" max="4" step="0.5"></label>
+          <label for="maxBlock">Longest stretch on one request<input id="maxBlock" type="number" min="1" max="8" step="0.5"></label>
+          <label for="weeks">Plan ahead<select id="weeks"><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option></select></label>
+        </div>
+        <label class="cap-grid" style="grid-template-columns:minmax(0,1fr)" for="hiShare">
+          <span>Split between P1–P2 and P3–P4 work: <span class="split-out" id="splitOut"></span></span>
+          <input id="hiShare" type="range" min="50" max="90" step="5">
+        </label>
+      </div>
+    </details>
+
+    <div class="panel" id="attentionPanel">
+      <div class="panel-head"><h2>Needs a decision</h2><span class="small muted" id="attCount"></span></div>
+      <div class="attention" id="attention"></div>
+    </div>
+
+    <div id="weeksOut" class="view"></div>
+  </section>
+
+  <!-- SCORING -->
+  <section class="view" id="view-scoring" hidden aria-labelledby="sTitle">
+    <div class="view-head">
+      <div>
+        <h1 id="sTitle">Scoring rules</h1>
+        <p>Each request gets a score out of 100. Change the weights to match what your organisation values, and the queue and week plan update straight away.</p>
+      </div>
+      <button class="btn" type="button" id="resetWeights">Reset to defaults</button>
+    </div>
+    <div class="score-layout">
+      <div class="panel">
+        <div class="panel-head"><h2>What matters most</h2><span class="small muted">0 = ignore, 10 = counts most</span></div>
+        <div class="weights" id="weights"></div>
+      </div>
+      <div style="display:grid;gap:20px">
+        <div class="panel">
+          <div class="panel-head"><h2>Priority bands</h2></div>
+          <div class="thresholds" id="thresholds"></div>
+          <div class="prose small muted" style="padding-top:0">
+            <p>A score at or above a band's minimum lands in that band. Anything below P3 goes to P4 Backlog.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>How a score is worked out</h2></div>
+          <div class="prose">
+            <ol>
+              <li>Each factor is rated 1 to 5. Text answers like "High" or "Whole organisation" are converted for you.</li>
+              <li>Urgency uses whichever is higher: what the requester said, or how close the delivery date is (within a week counts as 5).</li>
+              <li>Effort is flipped into Ease, so quick wins rise up the list.</li>
+              <li>The weighted average becomes a score out of 100. Regulatory or mandatory requests get a boost of <b id="boostEcho"></b> points on top.</li>
+              <li>Missing answers count as a 3 and the request is marked <span class="chip flag-info">Needs info</span> so you know who to chase.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Your data</h2><span class="small muted" id="storeMode"></span></div>
+          <div class="data-actions">
+            <button class="btn" type="button" id="exportCsv">Export ranked list (CSV)</button>
+            <button class="btn" type="button" id="templateCsv">Download intake form template</button>
+          </div>
+          <div class="data-actions" style="padding-top:0" id="clearWrap">
+            <button class="btn btn-danger" type="button" id="clearAll">Delete all requests</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog class="modal" id="importDlg" aria-labelledby="impTitle">
+  <div class="modal-inner">
+    <div class="sheet-head"><div><h2 id="impTitle" style="font-size:var(--t-lg)">Import requests</h2><p class="small muted">Excel (.xlsx, .xls) or CSV exports from Microsoft Forms, Google Forms or your own tracker.</p></div>
+      <button class="btn btn-quiet" type="button" data-close aria-label="Close"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="modal-body" id="impBody"></div>
+    <div class="sheet-foot" id="impFoot"></div>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="detail" aria-labelledby="dTitle">
+  <div class="sheet-inner" id="detailInner"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const DAY = 864e5;
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const fromIso = s => { if (!s) return null; const [y, m, d] = String(s).split('-').map(Number); return (y && m && d) ? new Date(y, m - 1, d) : null; };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const daysUntil = s => { const d = fromIso(s); return d ? Math.round((d - today()) / DAY) : null; };
+const fmtDay = d => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtShort = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const fmtH = h => (Math.round(h * 10) / 10) + 'h';
+const hm = t => { const [h, m] = String(t || '09:00').split(':').map(Number); return (h || 0) + (m || 0) / 60; };
+const clock = x => { const h = Math.floor(x + 1e-6), m = Math.round((x - h) * 60); return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); };
+const uid = () => 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
+
+const TIERS = ['P1', 'P2', 'P3', 'P4'];
+const TIER_NAME = { P1: 'Do now', P2: 'Plan next', P3: 'Schedule in', P4: 'Backlog' };
+const TIER_VAR = t => `var(--${t.toLowerCase()})`;
+const STATUSES = [['new', 'New'], ['accepted', 'Accepted'], ['progress', 'In progress'], ['hold', 'On hold'], ['done', 'Done'], ['declined', 'Declined']];
+const STATUS_LABEL = Object.fromEntries(STATUSES);
+const ACTIVE = new Set(['new', 'accepted', 'progress']);
+const EFFORT_HOURS = [2, 4, 8, 16, 24];
+const FACTORS = [
+  { k: 'impact', label: 'Business impact', hint: 'How much better things get once it is done' },
+  { k: 'urgency', label: 'Urgency', hint: 'Requester’s view or the delivery date, whichever is higher' },
+  { k: 'reach', label: 'People affected', hint: '1 is one person, 5 is the whole organisation' },
+  { k: 'alignment', label: 'Strategic fit', hint: 'Links to this year’s transformation goals' },
+  { k: 'risk', label: 'Risk if not done', hint: 'Cost of delay, service or reputational risk' },
+  { k: 'ease', label: 'Ease', hint: 'Effort flipped, so quick wins rise' },
+];
+const RATED = ['impact', 'urgency', 'reach', 'alignment', 'risk', 'effort'];
+const DEFAULTS = {
+  weights: { impact: 5, urgency: 4, reach: 3, alignment: 3, risk: 3, ease: 2 },
+  boost: 15,
+  thresholds: { P1: 70, P2: 52, P3: 35 },
+  dayHours: [6, 6, 6, 6, 4, 0, 0],
+  dayStart: '09:00', mineStart: '12:30', mineHours: 1,
+  hiShare: 70, maxBlock: 3, weeks: 4,
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+
+const S = { requests: [], settings: clone(DEFAULTS), examples: false, filter: { tiers: new Set(), q: '', status: 'open' }, plan: null };
+
+/* ---------- Scoring ---------- */
+function dateUrgency(due) {
+  const n = daysUntil(due); if (n == null) return null;
+  return n <= 7 ? 5 : n <= 14 ? 4 : n <= 30 ? 3 : n <= 60 ? 2 : 1;
+}
+function scoreOf(r) {
+  const w = S.settings.weights;
+  const du = dateUrgency(r.due);
+  const urg = Math.max(r.urgency || 0, du || 0) || 3;
+  const f = { impact: r.impact ?? 3, urgency: urg, reach: r.reach ?? 3, alignment: r.alignment ?? 3, risk: r.risk ?? 3, ease: 6 - (r.effort ?? 3) };
+  const wsum = FACTORS.reduce((a, x) => a + (+w[x.k] || 0), 0) || 1;
+  const parts = FACTORS.map(x => ({ k: x.k, label: x.label, rating: f[x.k], pts: 100 * (+w[x.k] || 0) * (f[x.k] - 1) / 4 / wsum, max: 100 * (+w[x.k] || 0) / wsum }));
+  const base = parts.reduce((a, p) => a + p.pts, 0);
+  const boost = r.compliance ? +S.settings.boost || 0 : 0;
+  const vw = FACTORS.filter(x => x.k !== 'ease').reduce((a, x) => a + (+w[x.k] || 0), 0) || 1;
+  const value = FACTORS.filter(x => x.k !== 'ease').reduce((a, x) => a + 100 * (+w[x.k] || 0) * (f[x.k] - 1) / 4 / vw, 0);
+  return { score: Math.round(clamp(base + boost, 0, 100)), parts, boost, value, urgencyFromDate: du != null && du >= (r.urgency || 0) };
+}
+function tierOf(score) { const t = S.settings.thresholds; return score >= t.P1 ? 'P1' : score >= t.P2 ? 'P2' : score >= t.P3 ? 'P3' : 'P4'; }
+function missingOf(r) {
+  const m = [];
+  if (r.impact == null) m.push('business impact');
+  if (r.urgency == null && !r.due) m.push('urgency or delivery date');
+  if (r.reach == null) m.push('people affected');
+  if (r.effort == null) m.push('effort');
+  if (!r.description) m.push('description');
+  return m;
+}
+function computeAll() {
+  for (const r of S.requests) {
+    const s = scoreOf(r); r._s = s; r._score = s.score; r._auto = tierOf(s.score); r._tier = r.pin || r._auto; r._missing = missingOf(r);
+  }
+  const order = { P1: 0, P2: 1, P3: 2, P4: 3 };
+  S.requests.sort((a, b) => (order[a._tier] - order[b._tier]) || (b._score - a._score) || ((fromIso(a.due) || Infinity) - (fromIso(b.due) || Infinity)));
+  let i = 0; for (const r of S.requests) r._rank = ACTIVE.has(r.status) ? ++i : null;
+  S.plan = buildPlan();
+}
+
+/* ---------- Week plan ---------- */
+function buildPlan() {
+  const st = S.settings;
+  const dueT = x => fromIso(x.r.due)?.getTime() ?? Infinity;
+  const sorter = (a, b) => (dueT(a) - dueT(b)) || (b.r._score - a.r._score);
+  const items = S.requests.filter(r => ACTIVE.has(r.status) && (+r.hours || 0) > 0).map(r => ({ r, left: +r.hours, finish: null }));
+  const hi = items.filter(x => x.r._tier === 'P1' || x.r._tier === 'P2').sort(sorter);
+  const lo = items.filter(x => x.r._tier === 'P3' || x.r._tier === 'P4').sort(sorter);
+  const start = today();
+  const days = [];
+  const dStart = hm(st.dayStart), ys = hm(st.mineStart), yh = Math.max(0, +st.mineHours || 0), ye = ys + yh;
+  const snap = h => Math.floor(h * 2 + 1e-6) / 2;
+  for (let i = 0; i < (+st.weeks || 4) * 7; i++) {
+    const date = addDays(start, i); const wd = (date.getDay() + 6) % 7;
+    const cap = Math.max(0, +st.dayHours[wd] || 0);
+    const day = { date, wd, cap, hi: [], lo: [], blocks: [], used: 0 };
+    days.push(day);
+    if (cap <= 0) continue;
+    const spent = {};
+    const take = (list, budget, bucket) => {
+      let moved = true;
+      while (budget >= 0.5 && moved) {
+        moved = false;
+        for (const x of list) {
+          if (x.left <= 0) continue;
+          const room = (+st.maxBlock || 3) - (spent[x.r.id] || 0);
+          const h = snap(Math.min(x.left, budget, room));
+          if (h < 0.5) continue;
+          const prev = bucket.find(b => b.x === x);
+          if (prev) prev.h += h; else bucket.push({ x, h });
+          x.left = Math.round((x.left - h) * 100) / 100; budget -= h; spent[x.r.id] = (spent[x.r.id] || 0) + h;
+          if (x.left <= 0) x.finish = date;
+          moved = true; break;
+        }
+      }
+      return budget;
+    };
+    const urgentHi = hi.some(x => x.left > 0 && x.r.due && (fromIso(x.r.due) - date) <= 2 * DAY);
+    const hiBudget = urgentHi ? cap : snap(cap * (+st.hiShare || 70) / 100);
+    let rest = take(hi, hiBudget, day.hi);
+    rest = take(lo, cap - hiBudget + rest, day.lo);
+    take(hi, rest, day.hi);
+    // place on the clock: high priority first, then lower priority; skip your time
+    let cur = dStart;
+    const place = (b, kind) => {
+      let remaining = b.h;
+      while (remaining > 1e-6) {
+        if (yh > 0 && cur >= ys && cur < ye) cur = ye;
+        const end = cur + remaining;
+        if (yh > 0 && cur < ys && end > ys) { const seg = ys - cur; day.blocks.push({ r: b.x.r, start: cur, h: seg, kind }); remaining -= seg; cur = ye; }
+        else { day.blocks.push({ r: b.x.r, start: cur, h: remaining, kind }); cur = end; remaining = 0; }
+      }
+    };
+    day.hi.forEach(b => place(b, 'hi'));
+    day.lo.forEach(b => place(b, 'lo'));
+    if (yh > 0) day.blocks.push({ mine: true, start: ys, h: yh });
+    day.used = day.hi.concat(day.lo).reduce((a, b) => a + b.h, 0);
+    day.end = Math.max(dStart + cap + (yh > 0 && ys < dStart + cap + yh ? yh : 0), ...day.blocks.map(b => b.start + b.h));
+  }
+  const byId = {};
+  for (const x of items) {
+    const due = fromIso(x.r.due);
+    let rag = 'green', note = '';
+    if (x.left > 0) { rag = 'red'; note = `Doesn’t fit in the next ${st.weeks} weeks (${fmtH(x.left)} left over)`; }
+    else if (due && x.finish > due) { rag = 'red'; const late = Math.round((x.finish - due) / DAY); note = `Finishes ${fmtDay(x.finish)}, ${late} day${late === 1 ? '' : 's'} after it’s due`; }
+    else if (due && due < today()) { rag = 'red'; note = 'Delivery date has passed'; }
+    else if (due && (due - x.finish) <= 2 * DAY) { rag = 'amber'; note = `Tight: finishes ${fmtDay(x.finish)}, due ${fmtDay(due)}`; }
+    else note = x.finish ? `Done by ${fmtDay(x.finish)}` : '';
+    byId[x.r.id] = { finish: x.finish, left: x.left, rag, note };
+  }
+  const finishes = items.filter(x => x.left <= 0).map(x => x.finish);
+  const spill = items.some(x => x.left > 0);
+  return { days, byId, clears: spill ? null : (finishes.length ? new Date(Math.max(...finishes)) : null), spill };
+}
+
+/* ---------- Parsing imports ---------- */
+const FIELDS = [
+  { key: 'title', label: 'Request title', syn: ['request title', 'name of change', 'title', 'change request', 'project name', 'request', 'summary', 'subject', 'what change', 'what do you need'] },
+  { key: 'requester', label: 'Requested by', syn: ['requested by', 'your name', 'requester', 'submitted by', 'raised by', 'full name', 'name', 'email', 'owner'] },
+  { key: 'dept', label: 'Team', syn: ['department', 'business unit', 'directorate', 'division', 'dept', 'team', 'service area', 'area'] },
+  { key: 'description', label: 'Description', syn: ['describe', 'description', 'details', 'justification', 'business case', 'problem', 'background', 'reason', 'why'] },
+  { key: 'submitted', label: 'Submitted on', syn: ['timestamp', 'submitted on', 'date submitted', 'submission date', 'completion time', 'start time', 'created'] },
+  { key: 'due', label: 'Delivery date', syn: ['delivery date', 'due date', 'deadline', 'required by', 'needed by', 'target date', 'go live', 'go-live', 'due', 'delivery'] },
+  { key: 'compliance', label: 'Regulatory / mandatory', syn: ['regulatory', 'compliance', 'mandatory', 'statutory', 'legal requirement'] },
+  { key: 'reach', label: 'People affected', syn: ['people affected', 'users affected', 'staff affected', 'number of users', 'how many', 'reach', 'audience', 'scope'] },
+  { key: 'risk', label: 'Risk if not done', syn: ['risk if', 'cost of delay', 'what happens if', 'consequence', 'risk'] },
+  { key: 'alignment', label: 'Strategic fit', syn: ['strategic', 'strategy', 'alignment', 'objective', 'okr', 'goal'] },
+  { key: 'urgency', label: 'Urgency', syn: ['urgency', 'urgent', 'time sensitive', 'priority'] },
+  { key: 'impact', label: 'Business impact', syn: ['business impact', 'impact', 'benefit', 'value', 'importance'] },
+  { key: 'effort', label: 'Effort / size', syn: ['effort', 'size', 'complexity', 'estimate', 'hours', 'days', 'duration'] },
+  { key: 'hours', label: 'Your hours', syn: ['your hours', 'coordinator hours', 'my hours'] },
+];
+const FIELD_BY = Object.fromEntries(FIELDS.map(f => [f.key, f]));
+function autoMap(headers) {
+  const cand = [];
+  headers.forEach((h, hi) => {
+    const n = String(h).toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!n) return;
+    FIELDS.forEach((f, fi) => {
+      let best = 0;
+      f.syn.forEach((s, si) => { const sc = (n === s ? 3 : n.startsWith(s) ? 2 : n.includes(s) ? 1 : 0) && ((n === s ? 3 : n.startsWith(s) ? 2 : 1) - si / 100); if (sc > best) best = sc; });
+      if (best) cand.push({ hi, key: f.key, sc: best, fi });
+    });
+  });
+  cand.sort((a, b) => b.sc - a.sc || a.fi - b.fi || a.hi - b.hi);
+  const map = headers.map(() => ''); const used = new Set();
+  for (const c of cand) { if (map[c.hi] || used.has(c.key)) continue; map[c.hi] = c.key; used.add(c.key); }
+  return map;
+}
+function scale(v, kind) {
+  if (v == null || v === '') return null;
+  if (typeof v === 'boolean') return v ? 5 : 1;
+  if (typeof v === 'number' && isFinite(v)) {
+    if (kind === 'reach' && v > 5) return v >= 500 ? 5 : v >= 100 ? 4 : v >= 25 ? 3 : v >= 5 ? 2 : 1;
+    if (v <= 0) return 1;
+    if (v <= 5) return clamp(Math.round(v), 1, 5);
+    if (v <= 10) return clamp(Math.round(v / 2), 1, 5);
+    return 5;
+  }
+  const s = String(v).toLowerCase().trim();
+  if (/^\d+(\.\d+)?/.test(s)) {
+    const n = parseFloat(s);
+    if (/\/\s*10\b|out of 10/.test(s)) return clamp(Math.round(n / 2), 1, 5);
+    if (kind === 'reach' && /people|users|staff|\+/.test(s) && n > 5) return scale(n, 'reach');
+    return scale(n, kind);
+  }
+  if (kind === 'effort') {
+    const t = { xs: 1, s: 2, small: 2, m: 3, medium: 3, l: 4, large: 4, xl: 5 }[s.replace(/[^a-z]/g, '')];
+    if (t) return t;
+  }
+  const words = [
+    [/very high|critical|severe|extreme|essential|whole (org|company|business|council|trust)|organi[sz]ation[- ]wide|company[- ]wide|everyone|all staff|all users|enterprise/, 5],
+    [/very low|minimal|negligible|nice to have|just me|individual|single (user|person)|one person/, 1],
+    [/high|major|significant|multiple (teams|departments)|several (teams|departments)|cross[- ]/, 4],
+    [/medium|moderate|some|department|whole team|average|normal/, 3],
+    [/low|minor|few|small|one team/, 2],
+  ];
+  for (const [re, val] of words) if (re.test(s)) return val;
+  return null;
+}
+function parseHours(v, header) {
+  if (v == null || v === '') return null;
+  const s = String(v).toLowerCase(); const n = parseFloat(s);
+  if (isNaN(n)) return null;
+  if (/hour|hr|\bh\b/.test(s)) return n;
+  if (/day/.test(s)) return n * 7.5;
+  if (/week|wk/.test(s)) return n * 37.5;
+  if (/month/.test(s)) return n * 150;
+  const h = String(header || '').toLowerCase();
+  if (/hour/.test(h)) return n; if (/day/.test(h)) return n * 7.5; if (/week/.test(h)) return n * 37.5;
+  return null;
+}
+function effortFromHours(h) { return h <= 4 ? 1 : h <= 16 ? 2 : h <= 40 ? 3 : h <= 80 ? 4 : 5; }
+function parseBool(v) {
+  if (v === true) return true; if (v == null || v === '' || v === false) return false;
+  const s = String(v).toLowerCase().trim();
+  return /^(y|yes|true|1|mandatory|required|regulatory|statutory|legal)/.test(s);
+}
+const MUST_RE = /\b(regulat\w*|complian\w*|gdpr|legal requirement|statutory|audit\w*|security|breach|cyber|data protection|mandatory)\b/i;
+function parseDate(v) {
+  if (v == null || v === '') return null;
+  if (v instanceof Date && !isNaN(v)) return iso(new Date(v.getFullYear(), v.getMonth(), v.getDate()));
+  if (typeof v === 'number' && v > 20000 && v < 80000) { const d = new Date(Math.round((v - 25569) * DAY)); return iso(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return iso(new Date(+m[1], +m[2] - 1, +m[3]));
+  m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/); // UK day first
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; const a = +m[1], b = +m[2]; const [d, mo] = b > 12 ? [b, a] : [a, b]; return iso(new Date(y, mo - 1, d)); }
+  const t = Date.parse(s); if (!isNaN(t)) { const d = new Date(t); return iso(new Date(d.getFullYear(), d.getMonth(), d.getDate())); }
+  return null;
+}
+function rowToRequest(row, headers, map) {
+  const get = k => { const i = map.indexOf(k); return i < 0 ? null : row[i]; };
+  const title = String(get('title') ?? '').trim();
+  if (!title) return null;
+  const r = { id: uid(), title, requester: String(get('requester') ?? '').trim(), dept: String(get('dept') ?? '').trim(), description: String(get('description') ?? '').trim(), status: 'new', pin: null, notes: '', source: 'Import' };
+  r.submitted = parseDate(get('submitted')) || iso(today());
+  r.due = parseDate(get('due'));
+  for (const k of ['impact', 'reach', 'risk', 'alignment', 'urgency']) r[k] = scale(get(k), k);
+  const ev = get('effort'); const eh = parseHours(ev, headers[map.indexOf('effort')]);
+  r.effort = eh != null ? effortFromHours(eh) : scale(ev, 'effort');
+  const hv = parseFloat(get('hours')); r.hours = isFinite(hv) && hv > 0 ? hv : null;
+  const mi = map.indexOf('compliance');
+  r.compliance = mi >= 0 ? parseBool(get('compliance')) : false;
+  r.mustDetected = !r.compliance && MUST_RE.test(r.title + ' ' + r.description);
+  if (r.mustDetected) r.compliance = true;
+  return normalise(r);
+}
+function normalise(r) {
+  r.status = r.status || 'new';
+  r.pin = r.pin || null;
+  for (const k of RATED) { if (r[k] != null) r[k] = clamp(Math.round(+r[k]), 1, 5); else r[k] = null; }
+  if (r.hours == null || !(+r.hours >= 0)) r.hours = EFFORT_HOURS[(r.effort ?? 3) - 1];
+  r.compliance = !!r.compliance;
+  return r;
+}
+
+/* ---------- Examples (shown until the first import; never saved) ---------- */
+function examples() {
+  const t = today(); const d = n => iso(addDays(t, n));
+  const rows = [
+    { title: 'GDPR retention rules in the CRM', requester: 'Priya Shah', dept: 'Legal', description: 'Auto-delete closed customer records after six years to meet the retention policy. Internal audit flagged it last quarter.', due: d(18), impact: 4, reach: 4, urgency: 4, alignment: 3, risk: 5, effort: 3, compliance: true, status: 'accepted' },
+    { title: 'MFA for contractor accounts', requester: 'Tom Okafor', dept: 'IT Security', description: 'Contractors still sign in with a password only. Extend conditional access and MFA to them.', due: d(9), impact: 4, reach: 3, urgency: 5, alignment: 4, risk: 5, effort: 2, compliance: true, status: 'progress' },
+    { title: 'Automate invoice approvals', requester: 'Hannah Reid', dept: 'Finance', description: 'Replace the email chain with an approval flow. Around 400 invoices a month.', due: d(35), impact: 5, reach: 3, urgency: 3, alignment: 5, risk: 3, effort: 4 },
+    { title: 'Month-end dashboard for finance', requester: 'Hannah Reid', dept: 'Finance', description: 'Report pulling ledger and budget data so month-end close takes less time.', due: d(28), impact: 4, reach: 2, urgency: 3, alignment: 4, risk: 2, effort: 3 },
+    { title: 'Digital onboarding forms for HR', requester: 'Gemma Lyons', dept: 'People', description: 'Move new-starter paperwork from PDFs to online forms.', due: d(42), impact: 3, reach: 4, urgency: 2, alignment: 4, risk: 2, effort: 3 },
+    { title: 'Training videos for the new ERP', requester: 'Aisha Karim', dept: 'Operations', description: 'Short how-to clips for the five most common ERP tasks.', due: d(21), impact: 3, reach: 4, urgency: 3, alignment: 3, risk: 3, effort: 2 },
+    { title: 'Meeting room kit for the Leeds office', requester: 'Marcus Bell', dept: 'Facilities', description: 'Two rooms need video kits before the January office move.', due: d(50), impact: 3, reach: 3, urgency: 2, alignment: 3, risk: 2, effort: 4 },
+    { title: 'Customer feedback survey tool', requester: 'Leo Grant', dept: 'Customer Service', description: 'Choose and set up a survey tool to replace the shared spreadsheet.', due: null, impact: 3, reach: 2, urgency: 2, alignment: 3, risk: 1, effort: 2 },
+    { title: 'Hot desk booking app', requester: 'Marcus Bell', dept: 'Facilities', description: '', due: d(14), impact: null, reach: 3, urgency: null, alignment: null, risk: null, effort: null },
+    { title: 'Intranet news page refresh', requester: 'Sophie Turner', dept: 'Comms', description: 'New layout for the intranet news page.', due: d(60), impact: 2, reach: 5, urgency: 1, alignment: 2, risk: 1, effort: 2 },
+    { title: 'Rename shared mailboxes', requester: 'Dan Morris', dept: 'Operations', description: 'Tidy the naming on 30 shared mailboxes.', due: null, impact: 1, reach: 2, urgency: 1, alignment: 1, risk: 1, effort: 1 },
+  ];
+  return rows.map((r, i) => normalise({ ...r, id: 'ex' + i, example: true, submitted: d(-i * 2 - 1), source: 'Example', notes: '' }));
+}
+
+/* ---------- Storage ---------- */
+const LS_KEY = 'triage-desk-v1';
+const withTimeout = (p, ms) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
+const Store = {
+  mode: 'memory', db: null, uid: null, chains: {}, timers: {},
+  async init() {
+    try {
+      if (window.claude && typeof window.claude.use === 'function') {
+        const db = await withTimeout(window.claude.use('db'), 10000);
+        const user = db ? await withTimeout(window.claude.use('user'), 10000) : null;
+        const id = user ? await withTimeout(user.id(), 10000) : null;
+        if (db && id) { this.db = db; this.uid = id; this.mode = 'db'; return; }
+      }
+    } catch (e) { /* fall through */ }
+    try { localStorage.setItem(LS_KEY + '-probe', '1'); localStorage.removeItem(LS_KEY + '-probe'); this.mode = 'local'; } catch (e) { this.mode = 'memory'; }
+  },
+  col() { return this.db.collection('data/users/' + this.uid); },
+  async load() {
+    if (this.mode === 'db') {
+      const snap = await withTimeout(this.col().get(), 10000);
+      if (!snap) throw new Error('timeout');
+      let settings = null; const requests = [];
+      for (const d of snap.docs) {
+        const v = clone(d.data() || {});
+        if (d.id === 'settings') settings = v; else if (d.id.startsWith('r')) requests.push(v);
+      }
+      return { settings, requests };
+    }
+    if (this.mode === 'local') {
+      try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : { settings: null, requests: [] }; } catch (e) { return { settings: null, requests: [] }; }
+    }
+    return { settings: null, requests: [] };
+  },
+  strip(r) { const o = {}; for (const [k, v] of Object.entries(r)) if (!k.startsWith('_') && v !== undefined) o[k] = v; return o; },
+  write(id, data) {
+    if (this.mode !== 'db') return this.saveLocal();
+    this.chains[id] = (this.chains[id] || Promise.resolve()).then(() => data === null ? this.col().doc(id).delete() : this.col().doc(id).set(data)).catch(err => { toast('Couldn’t save that change. Check your connection and try again.'); console.warn(err); });
+    return this.chains[id];
+  },
+  saveRequest(r, delay = 0) {
+    if (S.examples || r.example) return;
+    clearTimeout(this.timers[r.id]);
+    this.timers[r.id] = setTimeout(() => this.write(r.id, this.strip(r)), delay);
+  },
+  deleteRequest(id) { clearTimeout(this.timers[id]); if (this.mode === 'db') this.write(id, null); else this.saveLocal(); },
+  saveSettings(delay = 400) { if (S.examples && this.mode === 'db') { this.pendingSettings = true; } clearTimeout(this.timers.settings); this.timers.settings = setTimeout(() => this.write('settings', clone(S.settings)), delay); },
+  saveLocal() {
+    if (this.mode !== 'local') return;
+    clearTimeout(this.timers.local);
+    this.timers.local = setTimeout(() => { try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: S.settings, requests: S.examples ? [] : S.requests.map(r => this.strip(r)) })); } catch (e) { toast('Your browser blocked saving. Export a CSV to keep your list.'); } }, 250);
+  },
+  async saveAll() {
+    if (this.mode === 'db') { for (const r of S.requests) await this.write(r.id, this.strip(r)); await this.write('settings', clone(S.settings)); }
+    else this.saveLocal();
+  },
+};
+
+/* ---------- Rendering: Queue ---------- */
+function visibleRequests() {
+  const { tiers, q, status } = S.filter; const ql = q.trim().toLowerCase();
+  return S.requests.filter(r => {
+    if (status === 'open' ? !ACTIVE.has(r.status) && r.status !== 'hold' : status !== 'all' && r.status !== status) return false;
+    if (tiers.size && !tiers.has(r._tier)) return false;
+    if (ql && !(`${r.title} ${r.requester} ${r.dept} ${r.description}`.toLowerCase().includes(ql))) return false;
+    return true;
+  });
+}
+function dueHtml(r) {
+  const n = daysUntil(r.due);
+  if (n == null) return '<span class="due muted">No date</span>';
+  const cls = n < 0 ? 'late' : n <= 7 ? 'soon' : '';
+  const txt = n < 0 ? `${-n} day${n === -1 ? '' : 's'} late` : n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : n < 14 ? `In ${n} days` : fmtShort(fromIso(r.due));
+  return `<span class="due ${cls}" title="${esc(fmtDay(fromIso(r.due)))}">${txt}</span>`;
+}
+function pillHtml(r) { return `<span class="pill${r.pin ? ' pinned' : ''}" style="--tier:${TIER_VAR(r._tier)}" title="${esc(TIER_NAME[r._tier])}${r.pin ? ' (set by you)' : ''}">${r._tier}</span>`; }
+function flagsHtml(r) {
+  let s = '';
+  if (r.compliance) s += '<span class="chip flag-must">Mandatory</span>';
+  if (r._missing.length) s += '<span class="chip flag-info">Needs info</span>';
+  return s;
+}
+function renderQueue() {
+  const open = S.requests.filter(r => ACTIVE.has(r.status) || r.status === 'hold');
+  const counts = {}, hours = {};
+  for (const t of TIERS) { counts[t] = 0; hours[t] = 0; }
+  for (const r of open) { counts[r._tier]++; hours[r._tier] += +r.hours || 0; }
+  $('#distBar').innerHTML = TIERS.map(t => `<span style="flex-grow:${counts[t]};background:${TIER_VAR(t)}"></span>`).join('');
+  $('#tierFilters').innerHTML = TIERS.map(t => `<button type="button" class="tier-filter" style="--tier:${TIER_VAR(t)}" data-tier="${t}" aria-pressed="${S.filter.tiers.has(t)}">
+      <span class="code">${t}</span><span class="name">${TIER_NAME[t]}</span><span class="meta">${counts[t]} request${counts[t] === 1 ? '' : 's'}, ${fmtH(hours[t])}</span></button>`).join('');
+  const totalH = open.reduce((a, r) => a + (+r.hours || 0), 0);
+  const plan = S.plan; const atRisk = Object.values(plan.byId).filter(x => x.rag === 'red').length;
+  const needInfo = open.filter(r => r._missing.length).length;
+  $('#facts').innerHTML = `<span><b>${open.length}</b> open</span><span><b>${fmtH(totalH)}</b> of your time</span>`
+    + `<span>${plan.spill ? `<b>More than ${S.settings.weeks} weeks</b> of work queued` : plan.clears ? `Queue clears by <b>${fmtDay(plan.clears)}</b>` : 'Nothing scheduled'}</span>`
+    + `<span class="${atRisk ? 'warn' : ''}"><b>${atRisk}</b> at risk of missing a date</span><span><b>${needInfo}</b> need more info</span>`;
+
+  const list = visibleRequests();
+  const rows = $('#rows');
+  if (!S.requests.length) {
+    rows.innerHTML = `<div class="empty"><h2 style="font-size:var(--t-lg)">No requests yet</h2><p>Import the spreadsheet your intake form produces, or add a request by hand. Each one is scored and ranked as soon as it lands.</p><div class="toolbar" style="justify-content:center"><button class="btn btn-primary" type="button" data-action="import">Import forms</button><button class="btn" type="button" data-action="add">Add request</button></div></div>`;
+  } else if (!list.length) {
+    rows.innerHTML = `<div class="empty"><p>No requests match these filters.</p><button class="btn" type="button" data-action="clear-filters">Clear filters</button></div>`;
+  } else {
+    rows.innerHTML = `<div class="row-head" role="presentation"><span>Rank</span><span>Priority</span><span>Request</span><span>Score</span><span>Due</span><span>Hours</span><span>Status</span></div>`
+      + list.map(r => `<button type="button" class="row" role="listitem" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">
+        <span class="rank c-rank">${r._rank ?? '–'}</span>
+        <span class="c-tier">${pillHtml(r)}</span>
+        <span class="c-title" style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')} ${flagsHtml(r)}</span></span>
+        <span class="c-sub req-sub" style="min-width:0">${esc([r.requester, r.dept].filter(Boolean).join(', '))} ${flagsHtml(r)}</span>
+        <span class="score c-score"><b>${r._score}</b><span class="meter" aria-hidden="true"><i style="width:${r._score}%"></i></span></span>
+        <span class="c-due">${dueHtml(r)}</span>
+        <span class="c-hours small">${fmtH(+r.hours || 0)}</span>
+        <span class="status c-status">${STATUS_LABEL[r.status]}</span>
+      </button>`).join('');
+  }
+  renderMatrix(list);
+}
+function renderMatrix(list) {
+  const W = 360, H = 290, L = 38, R = 12, T = 14, B = 40;
+  const x = e => L + (e - 1) / 4 * (W - L - R);
+  const y = v => T + (1 - v / 100) * (H - T - B);
+  const pts = list.filter(r => ACTIVE.has(r.status) || r.status === 'hold');
+  const midX = x(3), midY = y(50);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Chart of business value against effort for ${pts.length} open requests">`;
+  s += `<rect x="${L}" y="${T}" width="${midX - L}" height="${midY - T}" fill="var(--ok)" opacity=".07"/>`;
+  for (let v = 0; v <= 100; v += 25) s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="10" fill="var(--ink-2)">${v}</text>`;
+  for (let e = 1; e <= 5; e++) s += `<text x="${x(e)}" y="${H - B + 16}" text-anchor="middle" font-size="10" fill="var(--ink-2)">${e}</text>`;
+  s += `<line x1="${midX}" x2="${midX}" y1="${T}" y2="${H - B}" stroke="var(--ink-2)" stroke-dasharray="3 4" opacity=".5"/><line x1="${L}" x2="${W - R}" y1="${midY}" y2="${midY}" stroke="var(--ink-2)" stroke-dasharray="3 4" opacity=".5"/>`;
+  s += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--ink-2)">Effort (1 small, 5 large)</text>`;
+  s += `<text transform="translate(11 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle" font-size="11" fill="var(--ink-2)">Value</text>`;
+  for (const r of pts) {
+    const jx = (hash(r.id) - .5) * 26, jy = (hash(r.id + 'y') - .5) * 8;
+    const cx = clamp(x(r.effort ?? 3) + jx, L + 7, W - R - 7), cy = clamp(y(r._s.value) + jy, T + 7, H - B - 7);
+    s += `<circle class="dot" tabindex="0" role="button" data-open="${esc(r.id)}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="6" fill="${TIER_VAR(r._tier)}" stroke="var(--surface)" stroke-width="2" aria-label="${esc(r.title)}, ${r._tier}, score ${r._score}"><title>${esc(r.title)} (${r._tier}, score ${r._score})</title></circle>`;
+  }
+  s += `<text x="${L + 6}" y="${T + 13}" font-size="11" font-weight="600" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ok)">Quick wins</text>`;
+  s += `<text x="${W - R - 6}" y="${T + 13}" text-anchor="end" font-size="11" font-weight="600" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ink-2)">Big bets</text>`;
+  s += `<text x="${L + 6}" y="${H - B - 7}" font-size="11" font-weight="600" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ink-2)">Fill-ins</text>`;
+  s += `<text x="${W - R - 6}" y="${H - B - 7}" text-anchor="end" font-size="11" font-weight="600" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ink-2)">Rethink</text>`;
+  s += '</svg>';
+  $('#matrix').innerHTML = s;
+}
+
+/* ---------- Rendering: Plan ---------- */
+function renderCapacity() {
+  const st = S.settings; const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  $('#capDays').innerHTML = names.map((n, i) => `<label for="cap${i}">${n}<input id="cap${i}" type="number" min="0" max="12" step="0.5" value="${st.dayHours[i]}" data-cap="${i}"></label>`).join('');
+  $('#dayStart').value = st.dayStart; $('#mineStart').value = st.mineStart; $('#mineHours').value = st.mineHours;
+  $('#maxBlock').value = st.maxBlock; $('#weeks').value = String(st.weeks); $('#hiShare').value = st.hiShare;
+  $('#splitOut').textContent = `${st.hiShare}% to P1–P2, ${100 - st.hiShare}% to P3–P4`;
+}
+function renderPlan() {
+  const st = S.settings; const plan = S.plan;
+  $('#legend').innerHTML = TIERS.map(t => `<span><i style="--tier:${TIER_VAR(t)}"></i>${t} ${TIER_NAME[t]}</span>`).join('') + `<span><i style="--tier:var(--ink-2);background:repeating-linear-gradient(135deg,var(--surface) 0 3px,var(--surface-2) 3px 6px);border-style:dashed"></i>Your time</span>`;
+  const att = S.requests.filter(r => plan.byId[r.id] && plan.byId[r.id].rag !== 'green').sort((a, b) => (plan.byId[a.id].rag === 'red' ? 0 : 1) - (plan.byId[b.id].rag === 'red' ? 0 : 1));
+  $('#attCount').textContent = att.length ? `${att.length} request${att.length === 1 ? '' : 's'}` : '';
+  $('#attention').innerHTML = att.length ? att.map(r => { const p = plan.byId[r.id]; return `<button type="button" class="att-row" data-open="${esc(r.id)}">
+      ${pillHtml(r)}<span style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc(p.note)}</span></span>
+      <span class="rag ${p.rag}">${p.rag === 'red' ? 'Off track' : 'Tight'}</span></button>`; }).join('')
+    : `<p class="small muted" style="padding:14px 16px">Everything open finishes before its delivery date at your current capacity.</p>`;
+  if (att.length) $('#attention').insertAdjacentHTML('beforeend', `<p class="small muted" style="padding:10px 16px 14px">To fix one: decline it, put it on hold, agree a later date, or give yourself more hours on a day above.</p>`);
+
+  const weeks = []; for (let i = 0; i < plan.days.length; i += 7) weeks.push(plan.days.slice(i, i + 7));
+  const dStart = hm(st.dayStart);
+  const t0 = today();
+  const dueByDay = {};
+  for (const r of S.requests) if (ACTIVE.has(r.status) && r.due) (dueByDay[r.due] = dueByDay[r.due] || []).push(r);
+  $('#weeksOut').innerHTML = weeks.map((wk, wi) => {
+    const days = wk.filter(d => d.cap > 0);
+    const used = wk.reduce((a, d) => a + d.used, 0), cap = wk.reduce((a, d) => a + d.cap, 0);
+    if (!days.length) return '';
+    if (!used) { const t = wi === 0 ? 'This week' : wi === 1 ? 'Next week' : `Week of ${fmtShort(wk[0].date)}`; return `<section class="week"><div class="week-head"><h2>${t}</h2><span class="small muted">0h planned of ${fmtH(cap)} available</span></div><p class="panel small muted" style="padding:14px 16px">Nothing planned yet. This week is free for new requests or catch-up.</p></section>`; }
+    const end = Math.ceil(Math.max(...days.map(d => d.end || dStart + 1)));
+    const startH = Math.floor(dStart);
+    const hours = end - startH;
+    const height = hours * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pph'));
+    const first = wk[0].date;
+    const title = wi === 0 ? 'This week' : wi === 1 ? 'Next week' : `Week of ${fmtShort(first)}`;
+    let g = `<div class="tt-corner"></div>`;
+    g += days.map(d => {
+      const isToday = +d.date === +t0;
+      const dues = dueByDay[iso(d.date)] || [];
+      return `<div class="tt-dayhead${isToday ? ' today' : ''}"><span class="d">${isToday ? 'Today, ' : ''}${fmtDay(d.date)}</span>
+        <span class="load"><span class="meter" aria-hidden="true"><i style="width:${d.cap ? Math.min(100, d.used / d.cap * 100) : 0}%"></i></span>${fmtH(d.used)} of ${fmtH(d.cap)}</span>
+        ${dues.length ? `<span class="dues">${dues.map(r => `<span class="chip" style="border-color:${TIER_VAR(r._tier)};color:${TIER_VAR(r._tier)}" title="${esc(r.title)}">Due: ${esc(r.title.length > 18 ? r.title.slice(0, 17) + '…' : r.title)}</span>`).join('')}</span>` : ''}</div>`;
+    }).join('');
+    g += `<div class="tt-gutter" style="height:${height}px">${Array.from({ length: hours + 1 }, (_, i) => `<span style="top:${i / hours * 100}%">${clock(startH + i)}</span>`).join('')}</div>`;
+    g += days.map(d => `<div class="tt-col" style="height:${height}px">${d.blocks.map(b => {
+      const top = (b.start - startH) / hours * height, h = b.h / hours * height - 3;
+      if (b.mine) return `<div class="blk mine${h < 44 ? ' short' : ''}" style="top:${top}px;height:${h}px" aria-label="Your time, ${clock(b.start)} to ${clock(b.start + b.h)}"><span class="bt">Your time</span><span class="bm">${clock(b.start)}–${clock(b.start + b.h)}</span></div>`;
+      const r = b.r;
+      return `<button type="button" class="blk${h < 30 ? ' tiny' : h < 44 ? ' short' : ''}" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)};top:${top}px;height:${h}px" title="${esc(r.title)}, ${clock(b.start)} to ${clock(b.start + b.h)}">
+        <span class="bt">${esc(r.title)}</span><span class="bm"><b>${r._tier}</b><span class="t">${clock(b.start)}–${clock(b.start + b.h)}</span></span></button>`;
+    }).join('')}</div>`).join('');
+    return `<section class="week" aria-label="${esc(title)}"><div class="week-head"><h2>${title}</h2><span class="small muted">${fmtH(used)} planned of ${fmtH(cap)} available</span></div>
+      <div class="timetable-scroll"><div class="timetable" style="--cols:${days.length}">${g}</div></div></section>`;
+  }).join('') || `<div class="panel empty"><p>No working hours set. Add hours to at least one day under Your capacity to build a plan.</p></div>`;
+}
+
+/* ---------- Rendering: Scoring ---------- */
+function renderScoring() {
+  const w = S.settings.weights;
+  $('#weights').innerHTML = FACTORS.map(f => `<div class="weight"><label class="wl" for="w-${f.k}"><b>${f.label}</b><span>${f.hint}</span></label>
+    <input id="w-${f.k}" type="range" min="0" max="10" step="1" value="${w[f.k]}" data-weight="${f.k}"><output for="w-${f.k}" id="wo-${f.k}">${w[f.k]}</output></div>`).join('')
+    + `<div class="weight"><label class="wl" for="w-boost"><b>Regulatory or mandatory</b><span>Points added on top of the score</span></label>
+    <input id="w-boost" type="range" min="0" max="40" step="5" value="${S.settings.boost}" data-boost><output id="wo-boost">${S.settings.boost}</output></div>`;
+  const t = S.settings.thresholds;
+  $('#thresholds').innerHTML = ['P1', 'P2', 'P3'].map(k => `<label for="th-${k}" style="color:${TIER_VAR(k)}">${k} ${TIER_NAME[k]} from<input id="th-${k}" type="number" min="0" max="100" value="${t[k]}" data-th="${k}" style="color:var(--ink)"></label>`).join('');
+  $('#boostEcho').textContent = S.settings.boost;
+  $('#storeMode').textContent = Store.mode === 'db' ? 'Saved to your account, private to you' : Store.mode === 'local' ? 'Saved in this browser only' : 'Not saved: storage is blocked here';
+}
+
+function renderAll() { computeAll(); renderQueue(); renderPlan(); $('#exampleNotice').hidden = !S.examples; }
+
+/* ---------- Detail sheet ---------- */
+let openId = null;
+function findReq(id) { return S.requests.find(r => r.id === id); }
+function segHtml(k, val) {
+  return `<span class="seg" role="group" aria-label="${k}">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-rate="${k}" data-v="${n}" aria-pressed="${val === n}">${n}</button>`).join('')}</span>`;
+}
+function openDetail(id, isNew) {
+  const r = findReq(id); if (!r) return;
+  openId = id;
+  const dlg = $('#detail');
+  const ratingRows = [
+    ['impact', 'Business impact', '1 minor, 5 transforms how we work'],
+    ['urgency', 'Urgency (requester’s view)', 'The delivery date can raise this'],
+    ['reach', 'People affected', '1 one person, 5 whole organisation'],
+    ['alignment', 'Strategic fit', '1 unrelated, 5 core to the programme'],
+    ['risk', 'Risk if not done', '1 none, 5 serious'],
+    ['effort', 'Effort', '1 a couple of hours, 5 several weeks'],
+  ];
+  $('#detailInner').innerHTML = `
+    <div class="sheet-head"><div style="min-width:0"><p class="small muted" id="dRank"></p><h2 id="dTitle" style="font-size:var(--t-lg)">${esc(r.title || 'New request')}</h2></div>
+      <button class="btn btn-quiet" type="button" data-close aria-label="Close"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="sheet-body">
+      <div id="dScore"></div>
+      <div class="form">
+        <label for="f-title">Title<input id="f-title" type="text" data-f="title" value="${esc(r.title)}" placeholder="What needs to change"></label>
+        <div class="two">
+          <label for="f-req">Requested by<input id="f-req" type="text" data-f="requester" value="${esc(r.requester)}"></label>
+          <label for="f-dept">Team<input id="f-dept" type="text" data-f="dept" value="${esc(r.dept)}"></label>
+        </div>
+        <label for="f-desc">Description<textarea id="f-desc" data-f="description">${esc(r.description)}</textarea></label>
+        <div class="two">
+          <label for="f-due">Delivery date<input id="f-due" type="date" data-f="due" value="${esc(r.due || '')}"></label>
+          <label for="f-hours">Your hours on it<input id="f-hours" type="number" min="0" step="0.5" data-f="hours" value="${esc(r.hours)}"><span class="hint">Your own time, not the delivery team’s</span></label>
+        </div>
+        <div class="two">
+          <label for="f-status">Status<select id="f-status" data-f="status">${STATUSES.map(([v, l]) => `<option value="${v}"${r.status === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+          <label for="f-pin">Priority<select id="f-pin" data-f="pin"><option value="">Use the score</option>${TIERS.map(t => `<option value="${t}"${r.pin === t ? ' selected' : ''}>Always ${t} ${TIER_NAME[t]}</option>`).join('')}</select></label>
+        </div>
+        <label class="check" for="f-must"><input id="f-must" type="checkbox" data-f="compliance"${r.compliance ? ' checked' : ''}>Regulatory or mandatory${r.mustDetected ? ' <span class="hint">(spotted in the description)</span>' : ''}</label>
+        <p class="section-title" style="margin-top:4px">Ratings</p>
+        ${ratingRows.map(([k, l, h]) => `<div class="factor"><span class="lbl">${l}<span class="hint">${h}</span></span>${segHtml(k, r[k])}</div>`).join('')}
+        <label for="f-notes">Your notes<textarea id="f-notes" data-f="notes" placeholder="Conversations, decisions, who to chase">${esc(r.notes || '')}</textarea></label>
+        <p class="small muted">${r.source === 'Example' ? 'Example request' : `Added ${r.submitted ? fmtDay(fromIso(r.submitted)) : ''}${r.source ? ` from ${esc(r.source)}` : ''}`}</p>
+      </div>
+    </div>
+    <div class="sheet-foot"><div class="confirm-row" id="delRow"><button class="btn btn-danger" type="button" data-del>Delete request</button></div><button class="btn btn-primary" type="button" data-close>Done</button></div>`;
+  renderDetailScore();
+  if (!dlg.open) dlg.showModal();
+  if (isNew) setTimeout(() => $('#f-title').focus(), 50);
+}
+function renderDetailScore() {
+  const r = findReq(openId); if (!r) return;
+  const s = r._s; const p = S.plan.byId[r.id];
+  $('#dRank').textContent = r._rank ? `Rank ${r._rank} of ${S.requests.filter(x => ACTIVE.has(x.status)).length} open` : STATUS_LABEL[r.status];
+  $('#dTitle').textContent = r.title || 'New request';
+  $('#dScore').innerHTML = `<div style="--tier:${TIER_VAR(r._tier)};display:grid;gap:14px">
+    <div class="big-score"><span class="n">${r._score}</span><div><div>${pillHtml(r)} <b>${TIER_NAME[r._tier]}</b></div>
+      <p class="small muted">${r.pin ? `You set this to ${r.pin}. The score alone puts it in ${r._auto}.` : 'Score out of 100'}${p && p.note ? `. ${esc(p.note)}` : ''}</p></div></div>
+    <div class="breakdown" aria-label="Why this score">
+      ${s.parts.map(x => `<div class="bd"><span>${x.label} <span class="muted">${x.rating}/5</span></span><span class="meter" aria-hidden="true"><i style="width:${x.max ? x.pts / x.max * 100 : 0}%"></i></span><span>+${Math.round(x.pts)}</span></div>`).join('')}
+      ${s.boost ? `<div class="bd"><span>Mandatory</span><span></span><span>+${s.boost}</span></div>` : ''}
+    </div>
+    ${r._missing.length ? `<p class="small"><span class="chip flag-info">Needs info</span> Ask ${esc(r.requester || 'the requester')} about: ${esc(r._missing.join(', '))}.</p>` : ''}
+    ${s.urgencyFromDate && r.due ? `<p class="small muted">Urgency is coming from the delivery date.</p>` : ''}
+  </div>`;
+}
+function updateField(r, f, v) {
+  if (f === 'hours') r.hours = v === '' ? 0 : Math.max(0, +v);
+  else if (f === 'compliance') { r.compliance = v; r.mustDetected = false; }
+  else if (f === 'pin') r.pin = v || null;
+  else if (f === 'due') r.due = v || null;
+  else r[f] = v;
+}
+function afterEdit(r, delay = 500) {
+  renderAll(); renderDetailScore(); Store.saveRequest(r, delay);
+}
+
+/* ---------- Import flow ---------- */
+const imp = { wb: null, sheet: null, headers: [], rows: [], map: [], mode: 'merge', file: '' };
+function openImport() {
+  imp.wb = null; renderImport(); const d = $('#importDlg'); if (!d.open) d.showModal();
+}
+function renderImport(err) {
+  const body = $('#impBody'), foot = $('#impFoot');
+  if (!imp.wb) {
+    body.innerHTML = `<label class="drop" id="drop" for="fileIn">
+        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="3" width="20" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 11h10M11 16h10M11 21h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <b>Drop your spreadsheet here, or choose a file</b>
+        <p>One row per request. Column names don’t need to match anything. You’ll check how they line up before anything is imported.</p>
+        <span class="btn">Choose file</span>
+        <input id="fileIn" type="file" accept=".xlsx,.xls,.csv,.ods" class="sr">
+      </label>${err ? `<p class="error">${esc(err)}</p>` : ''}
+      <p class="small muted">No form yet? Download the intake template from Scoring rules and use its questions in Microsoft Forms or Google Forms.</p>`;
+    foot.innerHTML = `<span></span><button class="btn" type="button" data-close>Cancel</button>`;
+    return;
+  }
+  const sheets = imp.wb.SheetNames;
+  const opts = `<option value="">Ignore</option>` + FIELDS.map(f => `<option value="${f.key}">${f.label}</option>`).join('');
+  const valid = imp.rows.filter(r => String(r[imp.map.indexOf('title')] ?? '').trim()).length;
+  const hasTitle = imp.map.includes('title');
+  body.innerHTML = `<div class="toolbar" style="justify-content:space-between"><p><b>${esc(imp.file)}</b> <span class="muted">${imp.rows.length} row${imp.rows.length === 1 ? '' : 's'}</span></p>
+      ${sheets.length > 1 ? `<label class="small" for="sheetSel">Sheet <select class="field-inline" id="sheetSel">${sheets.map(s => `<option${s === imp.sheet ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></label>` : ''}</div>
+    <p class="small muted">Check each column goes to the right place. Columns set to Ignore are left out.</p>
+    <div class="map-scroll"><table class="map"><thead><tr><th>Your column</th><th>Example answer</th><th>Use as</th></tr></thead><tbody>
+      ${imp.headers.map((h, i) => { const ex = imp.rows.find(r => r[i] != null && r[i] !== '')?.[i]; return `<tr><td><b>${esc(h || `Column ${i + 1}`)}</b></td><td class="sample">${esc(ex instanceof Date ? fmtDay(ex) : ex ?? '')}</td><td><label class="sr" for="map${i}">Use ${esc(h)} as</label><select id="map${i}" data-map="${i}">${opts.replace(`value="${imp.map[i]}"`, `value="${imp.map[i]}" selected`)}</select></td></tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="radio-row" role="radiogroup" aria-label="Import mode">
+      <label><input type="radio" name="impMode" value="merge"${imp.mode === 'merge' ? ' checked' : ''}> Add to my queue (matching requests are updated)</label>
+      <label><input type="radio" name="impMode" value="replace"${imp.mode === 'replace' ? ' checked' : ''}> Replace my whole queue</label>
+    </div>
+    ${!hasTitle ? `<p class="error">Pick which column holds the request title. Every request needs one.</p>` : ''}`;
+  foot.innerHTML = `<button class="btn btn-quiet" type="button" data-imp-back>Choose another file</button><span class="toolbar"><button class="btn" type="button" data-close>Cancel</button><button class="btn btn-primary" type="button" data-imp-go${hasTitle && valid ? '' : ' disabled'}>Import ${valid} request${valid === 1 ? '' : 's'}</button></span>`;
+}
+function loadSheet(name) {
+  imp.sheet = name;
+  const ws = imp.wb.Sheets[name];
+  const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
+  let hr = aoa.findIndex(r => r && r.filter(c => c != null && String(c).trim() !== '').length >= 2);
+  if (hr < 0) hr = 0;
+  imp.headers = (aoa[hr] || []).map(h => h == null ? '' : String(h).trim());
+  imp.rows = aoa.slice(hr + 1).filter(r => r && r.some(c => c != null && String(c).trim() !== ''));
+  imp.map = autoMap(imp.headers);
+}
+async function readFile(file) {
+  if (!window.XLSX) { renderImport('The spreadsheet reader didn’t load. Check your connection and reopen this window.'); return; }
+  try {
+    const buf = await file.arrayBuffer();
+    const isText = /\.(csv|txt)$/i.test(file.name);
+    imp.wb = XLSX.read(buf, isText ? { type: 'array', raw: true } : { type: 'array', cellDates: true });
+    imp.file = file.name;
+    const first = imp.wb.SheetNames.find(n => { const r = XLSX.utils.sheet_to_json(imp.wb.Sheets[n], { header: 1 }); return r.length > 1; }) || imp.wb.SheetNames[0];
+    loadSheet(first);
+    if (!imp.rows.length) { imp.wb = null; renderImport(`${file.name} has no rows under the header. Export the responses again and retry.`); return; }
+    renderImport();
+  } catch (e) { imp.wb = null; renderImport(`Couldn’t read ${file.name}. Save it as .xlsx or .csv and try again.`); }
+}
+function doImport() {
+  const fresh = imp.rows.map(r => rowToRequest(r, imp.headers, imp.map)).filter(Boolean);
+  const keyOf = r => (r.title + '|' + (r.requester || '')).toLowerCase().trim();
+  const wasExamples = S.examples;
+  if (wasExamples || imp.mode === 'replace') {
+    const old = wasExamples ? [] : S.requests.slice();
+    S.requests = []; S.examples = false;
+    if (Store.mode === 'db') for (const r of old) Store.deleteRequest(r.id);
+  }
+  const byKey = new Map(S.requests.map(r => [keyOf(r), r]));
+  let added = 0, updated = 0;
+  for (const n of fresh) {
+    n.source = imp.file;
+    const ex = byKey.get(keyOf(n));
+    if (ex) {
+      for (const k of ['description', 'dept', 'due', 'impact', 'reach', 'risk', 'alignment', 'urgency', 'effort']) if (n[k] != null && n[k] !== '') ex[k] = n[k];
+      if (n.compliance) ex.compliance = true;
+      updated++; Store.saveRequest(ex);
+    } else { S.requests.push(n); byKey.set(keyOf(n), n); added++; Store.saveRequest(n); }
+  }
+  if (wasExamples) Store.saveSettings(0);
+  Store.saveLocal();
+  $('#importDlg').close();
+  renderAll();
+  toast(`Imported ${added} new${updated ? `, updated ${updated}` : ''}. Ranked and scheduled.`);
+}
+
+/* ---------- Downloads ---------- */
+async function saveFile(filename, text) {
+  try {
+    const dl = window.claude?.use ? await withTimeout(window.claude.use('downloads'), 4000) : null;
+    if (dl) { await dl.save({ filename, data: new Blob([text], { type: 'text/csv' }) }); return; }
+  } catch (e) { if (e && e.code && e.code !== 'unavailable') return; }
+  try {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  } catch (e) { toast('Downloads are blocked here.'); }
+}
+const csvCell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function exportCsv() {
+  const head = ['Rank', 'Priority', 'Score', 'Title', 'Requested by', 'Team', 'Delivery date', 'Your hours', 'Status', 'Mandatory', 'Planned finish', 'Plan status', 'Needs info', 'Notes'];
+  const lines = [head.join(',')].concat(S.requests.map(r => { const p = S.plan.byId[r.id]; return [r._rank ?? '', r._tier, r._score, r.title, r.requester, r.dept, r.due || '', r.hours, STATUS_LABEL[r.status], r.compliance ? 'Yes' : 'No', p?.finish ? iso(p.finish) : '', p ? (p.rag === 'red' ? 'Off track' : p.rag === 'amber' ? 'Tight' : 'On track') : '', r._missing.join('; '), r.notes || ''].map(csvCell).join(','); }));
+  saveFile(`change-queue-${iso(today())}.csv`, lines.join('\n'));
+}
+function templateCsv() {
+  const head = ['Request title', 'Your name', 'Team', 'Describe the change', 'Business impact (Low/Medium/High/Critical)', 'How many people does it affect', 'Delivery date (dd/mm/yyyy)', 'Urgency (1-5)', 'Strategic fit (1-5)', 'Risk if not done (1-5)', 'Effort (S/M/L/XL)', 'Regulatory or mandatory (Yes/No)'];
+  const ex = ['Automate invoice approvals', 'Hannah Reid', 'Finance', 'Replace the email approval chain with a workflow', 'High', 'Multiple departments', '15/01/2027', '3', '5', '3', 'L', 'No'];
+  saveFile('change-request-intake-template.csv', head.map(csvCell).join(',') + '\n' + ex.map(csvCell).join(','));
+}
+
+/* ---------- Routing ---------- */
+const VIEWS = ['queue', 'plan', 'scoring'];
+function route() {
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'queue';
+  for (const x of VIEWS) $('#view-' + x).hidden = x !== v;
+  $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.view === v ? 'page' : 'false'));
+  if (v === 'scoring') renderScoring();
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
+
+/* ---------- Events ---------- */
+function addRequest() {
+  if (S.examples) { S.requests = []; S.examples = false; Store.saveSettings(0); }
+  const r = normalise({ id: uid(), title: '', requester: '', dept: '', description: '', due: null, status: 'new', submitted: iso(today()), source: 'Added by hand', notes: '', impact: null, reach: null, urgency: null, alignment: null, risk: null, effort: null, compliance: false });
+  S.requests.push(r); renderAll(); openDetail(r.id, true); Store.saveRequest(r, 800);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-open], a'); if (!t) return;
+  if (t.matches('[data-open]')) { openDetail(t.dataset.open); return; }
+  if (t.id === 'importBtn' || t.dataset.action === 'import') { openImport(); return; }
+  if (t.id === 'addBtn' || t.dataset.action === 'add') { addRequest(); return; }
+  if (t.dataset.action === 'clear-filters') { S.filter.tiers.clear(); S.filter.q = ''; S.filter.status = 'open'; $('#search').value = ''; $('#statusFilter').value = 'open'; renderQueue(); return; }
+  if (t.matches('[data-tier]')) { const k = t.dataset.tier; S.filter.tiers.has(k) ? S.filter.tiers.delete(k) : S.filter.tiers.add(k); renderQueue(); return; }
+  if (t.matches('[data-close]')) { t.closest('dialog').close(); return; }
+  if (t.matches('[data-rate]')) {
+    const r = findReq(openId); const k = t.dataset.rate, v = +t.dataset.v;
+    r[k] = r[k] === v ? null : v;
+    if (k === 'effort' && !r._hoursEdited) r.hours = EFFORT_HOURS[(r.effort ?? 3) - 1];
+    $$(`[data-rate="${k}"]`).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === r[k])));
+    if (k === 'effort') $('#f-hours').value = r.hours;
+    afterEdit(r, 300); return;
+  }
+  if (t.matches('[data-del]')) {
+    $('#delRow').innerHTML = `<span class="small">Delete this request?</span><button class="btn btn-danger" type="button" data-del-yes>Delete</button><button class="btn btn-quiet" type="button" data-del-no>Keep it</button>`; return;
+  }
+  if (t.matches('[data-del-no]')) { $('#delRow').innerHTML = `<button class="btn btn-danger" type="button" data-del>Delete request</button>`; return; }
+  if (t.matches('[data-del-yes]')) {
+    const id = openId; S.requests = S.requests.filter(r => r.id !== id); Store.deleteRequest(id); $('#detail').close(); renderAll(); toast('Request deleted'); return;
+  }
+  if (t.matches('[data-imp-back]')) { imp.wb = null; renderImport(); return; }
+  if (t.matches('[data-imp-go]')) { doImport(); return; }
+  if (t.id === 'exportCsv') { exportCsv(); return; }
+  if (t.id === 'templateCsv') { templateCsv(); return; }
+  if (t.id === 'resetWeights') { S.settings.weights = clone(DEFAULTS.weights); S.settings.boost = DEFAULTS.boost; S.settings.thresholds = clone(DEFAULTS.thresholds); renderScoring(); renderAll(); Store.saveSettings(); toast('Scoring reset to defaults'); return; }
+  if (t.id === 'clearAll') { $('#clearWrap').innerHTML = `<span class="small">This removes every request and can’t be undone.</span><button class="btn btn-danger" type="button" id="clearYes">Delete all</button><button class="btn btn-quiet" type="button" id="clearNo">Keep them</button>`; return; }
+  if (t.id === 'clearNo') { $('#clearWrap').innerHTML = `<button class="btn btn-danger" type="button" id="clearAll">Delete all requests</button>`; return; }
+  if (t.id === 'clearYes') {
+    const old = S.examples ? [] : S.requests.slice(); S.requests = []; S.examples = false;
+    old.forEach(r => Store.deleteRequest(r.id)); Store.saveLocal(); renderAll();
+    $('#clearWrap').innerHTML = `<button class="btn btn-danger" type="button" id="clearAll">Delete all requests</button>`; toast('All requests deleted'); return;
+  }
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('circle[data-open]')) { e.preventDefault(); openDetail(e.target.dataset.open); }
+});
+$('#detail').addEventListener('input', e => {
+  const el = e.target; const f = el.dataset.f; if (!f) return;
+  const r = findReq(openId); if (!r) return;
+  if (f === 'hours') r._hoursEdited = true;
+  updateField(r, f, el.type === 'checkbox' ? el.checked : el.value);
+  afterEdit(r, el.tagName === 'TEXTAREA' || el.type === 'text' ? 700 : 200);
+});
+$('#detail').addEventListener('close', () => {
+  const r = findReq(openId);
+  if (r && !r.title.trim()) { S.requests = S.requests.filter(x => x !== r); Store.deleteRequest(r.id); renderAll(); }
+  openId = null;
+});
+$('#detail').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$('#importDlg').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$('#importDlg').addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'fileIn' && el.files[0]) readFile(el.files[0]);
+  else if (el.id === 'sheetSel') { loadSheet(el.value); renderImport(); }
+  else if (el.dataset.map != null) { const i = +el.dataset.map; const v = el.value; if (v) imp.map = imp.map.map((m, j) => (m === v && j !== i) ? '' : m); imp.map[i] = v; renderImport(); }
+  else if (el.name === 'impMode') imp.mode = el.value;
+});
+['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => {
+  if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+  e.preventDefault(); if (!$('#importDlg').open) openImport(); $('#drop')?.classList.add('over');
+}));
+document.addEventListener('dragleave', e => { if (e.target.id === 'drop') e.target.classList.remove('over'); });
+document.addEventListener('drop', e => {
+  if (!e.dataTransfer?.files?.length) return; e.preventDefault(); $('#drop')?.classList.remove('over');
+  if (!$('#importDlg').open) openImport(); readFile(e.dataTransfer.files[0]);
+});
+$('#search').addEventListener('input', e => { S.filter.q = e.target.value; renderQueue(); });
+$('#statusFilter').addEventListener('change', e => { S.filter.status = e.target.value; renderQueue(); });
+$('#view-plan').addEventListener('change', e => {
+  const el = e.target; const st = S.settings;
+  if (el.dataset.cap != null) st.dayHours[+el.dataset.cap] = clamp(+el.value || 0, 0, 12);
+  else if (el.id === 'dayStart') st.dayStart = el.value || '09:00';
+  else if (el.id === 'mineStart') st.mineStart = el.value || '12:30';
+  else if (el.id === 'mineHours') st.mineHours = clamp(+el.value || 0, 0, 4);
+  else if (el.id === 'maxBlock') st.maxBlock = clamp(+el.value || 3, 0.5, 8);
+  else if (el.id === 'weeks') st.weeks = +el.value;
+  else return;
+  renderAll(); Store.saveSettings();
+});
+$('#hiShare').addEventListener('input', e => { S.settings.hiShare = +e.target.value; $('#splitOut').textContent = `${S.settings.hiShare}% to P1–P2, ${100 - S.settings.hiShare}% to P3–P4`; renderAll(); Store.saveSettings(); });
+$('#view-scoring').addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.weight) { S.settings.weights[el.dataset.weight] = +el.value; $('#wo-' + el.dataset.weight).textContent = el.value; }
+  else if (el.dataset.boost != null) { S.settings.boost = +el.value; $('#wo-boost').textContent = el.value; $('#boostEcho').textContent = el.value; }
+  else if (el.dataset.th) { const v = clamp(+el.value || 0, 0, 100); S.settings.thresholds[el.dataset.th] = v; }
+  else return;
+  renderAll(); Store.saveSettings();
+});
+window.addEventListener('hashchange', route);
+
+/* ---------- Boot ---------- */
+function applySettings(s) {
+  if (!s) return;
+  const m = Object.assign(clone(DEFAULTS), s);
+  m.weights = Object.assign(clone(DEFAULTS.weights), s.weights || {});
+  m.thresholds = Object.assign(clone(DEFAULTS.thresholds), s.thresholds || {});
+  if (!Array.isArray(m.dayHours) || m.dayHours.length !== 7) m.dayHours = DEFAULTS.dayHours.slice();
+  S.settings = m;
+}
+S.requests = examples(); S.examples = true;
+renderCapacity(); renderAll(); route();
+(async () => {
+  await Store.init();
+  try {
+    const data = await Store.load();
+    applySettings(data.settings);
+    if (data.requests && data.requests.length) { S.requests = data.requests.map(normalise); S.examples = false; }
+  } catch (e) { toast('Couldn’t load your saved requests. Showing examples for now.'); }
+  renderCapacity(); renderAll(); route();
+})();
+})();
+</script>
+
+</body>
+</html>
