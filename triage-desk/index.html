@@ -10,7 +10,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* Layout: teal shell rail on top; Queue = ranked list + value/effort matrix; Week plan = timetable columns (morning = high priority, your time, afternoon = lighter work). */
@@ -35,7 +35,9 @@
   --focus: #1F6FD1;
   --font: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --t-xs: .75rem; --t-sm: .8125rem; --t-base: .9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem; --t-xl: 1.625rem;
-  --r-sm: 6px; --r-md: 10px;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
+  --t-2xl: 2rem; --t-band: 2.75rem;
+  --p1-hi: #FF8E7F; --p2-hi: #F4B650; --shell-line: rgba(230, 240, 236, .12);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --pph: 46px;
@@ -74,7 +76,7 @@ p { margin: 0; }
 .tab[aria-current="page"] { color: var(--shell-ink); }
 .tab[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 2px; background: var(--signal); }
 @media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--shell-ink); background: var(--shell-2); } }
-.shell-actions { display: flex; gap: 8px; }
+.shell-actions { display: flex; gap: 8px; align-items: center; }
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: var(--t-sm); cursor: pointer; text-decoration: none; transition: transform .12s var(--ease-out), background-color .15s ease, border-color .15s ease; }
@@ -98,8 +100,6 @@ main { padding-block: 24px 64px; }
 .view-head h1 { font-size: var(--t-xl); font-weight: 700; }
 .view-head p { color: var(--ink-2); max-width: 62ch; margin-top: 4px; }
 
-.notice { display: flex; gap: 12px 16px; align-items: center; flex-wrap: wrap; justify-content: space-between; background: color-mix(in srgb, var(--signal) 22%, var(--surface)); border: 1px solid color-mix(in srgb, var(--signal) 60%, var(--line)); border-radius: var(--r-md); padding: 12px 16px; }
-.notice p { max-width: 70ch; }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); }
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
@@ -107,52 +107,139 @@ main { padding-block: 24px 64px; }
 .muted { color: var(--ink-2); }
 .small { font-size: var(--t-sm); }
 
-/* Tier distribution bar (also the filter) */
-.dist { display: grid; gap: 10px; }
-.dist-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--surface-2); gap: 2px; }
-.dist-bar span { display: block; height: 100%; transition: flex-grow .25s var(--ease-out); }
-.tier-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.tier-filter { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; text-align: left; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); cursor: pointer; transition: border-color .15s ease, background-color .15s ease, transform .12s var(--ease-out); }
-.tier-filter:active { transform: scale(0.98); }
-.tier-filter .code { grid-row: span 2; align-self: center; font-weight: 700; font-size: var(--t-lg); color: var(--tier); }
-.tier-filter .name { font-weight: 600; font-size: var(--t-sm); }
-.tier-filter .meta { font-size: var(--t-xs); color: var(--ink-2); }
-.tier-filter[aria-pressed="true"] { border-color: var(--tier); background: color-mix(in srgb, var(--tier) 9%, var(--surface)); }
-@media (hover: hover) and (pointer: fine) { .tier-filter:hover { border-color: var(--tier); } }
-.facts { display: flex; flex-wrap: wrap; gap: 6px 28px; font-size: var(--t-sm); color: var(--ink-2); }
+/* Queue: band rail + bento */
+@property --band { syntax: '<color>'; inherits: true; initial-value: #0F3B3A; }
+:root { interpolate-size: allow-keywords; }
+.q-head { display: flex; justify-content: space-between; align-items: end; gap: 16px 32px; flex-wrap: wrap; }
+.q-title h1 { font-size: var(--t-2xl); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.facts { margin-top: 8px; font-size: var(--t-sm); color: var(--ink-2); max-width: 70ch; }
 .facts b { color: var(--ink); font-weight: 600; }
-.facts .warn b { color: var(--p1); }
-
-/* Queue layout */
-.queue-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+.facts a { color: var(--p1); font-weight: 600; text-underline-offset: 3px; }
+.q-tools { display: flex; gap: 8px; flex: 0 1 460px; min-width: 0; }
 .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.field-inline { min-height: 38px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 0 10px; }
+.field-inline { min-height: 40px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 0 12px; font-size: var(--t-sm); transition: border-color .15s ease; }
+.field-inline:focus-visible { border-color: var(--focus); }
+@media (hover: hover) and (pointer: fine) { .field-inline:hover { border-color: var(--ink-2); } }
 .search { flex: 1 1 200px; min-width: 0; }
 
-.rows { display: grid; }
-.row-head, .row { display: grid; grid-template-columns: 40px 64px minmax(0, 1fr) 92px 112px 64px 100px; gap: 12px; align-items: center; padding: 10px 16px; }
-.row-head { font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--line); letter-spacing: .01em; }
-.row { width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; transition: background-color .15s ease; }
-.row:last-child { border-bottom: 0; border-radius: 0 0 var(--r-md) var(--r-md); }
-@media (hover: hover) and (pointer: fine) { .row:hover { background: var(--surface-2); } }
-.rank { font-weight: 600; color: var(--ink-2); }
+.bandbar { overflow-x: auto; border-radius: 14px; background: var(--surface-2); scrollbar-width: none; }
+.bandbar::-webkit-scrollbar { display: none; }
+.band-track { position: relative; display: flex; gap: 2px; padding: 4px; min-width: 100%; width: max-content; }
+.band-ind { position: absolute; inset: 4px; border-radius: 11px; pointer-events: none;
+  background: color-mix(in srgb, var(--band) 13%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--band) 30%, transparent);
+  clip-path: inset(0 100% 0 0 round 11px); }
+.band-ind.ready { transition: clip-path .34s var(--ease-out), --band .34s ease; }
+.seg-band { position: relative; z-index: 1; flex: 1 0 auto; min-width: 128px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; text-align: left; padding: 10px 16px; border: 0; border-radius: 11px; background: transparent; cursor: pointer; color: var(--ink-2); transition: color .2s ease, background-color .2s ease, transform .12s var(--ease-out); }
+.seg-band:active { transform: scale(0.97); }
+.seg-band .code { grid-row: span 2; font-size: var(--t-xl); font-weight: 700; font-stretch: 78%; letter-spacing: -0.03em; line-height: 1; color: var(--tier); transition: opacity .2s ease; opacity: .7; }
+.seg-band .nm { font-size: var(--t-sm); font-weight: 600; }
+.seg-band .ct { font-size: var(--t-xs); }
+.seg-band[aria-pressed="true"] { color: var(--ink); }
+.seg-band[aria-pressed="true"] .code { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .seg-band[aria-pressed="false"]:hover { background: color-mix(in srgb, var(--tier) 7%, transparent); color: var(--ink); }
+  .seg-band:hover .code { opacity: 1; }
+}
+
+.bento { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.bento-main, .bento-side { display: grid; gap: 16px; min-width: 0; align-content: start; }
+.mod { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); min-width: 0; }
+.mod-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 18px 10px; }
+.mod-head h2 { font-size: var(--t-md); font-weight: 600; letter-spacing: -0.01em; }
+.mod-head a { font-size: var(--t-sm); font-weight: 600; color: var(--p3); text-decoration: none; }
+.mod-head a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Band modules */
+.band { --tier: var(--p4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); min-width: 0; }
+.band-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 18px 20px; }
+.band-code { font-size: var(--t-band); font-weight: 700; font-stretch: 75%; letter-spacing: -0.045em; line-height: .82; color: var(--tier); }
+.band-name { font-size: var(--t-lg); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
+.band-meta { font-size: var(--t-sm); color: var(--ink-2); }
+.band-load { font-size: var(--t-sm); color: var(--ink-2); text-align: right; white-space: nowrap; }
+.band-load b { display: block; font-size: var(--t-lg); color: var(--ink); font-weight: 600; letter-spacing: -0.01em; }
+
+/* P1: the one committed module */
+.band-p1 { --tier: var(--p1-hi); background: var(--shell); border-color: transparent; color: var(--shell-ink); }
+.band-p1 .band-meta, .band-p1 .band-load { color: var(--shell-ink-2); }
+.band-p1 .band-load b { color: var(--shell-ink); }
+.p1-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; padding: 0 12px 12px; }
+.card-p1 { display: grid; gap: 14px; align-content: space-between; min-height: 172px; text-align: left; padding: 18px; border-radius: 12px; border: 1px solid var(--shell-line); background: var(--shell-2); color: inherit; cursor: pointer; transition: transform .22s var(--ease-out), background-color .2s ease, border-color .2s ease; }
+.card-p1:active { transform: scale(0.99); }
+@media (hover: hover) and (pointer: fine) { .card-p1:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--p1-hi) 45%, transparent); } }
+.card-p1 .t { font-size: var(--t-lg); font-weight: 600; line-height: 1.25; letter-spacing: -0.015em; text-wrap: balance; }
+.card-p1 .sub { font-size: var(--t-sm); color: var(--shell-ink-2); margin-top: 4px; }
+.card-p1 .foot { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.card-p1 .when { font-size: var(--t-sm); color: var(--shell-ink-2); display: grid; gap: 2px; }
+.card-p1 .when b { color: var(--shell-ink); font-weight: 600; }
+.card-p1 .when b.late { color: var(--p1-hi); }
+.big-n { font-size: 2.25rem; font-weight: 700; font-stretch: 78%; letter-spacing: -0.04em; line-height: .85; color: var(--tier); }
+.band-p1 .why .chip { border-color: var(--shell-line); color: var(--shell-ink-2); }
+.band-p1 .why .chip.flag-must { border-color: color-mix(in srgb, var(--p1-hi) 50%, transparent); color: var(--p1-hi); }
+.band-p1 .why .chip.flag-info { border-color: color-mix(in srgb, var(--p2-hi) 50%, transparent); color: var(--p2-hi); }
+.band-calm { padding: 0 20px 20px; color: var(--shell-ink-2); max-width: 56ch; }
+
+/* P2 to P4: disclosure modules */
+details.band > summary { list-style: none; cursor: pointer; border-radius: var(--r-lg); transition: background-color .2s ease; }
+details.band > summary::-webkit-details-marker { display: none; }
+@media (hover: hover) and (pointer: fine) { details.band > summary:hover { background: color-mix(in srgb, var(--tier) 5%, var(--surface)); } }
+details.band[open] > summary { border-radius: var(--r-lg) var(--r-lg) 0 0; }
+details.band::details-content { block-size: 0; overflow: clip; transition: block-size .3s var(--ease-out), content-visibility .3s allow-discrete; }
+details.band[open]::details-content { block-size: auto; }
+.chev-b { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--ink-2); transition: transform .3s var(--ease-out), background-color .2s ease; }
+details.band[open] .chev-b { transform: rotate(180deg); }
+.band-head .right { display: flex; align-items: center; gap: 14px; }
+.items { display: grid; padding: 0 8px 8px; }
+.item { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto 92px 52px; gap: 16px; align-items: center; width: 100%; padding: 14px 12px; border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; border-radius: 10px; transition: background-color .15s ease; }
+.item:first-child { border-top-color: transparent; }
+@media (hover: hover) and (pointer: fine) { .item:hover { background: color-mix(in srgb, var(--tier) 6%, var(--surface)); } .item:hover + .item { border-top-color: transparent; } }
+.item .rk { font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); }
+.item .t { font-weight: 600; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .sub { font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .sc { font-size: var(--t-xl); font-weight: 700; font-stretch: 78%; letter-spacing: -0.03em; color: var(--tier); text-align: right; line-height: 1; }
+.why { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { display: inline-block; font-size: var(--t-xs); font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.chip.flag-info { border-color: color-mix(in srgb, var(--p2) 50%, var(--line)); color: var(--p2); }
+.chip.flag-must { border-color: color-mix(in srgb, var(--p1) 45%, var(--line)); color: var(--p1); }
+.due { font-size: var(--t-sm); }
+.due.late { color: var(--p1); font-weight: 600; }
+.due.soon { color: var(--p2); font-weight: 600; }
 .pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 12px; font-size: var(--t-xs); font-weight: 700; color: var(--tier); background: color-mix(in srgb, var(--tier) 14%, var(--surface)); white-space: nowrap; }
 .pill.pinned::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .req-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .req-sub { font-size: var(--t-sm); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; gap: 8px; align-items: center; }
-.chip { display: inline-block; font-size: var(--t-xs); font-weight: 600; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
-.chip.flag-info { border-color: color-mix(in srgb, var(--p2) 50%, var(--line)); color: var(--p2); }
-.chip.flag-must { border-color: color-mix(in srgb, var(--p1) 45%, var(--line)); color: var(--p1); }
-.score { display: grid; gap: 4px; }
-.score b { font-size: var(--t-sm); }
 .meter { height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
 .meter i { display: block; height: 100%; background: var(--tier); border-radius: 2px; }
-.due { font-size: var(--t-sm); }
-.due.late { color: var(--p1); font-weight: 600; }
-.due.soon { color: var(--p2); font-weight: 600; }
-.status { font-size: var(--t-sm); color: var(--ink-2); }
-.empty { padding: 40px 20px; text-align: center; display: grid; gap: 12px; justify-items: center; }
+
+/* Side modules */
+.slots { display: grid; padding: 0 10px 12px; }
+.slot { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: baseline; width: 100%; padding: 9px 8px; border: 0; background: transparent; text-align: left; border-radius: 8px; cursor: pointer; transition: background-color .15s ease; }
+@media (hover: hover) and (pointer: fine) { .slot:hover { background: var(--surface-2); } }
+.slot .tm { font-size: var(--t-sm); color: var(--ink-2); }
+.slot .tt { font-size: var(--t-sm); font-weight: 600; display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.slot .tt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--tier); transform: translateY(-1px); }
+.slot.mine .tt { color: var(--ink-2); font-weight: 500; }
+.slot.mine .dot { background: transparent; border: 1.5px dashed var(--ink-2); }
+.asks { display: grid; padding: 0 10px 12px; }
+.ask { display: grid; gap: 2px; width: 100%; padding: 9px 8px; border: 0; background: transparent; text-align: left; border-radius: 8px; cursor: pointer; transition: background-color .15s ease; }
+@media (hover: hover) and (pointer: fine) { .ask:hover { background: var(--surface-2); } }
+.ask b { font-size: var(--t-sm); font-weight: 600; }
+.ask span { font-size: var(--t-xs); color: var(--ink-2); }
+.mod-empty { padding: 0 18px 18px; font-size: var(--t-sm); color: var(--ink-2); }
+
+/* Example-data indicator in the shell */
+.demo-chip { display: inline-flex; align-items: center; gap: 0; min-height: 30px; padding: 0 12px; border-radius: 999px; border: 1px dashed color-mix(in srgb, var(--shell-ink) 35%, transparent); background: transparent; color: var(--shell-ink-2); font-size: var(--t-xs); font-weight: 600; cursor: pointer; white-space: nowrap; transition: color .15s ease, border-color .15s ease; }
+.demo-chip::before { content: ""; margin-right: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--signal); }
+@media (hover: hover) and (pointer: fine) { .demo-chip:hover { color: var(--shell-ink); border-color: var(--shell-ink-2); } }
+
+.empty { padding: 48px 24px; text-align: center; display: grid; gap: 12px; justify-items: center; }
 .empty p { max-width: 46ch; color: var(--ink-2); }
+
+/* Band entrance when the filter changes: a quick, short rise */
+@keyframes band-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes band-fade { from { opacity: 0; } }
+.enter { animation: band-in .26s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms); }
 
 /* Matrix */
 .matrix svg { display: block; width: 100%; height: auto; }
@@ -292,18 +379,21 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 1080px) {
-  .queue-grid { grid-template-columns: minmax(0, 1fr); }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .bento-side { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
   .score-layout { grid-template-columns: minmax(0, 1fr); }
   .cap-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
-  .row-head { display: none; }
-  .row { grid-template-columns: 30px 56px minmax(0, 1fr) auto; grid-template-areas: "rank tier title title" ". sub sub sub" ". score due hours"; row-gap: 6px; }
-  .row .c-rank { grid-area: rank; } .row .c-tier { grid-area: tier; } .row .c-title { grid-area: title; }
-  .row .c-score { grid-area: score; } .row .c-due { grid-area: due; } .row .c-hours { grid-area: hours; text-align: right; } .row .c-status { display: none; }
-  .row .c-title .req-sub { display: none; }
-  .row .c-sub { grid-area: sub; display: flex !important; }
-  .tier-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root { --t-band: 2.25rem; --t-2xl: 1.75rem; }
+  .q-tools { flex-basis: 100%; }
+  .seg-band { min-width: 112px; padding: 8px 12px; }
+  .band-head { padding: 16px; gap: 12px; }
+  .band-load b { font-size: var(--t-md); }
+  .item { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main sc" "why due"; row-gap: 8px; }
+  .item .rk { display: none; }
+  .item .main { grid-area: main; } .item .why { grid-area: why; } .item .due-c { grid-area: due; text-align: right; } .item .sc { grid-area: sc; }
+  .card-p1 { min-height: 0; }
   .cap-days { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .cap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .thresholds { grid-template-columns: 1fr; }
@@ -313,12 +403,14 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
   .shell-actions .btn span { display: none; }
   .shell .wrap { gap: 10px 14px; }
   .tabs { order: 3; flex-basis: 100%; }
+  .demo-chip span { display: none; }
 }
-.c-sub { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-property: opacity, background-color, border-color, color !important; }
-  .btn:active, .blk:active, .tier-filter:active { transform: none; }
+  .btn:active, .blk:active, .seg-band:active, .card-p1:active { transform: none; }
+  .card-p1:hover { transform: none !important; }
+  .enter { animation-name: band-fade; }
   @starting-style { .sheet[open], .modal[open] { transform: none; } }
 }
 </style>
@@ -335,6 +427,7 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
       <a class="tab" href="#scoring" data-view="scoring">Scoring rules</a>
     </nav>
     <div class="shell-actions">
+      <button class="demo-chip" id="demoChip" type="button" hidden title="These are example requests. Import your forms to replace them. Nothing is saved until you do.">Example data<span>, import yours</span></button>
       <button class="btn btn-ghost-dark" id="addBtn" type="button" aria-label="Add request">
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Add request</span></button>
       <button class="btn btn-primary" id="importBtn" type="button" aria-label="Import forms">
@@ -344,50 +437,43 @@ dialog::backdrop { background: rgba(8, 20, 19, .45); }
 </header>
 
 <main class="wrap">
-  <div id="exampleNotice" class="notice" hidden style="margin-bottom:20px">
-    <p><b>These are example requests.</b> Import the Excel or CSV export from your intake form to replace them with your own. Nothing here is saved until you do.</p>
-    <button class="btn btn-primary" type="button" data-action="import">Import forms</button>
-  </div>
-
   <!-- QUEUE -->
   <section class="view" id="view-queue" aria-labelledby="qTitle">
-    <div class="view-head">
-      <div>
+    <div class="q-head">
+      <div class="q-title">
         <h1 id="qTitle">Change queue</h1>
-        <p>Every open request, ranked by score. Pick a priority band to filter the list.</p>
+        <p class="facts" id="facts"></p>
+      </div>
+      <div class="q-tools">
+        <label class="sr" for="search">Search requests</label>
+        <input class="field-inline search" id="search" type="search" placeholder="Search title, requester or team">
+        <label class="sr" for="statusFilter">Status</label>
+        <select class="field-inline" id="statusFilter">
+          <option value="open">Open</option>
+          <option value="all">All</option>
+          <option value="new">New</option>
+          <option value="accepted">Accepted</option>
+          <option value="progress">In progress</option>
+          <option value="hold">On hold</option>
+          <option value="done">Done</option>
+          <option value="declined">Declined</option>
+        </select>
       </div>
     </div>
-    <div class="dist">
-      <div class="dist-bar" id="distBar" aria-hidden="true"></div>
-      <div class="tier-filters" id="tierFilters"></div>
-      <div class="facts" id="facts"></div>
+    <div class="bandbar" role="group" aria-label="Filter by priority band">
+      <div class="band-track" id="bandTrack"><div class="band-ind" id="bandInd" aria-hidden="true"></div></div>
     </div>
-    <div class="queue-grid">
-      <div class="panel">
-        <div class="panel-head">
-          <div class="toolbar" style="flex:1">
-            <label class="sr" for="search">Search requests</label>
-            <input class="field-inline search" id="search" type="search" placeholder="Search title, requester or team">
-            <label class="sr" for="statusFilter">Status</label>
-            <select class="field-inline" id="statusFilter">
-              <option value="open">Open requests</option>
-              <option value="all">All requests</option>
-              <option value="new">New</option>
-              <option value="accepted">Accepted</option>
-              <option value="progress">In progress</option>
-              <option value="hold">On hold</option>
-              <option value="done">Done</option>
-              <option value="declined">Declined</option>
-            </select>
-          </div>
-        </div>
-        <div class="rows" id="rows" role="list"></div>
-      </div>
-      <div class="panel matrix">
-        <div class="panel-head"><h2>Value against effort</h2></div>
-        <div id="matrix"></div>
-        <p class="matrix-note">Top left is where quick wins sit. Bottom right is worth a second conversation with the requester.</p>
-      </div>
+    <div class="bento">
+      <div class="bento-main" id="bands"></div>
+      <aside class="bento-side" aria-label="At a glance">
+        <section class="mod" id="todayMod"></section>
+        <section class="mod matrix">
+          <div class="mod-head"><h2>Value against effort</h2></div>
+          <div id="matrix"></div>
+          <p class="matrix-note">Top left holds the quick wins. Bottom right is worth a second conversation with the requester.</p>
+        </section>
+        <section class="mod" id="askMod"></section>
+      </aside>
     </div>
   </section>
 
@@ -543,7 +629,7 @@ const DEFAULTS = {
 };
 const clone = o => JSON.parse(JSON.stringify(o));
 
-const S = { requests: [], settings: clone(DEFAULTS), examples: false, filter: { tiers: new Set(), q: '', status: 'open' }, plan: null };
+const S = { requests: [], settings: clone(DEFAULTS), examples: false, filter: { band: 'all', q: '', status: 'open' }, ui: { open: { P2: true, P3: true, P4: false } }, plan: null };
 
 /* ---------- Scoring ---------- */
 function dateUrgency(due) {
@@ -857,10 +943,10 @@ const Store = {
 
 /* ---------- Rendering: Queue ---------- */
 function visibleRequests() {
-  const { tiers, q, status } = S.filter; const ql = q.trim().toLowerCase();
+  const { band, q, status } = S.filter; const ql = q.trim().toLowerCase();
   return S.requests.filter(r => {
     if (status === 'open' ? !ACTIVE.has(r.status) && r.status !== 'hold' : status !== 'all' && r.status !== status) return false;
-    if (tiers.size && !tiers.has(r._tier)) return false;
+    if (band !== 'all' && r._tier !== band) return false;
     if (ql && !(`${r.title} ${r.requester} ${r.dept} ${r.description}`.toLowerCase().includes(ql))) return false;
     return true;
   });
@@ -879,41 +965,118 @@ function flagsHtml(r) {
   if (r._missing.length) s += '<span class="chip flag-info">Needs info</span>';
   return s;
 }
-function renderQueue() {
+const SEGMENTS = [['all', 'All', 'Every band'], ...TIERS.map(t => [t, t, TIER_NAME[t]])];
+function buildBandbar() {
+  const track = $('#bandTrack');
+  track.insertAdjacentHTML('beforeend', SEGMENTS.map(([k, code, name]) => `<button type="button" class="seg-band" data-band="${k}" aria-pressed="false" style="--tier:${k === 'all' ? 'var(--ink)' : TIER_VAR(k)}">
+    <span class="code">${code}</span><span class="nm">${name}</span><span class="ct" data-ct="${k}"></span></button>`).join(''));
+  window.addEventListener('resize', () => placeIndicator(false));
+}
+function placeIndicator(animate = true) {
+  const track = $('#bandTrack'), ind = $('#bandInd');
+  const btn = track.querySelector(`[data-band="${S.filter.band}"]`); if (!btn) return;
+  const W = track.clientWidth - 8, L = btn.offsetLeft - 4, w = btn.offsetWidth;
+  if (!animate) ind.classList.remove('ready');
+  ind.style.setProperty('--band', resolveColor(btn));
+  ind.style.clipPath = `inset(0 ${Math.max(0, W - L - w)}px 0 ${Math.max(0, L)}px round 11px)`;
+  if (!animate) requestAnimationFrame(() => requestAnimationFrame(() => ind.classList.add('ready')));
+}
+function resolveColor(el) { return getComputedStyle(el.querySelector('.code')).color; }
+function reasonsOf(r) {
+  const out = [];
+  if (r.compliance) out.push('<span class="chip flag-must">Mandatory</span>');
+  const n = daysUntil(r.due);
+  if (n != null && n >= 0 && n <= 14) out.push('<span class="chip">Due soon</span>');
+  const label = { impact: 'High impact', reach: 'Wide reach', alignment: 'Strategic', risk: 'Risky to delay', ease: 'Quick win' };
+  r._s.parts.filter(p => p.k !== 'urgency' && p.rating >= 4).sort((a, b) => b.pts - a.pts).slice(0, out.length ? 1 : 2).forEach(p => out.push(`<span class="chip">${label[p.k]}</span>`));
+  if (r._missing.length) out.push('<span class="chip flag-info">Needs info</span>');
+  return out.slice(0, 3).join('');
+}
+function whenText(r) {
+  const n = daysUntil(r.due);
+  if (n == null) return { txt: 'No delivery date', late: false };
+  if (n < 0) return { txt: `${-n} day${n === -1 ? '' : 's'} overdue`, late: true };
+  if (n === 0) return { txt: 'Due today', late: true };
+  if (n === 1) return { txt: 'Due tomorrow', late: true };
+  return { txt: n < 14 ? `Due in ${n} days` : `Due ${fmtShort(fromIso(r.due))}`, late: n <= 7 };
+}
+function renderQueue(animate = false) {
   const open = S.requests.filter(r => ACTIVE.has(r.status) || r.status === 'hold');
-  const counts = {}, hours = {};
+  const counts = { all: open.length }, hours = { all: 0 };
   for (const t of TIERS) { counts[t] = 0; hours[t] = 0; }
-  for (const r of open) { counts[r._tier]++; hours[r._tier] += +r.hours || 0; }
-  $('#distBar').innerHTML = TIERS.map(t => `<span style="flex-grow:${counts[t]};background:${TIER_VAR(t)}"></span>`).join('');
-  $('#tierFilters').innerHTML = TIERS.map(t => `<button type="button" class="tier-filter" style="--tier:${TIER_VAR(t)}" data-tier="${t}" aria-pressed="${S.filter.tiers.has(t)}">
-      <span class="code">${t}</span><span class="name">${TIER_NAME[t]}</span><span class="meta">${counts[t]} request${counts[t] === 1 ? '' : 's'}, ${fmtH(hours[t])}</span></button>`).join('');
-  const totalH = open.reduce((a, r) => a + (+r.hours || 0), 0);
+  for (const r of open) { counts[r._tier]++; hours[r._tier] += +r.hours || 0; hours.all += +r.hours || 0; }
+
+  // Band rail
+  $$('.seg-band').forEach(b => {
+    const k = b.dataset.band; b.setAttribute('aria-pressed', String(S.filter.band === k));
+    b.querySelector('.ct').textContent = `${counts[k]} open, ${fmtH(hours[k])}`;
+  });
+  placeIndicator(animate);
+
+  // Facts line
   const plan = S.plan; const atRisk = Object.values(plan.byId).filter(x => x.rag === 'red').length;
-  const needInfo = open.filter(r => r._missing.length).length;
-  $('#facts').innerHTML = `<span><b>${open.length}</b> open</span><span><b>${fmtH(totalH)}</b> of your time</span>`
-    + `<span>${plan.spill ? `<b>More than ${S.settings.weeks} weeks</b> of work queued` : plan.clears ? `Queue clears by <b>${fmtDay(plan.clears)}</b>` : 'Nothing scheduled'}</span>`
-    + `<span class="${atRisk ? 'warn' : ''}"><b>${atRisk}</b> at risk of missing a date</span><span><b>${needInfo}</b> need more info</span>`;
+  $('#facts').innerHTML = `<b>${open.length}</b> open requests and <b>${fmtH(hours.all)}</b> of your time. `
+    + (plan.spill ? `More than <b>${S.settings.weeks} weeks</b> of work is queued. ` : plan.clears ? `The queue clears by <b>${fmtDay(plan.clears)}</b>. ` : '')
+    + (atRisk ? `<a href="#plan">${atRisk} at risk of missing a date</a>` : 'Nothing is at risk of missing a date.');
 
   const list = visibleRequests();
-  const rows = $('#rows');
+  const byTier = Object.fromEntries(TIERS.map(t => [t, list.filter(r => r._tier === t)]));
+  const showTiers = S.filter.band === 'all' ? TIERS : [S.filter.band];
+  const enter = () => animate ? ' enter' : '';
+  let html = '';
   if (!S.requests.length) {
-    rows.innerHTML = `<div class="empty"><h2 style="font-size:var(--t-lg)">No requests yet</h2><p>Import the spreadsheet your intake form produces, or add a request by hand. Each one is scored and ranked as soon as it lands.</p><div class="toolbar" style="justify-content:center"><button class="btn btn-primary" type="button" data-action="import">Import forms</button><button class="btn" type="button" data-action="add">Add request</button></div></div>`;
+    html = `<div class="mod empty"><h2 style="font-size:var(--t-xl);letter-spacing:-0.02em">Your queue is empty</h2><p>Import the spreadsheet your intake form produces, or add a request by hand. Each one is scored and ranked as soon as it lands.</p><div class="toolbar" style="justify-content:center"><button class="btn btn-primary" type="button" data-action="import">Import forms</button><button class="btn" type="button" data-action="add">Add request</button></div></div>`;
   } else if (!list.length) {
-    rows.innerHTML = `<div class="empty"><p>No requests match these filters.</p><button class="btn" type="button" data-action="clear-filters">Clear filters</button></div>`;
+    html = `<div class="mod empty"><p>No requests match this search or filter.</p><button class="btn" type="button" data-action="clear-filters">Show everything</button></div>`;
   } else {
-    rows.innerHTML = `<div class="row-head" role="presentation"><span>Rank</span><span>Priority</span><span>Request</span><span>Score</span><span>Due</span><span>Hours</span><span>Status</span></div>`
-      + list.map(r => `<button type="button" class="row" role="listitem" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}">
-        <span class="rank c-rank">${r._rank ?? '–'}</span>
-        <span class="c-tier">${pillHtml(r)}</span>
-        <span class="c-title" style="min-width:0"><span class="req-title" style="display:block">${esc(r.title)}</span><span class="req-sub">${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')} ${flagsHtml(r)}</span></span>
-        <span class="c-sub req-sub" style="min-width:0">${esc([r.requester, r.dept].filter(Boolean).join(', '))} ${flagsHtml(r)}</span>
-        <span class="score c-score"><b>${r._score}</b><span class="meter" aria-hidden="true"><i style="width:${r._score}%"></i></span></span>
-        <span class="c-due">${dueHtml(r)}</span>
-        <span class="c-hours small">${fmtH(+r.hours || 0)}</span>
-        <span class="status c-status">${STATUS_LABEL[r.status]}</span>
-      </button>`).join('');
+    html = showTiers.map((t, i) => {
+      const rs = byTier[t]; const h = rs.reduce((a, r) => a + (+r.hours || 0), 0);
+      const load = `<div class="band-load"><b>${fmtH(h)}</b>your time</div>`;
+      const head = `<span class="band-code">${t}</span><span style="min-width:0"><span class="band-name" style="display:block">${TIER_NAME[t]}</span><span class="band-meta">${rs.length} request${rs.length === 1 ? '' : 's'}</span></span>`;
+      if (t === 'P1') {
+        const cards = rs.map(r => { const w = whenText(r); return `<button type="button" class="card-p1" data-open="${esc(r.id)}">
+            <span><span class="t" style="display:block">${esc(r.title)}</span><span class="sub" style="display:block">${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')}</span></span>
+            <span class="why">${reasonsOf(r)}</span>
+            <span class="foot"><span class="when"><b class="${w.late ? 'late' : ''}">${w.txt}</b>${fmtH(+r.hours || 0)} of your time, ${STATUS_LABEL[r.status].toLowerCase()}</span><span class="big-n" aria-label="Score ${r._score}">${r._score}</span></span>
+          </button>`; }).join('');
+        return `<section class="band band-p1${enter()}" style="--i:${i}" aria-label="P1 ${TIER_NAME.P1}"><div class="band-head">${head}${load}</div>
+          ${rs.length ? `<div class="p1-grid">${cards}</div>` : `<p class="band-calm">Nothing needs doing right now. A good week to move P3 work forward.</p>`}</section>`;
+      }
+      const isOpen = S.filter.band === t || S.ui.open[t];
+      const items = rs.map(r => { const w = whenText(r); return `<button type="button" class="item" data-open="${esc(r.id)}">
+          <span class="rk">${r._rank ?? '–'}</span>
+          <span class="main" style="min-width:0"><span class="t" style="display:block">${esc(r.title)}</span><span class="sub" style="display:block">${esc([r.requester, r.dept].filter(Boolean).join(', ') || 'No requester')}${r.status !== 'new' ? `, ${STATUS_LABEL[r.status].toLowerCase()}` : ''}</span></span>
+          <span class="why">${reasonsOf(r)}</span>
+          <span class="due-c"><span class="due ${w.late ? 'late' : ''}">${w.txt.replace('Due ', '').replace(/^in /, 'In ')}</span><span class="small muted" style="display:block">${fmtH(+r.hours || 0)}</span></span>
+          <span class="sc" aria-label="Score ${r._score}">${r._score}</span>
+        </button>`; }).join('');
+      return `<details class="band${enter()}" data-band-mod="${t}" style="--tier:${TIER_VAR(t)};--i:${i}"${isOpen ? ' open' : ''}>
+        <summary class="band-head">${head}<span class="right">${load}<span class="chev-b" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></summary>
+        ${rs.length ? `<div class="items">${items}</div>` : `<p class="mod-empty">No requests in this band.</p>`}</details>`;
+    }).join('');
   }
+  $('#bands').innerHTML = html;
+
+  renderToday();
+  renderAsks(open);
   renderMatrix(list);
+}
+function renderToday() {
+  const t0 = +today();
+  const day = S.plan.days.find(d => d.blocks.some(b => !b.mine));
+  const label = !day ? 'Today' : +day.date === t0 ? 'Today' : +day.date === t0 + DAY ? 'Tomorrow' : fmtDay(day.date);
+  const blocks = day ? day.blocks.slice().sort((a, b) => a.start - b.start) : [];
+  $('#todayMod').innerHTML = `<div class="mod-head"><h2>${label}</h2><a href="#plan">Week plan</a></div>`
+    + (blocks.length ? `<div class="slots">${blocks.map(b => b.mine
+        ? `<div class="slot mine"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot"></i><span>Your time</span></span></div>`
+        : `<button type="button" class="slot" data-open="${esc(b.r.id)}" style="--tier:${TIER_VAR(b.r._tier)}"><span class="tm">${clock(b.start)}–${clock(b.start + b.h)}</span><span class="tt"><i class="dot"></i><span>${esc(b.r.title)}</span></span></button>`).join('')}</div>`
+      : `<p class="mod-empty">Nothing planned. Add hours under Week plan, or import requests to fill the day.</p>`);
+}
+function renderAsks(open) {
+  const need = open.filter(r => r._missing.length);
+  $('#askMod').innerHTML = `<div class="mod-head"><h2>Waiting on answers</h2><span class="small muted">${need.length || ''}</span></div>`
+    + (need.length ? `<div class="asks">${need.slice(0, 5).map(r => `<button type="button" class="ask" data-open="${esc(r.id)}"><b>${esc(r.title)}</b><span>Ask ${esc(r.requester || 'the requester')} about ${esc(r._missing.slice(0, 3).join(', '))}</span></button>`).join('')}${need.length > 5 ? `<p class="mod-empty" style="padding:6px 8px 0">and ${need.length - 5} more</p>` : ''}</div>`
+      : `<p class="mod-empty">Every open request has the answers it needs to be scored.</p>`);
 }
 function renderMatrix(list) {
   const W = 360, H = 290, L = 38, R = 12, T = 14, B = 40;
@@ -1010,7 +1173,7 @@ function renderScoring() {
   $('#storeMode').textContent = Store.mode === 'db' ? 'Saved to your account, private to you' : Store.mode === 'local' ? 'Saved in this browser only' : 'Not saved: storage is blocked here';
 }
 
-function renderAll() { computeAll(); renderQueue(); renderPlan(); $('#exampleNotice').hidden = !S.examples; }
+function renderAll() { computeAll(); renderQueue(); renderPlan(); $('#demoChip').hidden = !S.examples; }
 
 /* ---------- Detail sheet ---------- */
 let openId = null;
@@ -1221,8 +1384,9 @@ document.addEventListener('click', e => {
   if (t.matches('[data-open]')) { openDetail(t.dataset.open); return; }
   if (t.id === 'importBtn' || t.dataset.action === 'import') { openImport(); return; }
   if (t.id === 'addBtn' || t.dataset.action === 'add') { addRequest(); return; }
-  if (t.dataset.action === 'clear-filters') { S.filter.tiers.clear(); S.filter.q = ''; S.filter.status = 'open'; $('#search').value = ''; $('#statusFilter').value = 'open'; renderQueue(); return; }
-  if (t.matches('[data-tier]')) { const k = t.dataset.tier; S.filter.tiers.has(k) ? S.filter.tiers.delete(k) : S.filter.tiers.add(k); renderQueue(); return; }
+  if (t.id === 'demoChip') { openImport(); return; }
+  if (t.dataset.action === 'clear-filters') { S.filter.band = 'all'; S.filter.q = ''; S.filter.status = 'open'; $('#search').value = ''; $('#statusFilter').value = 'open'; renderQueue(true); return; }
+  if (t.matches('[data-band]')) { const k = t.dataset.band; if (S.filter.band === k) return; S.filter.band = k; if (k !== 'all') S.ui.open[k] = true; renderQueue(true); return; }
   if (t.matches('[data-close]')) { t.closest('dialog').close(); return; }
   if (t.matches('[data-rate]')) {
     const r = findReq(openId); const k = t.dataset.rate, v = +t.dataset.v;
@@ -1307,7 +1471,8 @@ $('#view-scoring').addEventListener('input', e => {
   else return;
   renderAll(); Store.saveSettings();
 });
-window.addEventListener('hashchange', route);
+window.addEventListener('hashchange', () => { route(); if (location.hash === '#queue' || !location.hash) placeIndicator(false); });
+document.addEventListener('toggle', e => { const t = e.target.dataset && e.target.dataset.bandMod; if (t) S.ui.open[t] = e.target.open; }, true);
 
 /* ---------- Boot ---------- */
 function applySettings(s) {
@@ -1319,6 +1484,7 @@ function applySettings(s) {
   S.settings = m;
 }
 S.requests = examples(); S.examples = true;
+buildBandbar();
 renderCapacity(); renderAll(); route();
 (async () => {
   await Store.init();
