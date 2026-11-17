@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..24,300..600,0..1,0&display=block">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* Layout: a calm personal planner. Lavender-white ground with soft light in the corners, white cards with hairline
@@ -29,10 +29,12 @@
   --bad: #D83A3A;
   --meet: #9A95B2;
   --focus: #5B4ED8;
-  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --t-xs: .75rem; --t-sm: .8125rem; --t-base: .9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem; --t-xl: 1.5rem;
   --r-sm: 8px; --r-md: 12px; --r-lg: 18px;
   --shadow: 0 1px 2px rgba(40, 30, 90, .04), 0 8px 24px rgba(40, 30, 90, .05);
+  --ease-ui: cubic-bezier(.2, .8, .2, 1);
+  --ease-enter: cubic-bezier(.22, 1, .36, 1);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
@@ -89,17 +91,18 @@ main { min-width: 0; padding: calc(36px + env(safe-area-inset-top, 0px)) max(32p
 .card-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
 .card-h h2 { font-size: var(--t-lg); font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
 .card-h h2 .ms { color: var(--accent); font-size: 24px; }
-.link { color: var(--accent); font-weight: 600; font-size: var(--t-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; cursor: pointer; padding: 0; }
-.link .ms { font-size: 18px; transition: transform .2s var(--ease-out); }
-@media (hover: hover) and (pointer: fine) { .link:hover .ms { transform: translateX(3px); } }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: var(--t-sm); cursor: pointer; text-decoration: none; white-space: nowrap; transition: transform .14s var(--ease-out), background-color .15s ease, border-color .15s ease, box-shadow .15s ease; }
-.btn:active { transform: scale(0.97); }
+.link { color: var(--accent); font-weight: 600; font-size: var(--t-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; border: 0; cursor: pointer; padding: 0 0 2px; transition: background-size 120ms var(--ease-ui); }
+@media (hover: hover) and (pointer: fine) { .link:hover { background-size: calc(100% - 22px) 1px; transition-duration: 150ms; } }
+.link .ms { font-size: 18px; transition: transform 120ms var(--ease-ui); }
+@media (hover: hover) and (pointer: fine) { .link:hover .ms { transform: translateX(3px); transition-duration: 150ms; } }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: var(--t-sm); cursor: pointer; text-decoration: none; white-space: nowrap; transition: transform 120ms var(--ease-ui), background-color 120ms var(--ease-ui), border-color 120ms var(--ease-ui), box-shadow 120ms var(--ease-ui); }
+.btn:active { transform: translateY(1px) scale(.985); transition-duration: 90ms; }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .btn .ms { font-size: 19px; }
 .btn.primary { background: linear-gradient(180deg, #6A5EE6, #5546D6); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(85, 70, 214, .25); }
 .btn.quiet { background: transparent; border-color: transparent; color: var(--ink-2); }
-.btn.danger { color: var(--bad); }
-@media (hover: hover) and (pointer: fine) { .btn:hover { border-color: #CFC8EA; } .btn.primary:hover { background: linear-gradient(180deg, #5F52E0, #4A3CC8); } .btn.quiet:hover { background: var(--surface-2); border-color: transparent; color: var(--ink); } }
+.btn.danger { color: #C02B2B; }
+@media (hover: hover) and (pointer: fine) { .btn:not(:disabled):hover { transform: translateY(-1px); transition-duration: 150ms; } .btn:not(:disabled):active { transform: translateY(1px) scale(.985); transition-duration: 90ms; } .btn:hover { border-color: #CFC8EA; background-color: #FBFAFF; } .btn.primary:hover { background: linear-gradient(180deg, #5F52E0, #4A3CC8); } .btn.quiet:hover { background: var(--surface-2); border-color: transparent; color: var(--ink); } }
 .pill { --tier: var(--ink-3); display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 24px; padding: 0 8px; border-radius: 8px; font-size: var(--t-xs); font-weight: 700; color: color-mix(in srgb, var(--tier) 85%, #000); background: color-mix(in srgb, var(--tier) 13%, #fff); white-space: nowrap; }
 .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; font-size: var(--t-xs); font-weight: 600; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
 .chip.flag-info { background: #FFF2DE; color: #9A5A00; }
@@ -128,7 +131,8 @@ main { min-width: 0; padding: calc(36px + env(safe-area-inset-top, 0px)) max(32p
 .ring { position: relative; width: 104px; height: 104px; display: grid; place-items: center; }
 .ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
 .ring b { position: relative; font-size: 1.375rem; font-weight: 800; letter-spacing: -0.02em; }
-.home-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.home-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: stretch; }
+.home-col { align-content: stretch; grid-auto-rows: auto 1fr; }
 .home-col { display: grid; gap: 20px; min-width: 0; }
 .plist { display: grid; }
 .prow { --tier: var(--ink-3); display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 14px; align-items: center; width: 100%; padding: 12px 6px; border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; border-radius: 12px; transition: background-color .15s ease; }
@@ -159,6 +163,9 @@ main { min-width: 0; padding: calc(36px + env(safe-area-inset-top, 0px)) max(32p
 .gl b small { font-size: .6em; font-weight: 700; color: var(--ink-2); letter-spacing: 0; }
 .gl span { display: block; color: var(--ink-2); font-size: var(--t-sm); margin-top: 2px; }
 .gl.risk .ms { color: var(--bad); }
+.gl b span, .gl b small span { display: inline; margin: 0; font-size: inherit; color: inherit; }
+.home-grid > .card { display: flex; flex-direction: column; }
+.home-grid > .card > .glance { flex: 1; align-items: center; }
 .coming { display: grid; gap: 4px; }
 .cu { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 12px; align-items: start; padding: 8px 0; }
 .cu i { width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; border: 2px solid var(--ink-2); }
@@ -201,7 +208,8 @@ main { min-width: 0; padding: calc(36px + env(safe-area-inset-top, 0px)) max(32p
 .it { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 34px; padding: 4px 6px; border: 0; border-radius: 9px; background: transparent; text-align: left; cursor: pointer; font-size: var(--t-sm); transition: background-color .15s ease; }
 @media (hover: hover) and (pointer: fine) { .it:hover { background: var(--surface-2); } }
 .cb { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid #B9B3D3; display: grid; place-items: center; background: var(--surface); transition: background-color .18s ease, border-color .18s ease; }
-.cb svg { width: 12px; height: 12px; }
+.cb svg { width: 12px; height: 12px; transform: scale(.7); opacity: 0; transition: transform 160ms var(--ease-ui), opacity 160ms var(--ease-ui); }
+[aria-checked="true"] > .cb svg { transform: none; opacity: 1; }
 .cb path { stroke-dasharray: 18; stroke-dashoffset: 18; transition: stroke-dashoffset .22s var(--ease-out); }
 [aria-checked="true"] > .cb { background: var(--accent); border-color: var(--accent); }
 [aria-checked="true"] > .cb path { stroke-dashoffset: 0; }
@@ -389,6 +397,29 @@ dialog::backdrop { background: rgba(29, 26, 43, .35); }
 .note { font-size: var(--t-xs); color: var(--ink-2); }
 .toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); opacity: 0; pointer-events: none; background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; font-weight: 600; font-size: var(--t-sm); box-shadow: 0 10px 28px rgba(29, 26, 43, .25); transition: transform .26s var(--ease-out), opacity .2s ease; z-index: 50; max-width: calc(100% - 32px); }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+/* Taste layer: cards that open something lift, fields ring, digits roll */
+@media (hover: hover) and (pointer: fine) {
+  .tcard:hover, .bchip:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(29, 26, 43, .08); transition: transform 180ms var(--ease-ui), box-shadow 180ms var(--ease-ui), border-color 150ms ease; }
+  .req-card:hover { box-shadow: 0 10px 24px rgba(29, 26, 43, .08); }
+  .focus-card .btn.primary:hover { box-shadow: 0 10px 22px rgba(85, 70, 214, .32); }
+}
+.tcard, .bchip { transition: transform 120ms var(--ease-ui), box-shadow 120ms var(--ease-ui), border-color 150ms ease, background-color 150ms ease; }
+.input, .select, .form input[type="text"], .form input[type="date"], .form input[type="number"], .form select, .form textarea, .daysrow input, .fgrid input, .fgrid select, .thr input, .field-inline { transition: border-color 140ms var(--ease-ui), box-shadow 140ms var(--ease-ui); }
+.input:focus-visible, .select:focus-visible, .form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible, .daysrow input:focus-visible, .fgrid input:focus-visible, .fgrid select:focus-visible, .thr input:focus-visible, .field-inline:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91, 78, 216, .16); }
+.rd { display: inline-block; }
+.roll { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; }
+.strip { grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 2px; }
+.strip-h { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-xs); color: var(--ink-2); font-weight: 600; }
+.strip-bar { position: relative; height: 16px; border-radius: 8px; background: var(--surface-2); overflow: hidden; }
+.sb { --tier: var(--accent); position: absolute; top: 0; bottom: 0; background: var(--tier); box-shadow: inset -2px 0 0 #fff; transform-origin: left; }
+.sb.meet { background: #B9B4CF; }
+.sb.mine { background: repeating-linear-gradient(135deg, #D9D4EE 0 4px, #EDEAF8 4px 8px); }
+.sb.done { opacity: .45; }
+.now-m { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--ink); border-radius: 1px; }
+.strip-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
+.wm { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .08em; margin-bottom: -.08em; }
+.wm > span { display: inline-block; }
 
 /* Responsive */
 @media (max-width: 1180px) {
@@ -1422,7 +1453,51 @@ function flip(root, mutate) {
     else if (Object.keys(before).length) el.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: EASE_OUT });
   });
 }
-const UIX = { ring: null, cap: null };
+const UIX = { ring: null, cap: null, booted: false };
+/* A changed number rolls in place: only the changed digits move, last digit first (stageshow: Count). */
+function roll(el, text) {
+  if (!el) return; text = String(text); const prev = el.dataset.roll; el.dataset.roll = text;
+  if (prev === undefined || prev === text || reduceMotion()) { el.textContent = text; return; }
+  const n = text.length, pn = prev.length;
+  el.innerHTML = [...text].map((c, i) => { const fr = n - 1 - i; return prev[pn - 1 - fr] !== c ? `<span class="roll"><span class="rd" data-r="${fr}">${esc(c)}</span></span>` : esc(c); }).join('');
+  $$('.rd', el).forEach(sp => sp.animate([{ transform: 'translateY(70%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 340, delay: Math.min(+sp.dataset.r, 4) * 45, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'backwards' }));
+}
+/* First load only: the heading rises out of word masks, then its line and controls, then the cards settle (taste: hero entrance). */
+function entrance(view) {
+  if (UIX.booted) return; UIX.booted = true;
+  if (reduceMotion()) return;
+  const root = $('#view-' + view); const h1 = $('h1', root); const E = 'cubic-bezier(.22, 1, .36, 1)';
+  if (h1 && !h1.children.length) {
+    const txt = h1.textContent; h1.setAttribute('aria-label', txt);
+    h1.innerHTML = txt.split(/(\s+)/).map(w => /\s/.test(w) ? w : `<span class="wm" aria-hidden="true"><span>${esc(w)}</span></span>`).join('');
+    const words = $$('.wm > span', h1);
+    const anims = words.map((w, i) => w.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: 700, delay: Math.min(i * 60, 240), easing: E, fill: 'backwards' }));
+    Promise.all(anims.map(a => a.finished)).then(() => { h1.textContent = txt; h1.removeAttribute('aria-label'); }).catch(() => {});
+  }
+  const follow = $$('.vhead .greet, .vhead .sub, .vhead .daynav, .vhead .toolbar, .vhead > .btn', root);
+  follow.forEach((el, i) => el.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: 300 + i * 60, easing: E, fill: 'backwards' }));
+  const blocks = [...root.children].filter(c => !c.classList.contains('vhead'));
+  let k = 0;
+  blocks.forEach(b => { const parts = b.classList.contains('home-grid') || b.classList.contains('wk-grid') || b.classList.contains('set-grid') ? [...b.children].flatMap(c => c.classList.contains('home-col') || c.classList.contains('wk-side') ? [...c.children] : [c]) : [b];
+    parts.forEach(el => { el.animate([{ opacity: 0, transform: 'translateY(14px) scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 640, delay: 420 + k * 70, easing: E, fill: 'backwards' }); k++; }); });
+  $$('#focusCard .sb').forEach((sb, i) => sb.animate([{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 600, delay: 700 + i * 35, easing: E, fill: 'backwards' }));
+  $$('#hMix .bar > span').forEach((b, i) => { const to = b.style.transform; b.animate([{ transform: 'scaleX(0)' }, { transform: to }], { duration: 700, delay: 800 + i * 60, easing: E, fill: 'backwards' }); });
+}
+function stripHtml(day, isToday) {
+  if (!day || day.off || day.cap <= 0) return '';
+  const st = Math.min(S.plan.dStart, ...day.blocks.map(b => b.start)), en = Math.max(S.plan.dEnd, ...day.blocks.map(b => b.start + b.h)); const span = en - st || 1;
+  const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60;
+  const segs = day.blocks.slice().sort((a, b) => a.start - b.start).map(b => {
+    const label = b.mine ? 'Your own time' : b.meet ? b.m.t : b.r.title;
+    const done = isToday && b.start + b.h <= nowH;
+    return `<span class="sb${b.mine ? ' mine' : b.meet ? ' meet' : ''}${done ? ' done' : ''}" style="left:${((b.start - st) / span * 100).toFixed(2)}%;width:${(b.h / span * 100).toFixed(2)}%;${b.r ? `--tier:${TIER_VAR(b.r._tier)}` : ''}" title="${esc(label)}, ${clock(b.start)}–${clock(b.start + b.h)}"></span>`;
+  }).join('');
+  const nowM = isToday && nowH > st && nowH < en ? `<span class="now-m" style="left:${((nowH - st) / span * 100).toFixed(2)}%" title="Now"></span>` : '';
+  const work = day.blocks.filter(b => b.r).reduce((a, b) => a + b.h, 0), meet = day.blocks.filter(b => b.meet).reduce((a, b) => a + b.h, 0);
+  return `<div class="strip"><div class="strip-h"><span>${isToday ? 'Today’s plan' : 'That day’s plan'}</span><span>${fmtH(work)} of work, ${fmtDur(meet)} in meetings</span></div>
+    <div class="strip-bar" role="img" aria-label="${fmtH(work)} of work and ${fmtDur(meet)} of meetings between ${clock(st)} and ${clock(en)}">${segs}${nowM}</div>
+    <div class="strip-axis" aria-hidden="true"><span>${clock(st)}</span><span>${clock(st + span / 2)}</span><span>${clock(en)}</span></div></div>`;
+}
 
 /* ---------- Home ---------- */
 function renderHome() {
@@ -1445,26 +1520,30 @@ function renderHome() {
       <div style="min-width:0"><div class="fc-chips"><span>${todays[0] === focus ? (S.ui.dayOff ? 'Planned that day' : 'In focus') : 'Top of your list'}</span><span>${focus._tier} ${TIER_NAME[focus._tier]}</span></div>
         <h2>${esc(focus.title)}</h2>${focus.milestone || focus.description ? `<p class="desc">${esc(focus.milestone ? `Next: ${focus.milestone}.` : focus.description)}</p>` : ''}
         <div class="fc-meta"><span>${msI('calendar_today')}${focus.due ? `Due: <b>${fmtDay(fromIso(focus.due))}</b>` : 'No delivery date'}${d.late ? ' <b style="color:var(--bad)">(late)</b>' : ''}</span><span>${msI('schedule')}<b>${fmtH(rem)}</b> remaining${dayH ? `, ${fmtH(dayH)} planned that day` : ''}</span>${focus.dept ? `<span>${msI('groups')}${esc(focus.dept)}</span>` : ''}</div></div>
-      <div class="fc-side"><div class="ring" id="fRing" role="img" aria-label="${p}% complete"></div><button class="btn primary" type="button" data-open="${esc(focus.id)}">Continue${msI('arrow_forward')}</button></div></article>`;
+      <div class="fc-side"><div class="ring" id="fRing" role="img" aria-label="${p}% complete"></div><button class="btn primary" type="button" data-open="${esc(focus.id)}">Continue${msI('arrow_forward')}</button></div>${stripHtml(day, S.ui.dayOff === 0)}</article>`;
     const R = 44, C = 2 * Math.PI * R;
     $('#fRing').innerHTML = `<svg viewBox="0 0 104 104" width="100%" height="100%"><circle cx="52" cy="52" r="${R}" fill="none" stroke="#EEEAF8" stroke-width="10"/><circle id="fArc" cx="52" cy="52" r="${R}" fill="none" stroke="#5B4ED8" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${C.toFixed(1)}"/></svg><b id="fNum">0%</b>`;
     const from = UIX.ring && UIX.ring.id === focus.id ? UIX.ring.v : 0;
-    tween(from, p, from === 0 ? 900 : 400, v => { $('#fArc')?.setAttribute('stroke-dashoffset', (C * (1 - v / 100)).toFixed(1)); const n = $('#fNum'); if (n) n.textContent = Math.round(v) + '%'; }, from === 0 ? 120 : 0);
+    $('#fNum').dataset.roll = from + '%'; $('#fNum').textContent = from + '%';
+    tween(from, p, from === 0 ? 1000 : 450, v => { $('#fArc')?.setAttribute('stroke-dashoffset', (C * (1 - v / 100)).toFixed(1)); }, from === 0 ? 300 : 0);
+    setTimeout(() => roll($('#fNum'), p + '%'), from === 0 ? 300 : 0);
     UIX.ring = { id: focus.id, v: p };
   }
   const open = S.requests.filter(r => ACTIVE.has(r.status)).sort(byRank);
   $('#hList').innerHTML = open.slice(0, 4).map(r => `<button type="button" class="prow" data-open="${esc(r.id)}" style="--tier:${TIER_VAR(r._tier)}"><span class="rank">${r._rank}</span><span style="min-width:0"><b>${esc(r.title)}</b><small>${esc(r.milestone || r.description || [r.requester, r.dept].filter(Boolean).join(', ') || '')}</small></span>${pillHtml(r)}</button>`).join('') || '<p class="empty-note">Nothing open yet.</p>';
   const all = openReqs(); const counts = TIERS.map(t => all.filter(r => r._tier === t).length); const max = Math.max(1, ...counts);
-  $('#hMix').innerHTML = TIERS.map((t, i) => `<div class="mix-row" style="--tier:${TIER_VAR(t)}"><i aria-hidden="true"></i><span>${t} ${TIER_NAME[t]}</span><span class="bar" aria-hidden="true"><span style="transform:scaleX(${counts[i] / max})"></span></span><b>${counts[i]}</b></div>`).join('');
+  if (!$('#hMix .mix-row')) $('#hMix').innerHTML = TIERS.map(t => `<div class="mix-row" style="--tier:${TIER_VAR(t)}"><i aria-hidden="true"></i><span>${t} ${TIER_NAME[t]}</span><span class="bar" aria-hidden="true"><span data-mixbar="${t}" style="transform:scaleX(0)"></span></span><b data-mixn="${t}"></b></div>`).join('');
+  TIERS.forEach((t, i) => { $(`[data-mixbar="${t}"]`).style.transform = `scaleX(${counts[i] / max})`; roll($(`[data-mixn="${t}"]`), counts[i]); });
   const fresh = S.requests.filter(r => r.status === 'new').length;
   $('#hReq').innerHTML = `${msI('inbox')}<span><span style="font-size:var(--t-lg);font-weight:700;display:block">Requests</span><b>${fresh ? `${fresh} new request${fresh === 1 ? '' : 's'}` : 'No new requests'}</b><small>${fresh ? 'Awaiting assessment' : 'You’re up to date'}</small></span>${msI('chevron_right')}`;
   const wk = weekDays(0); const total = wk.reduce((a, d) => a + (d.off ? 0 : (+S.settings.dayHours[d.wd] || 0)), 0);
   const planned = wk.reduce((a, d) => a + d.used, 0) + (S.wk.tasks || []).filter(t => t.day >= wk[0].key && t.day <= wk[6].key).reduce((a, t) => a + (+t.hours || 0), 0);
   const outs = outcomesFor(0);
   const risk = all.filter(r => { const g = ragOf(r); return g === 'red' || g === 'amber'; }).length;
-  $('#hGlance').innerHTML = `<div class="gl">${msI('track_changes')}<b>${outs.list.length}</b><span>Key deliverables</span></div>
-    <div class="gl">${msI('schedule')}<b>${Math.round(planned * 10) / 10} <small>/ ${Math.round(total * 10) / 10}h</small></b><span>Planned workload</span></div>
-    <div class="gl risk">${msI('flag')}<b>${risk}</b><span>At risk</span></div>`;
+  if (!$('#hGlance .gl')) $('#hGlance').innerHTML = `<div class="gl">${msI('track_changes')}<b data-gl="d"></b><span>Key deliverables</span></div>
+    <div class="gl">${msI('schedule')}<b><span data-gl="p"></span> <small>/ <span data-gl="t"></span>h</small></b><span>Planned workload</span></div>
+    <div class="gl risk">${msI('flag')}<b data-gl="r"></b><span>At risk</span></div>`;
+  roll($('[data-gl="d"]'), outs.list.length); roll($('[data-gl="p"]'), Math.round(planned * 10) / 10); roll($('[data-gl="t"]'), Math.round(total * 10) / 10); roll($('[data-gl="r"]'), risk);
   const now = new Date(); const nowH = now.getHours() + now.getMinutes() / 60; const tk = iso(t0);
   const meets = calendarEvents().filter(e => !e.allDay && (e.d > tk || (e.d === tk && e.s > nowH))).map(e => ({ when: fromIso(e.d).getTime() + e.s * 36e5, t: e.t, sub: `${fmtDay(fromIso(e.d))}, ${clock(e.s)}`, kind: 'meet' }));
   const dues = all.filter(r => { const n = daysUntil(r.due); return n != null && n >= 0 && n <= 14; }).map(r => ({ when: fromIso(r.due).getTime() + 17 * 36e5, t: `${r.title} due`, sub: fmtDay(fromIso(r.due)), kind: 'due', id: r.id }));
@@ -1526,8 +1605,8 @@ function renderWeek(opts = {}) {
   const planned = wk.reduce((a, d) => a + d.used, 0) + tasksH;
   const avail = Math.max(0, wk.reduce((a, d) => a + (d.past || d.off ? 0 : Math.max(0, d.capEff - d.used)), 0));
   if (!$('#capFill')) $('#wCap').innerHTML = `${msI('stacks')}<h2>Weekly capacity</h2><div class="cap-mid"><b id="capTxt"></b><div class="cap-bar"><span id="capFill" style="transform:scaleX(0)"></span></div></div><div class="cap-av"><b id="capAv"></b><span>Available</span></div>`;
-  $('#capTxt').textContent = `${Math.round(planned * 10) / 10} / ${Math.round(total * 10) / 10} hours`;
-  $('#capAv').textContent = `${Math.round(avail * 10) / 10} hours`;
+  roll($('#capTxt'), `${Math.round(planned * 10) / 10} / ${Math.round(total * 10) / 10} hours`);
+  roll($('#capAv'), `${Math.round(avail * 10) / 10} hours`);
   const fill = $('#capFill'); fill.classList.toggle('over', planned > total);
   requestAnimationFrame(() => { fill.style.transform = `scaleX(${total ? Math.min(1, planned / total) : 0})`; });
   $$('#wMode [data-wmode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wmode === S.ui.weekMode)));
@@ -1555,7 +1634,7 @@ function renderWeek(opts = {}) {
     }).join('')}</div>`;
   }
   const doIt = () => { box.innerHTML = html; };
-  if (opts.slide && !reduceMotion()) { doIt(); box.firstElementChild.animate([{ opacity: 0, transform: `translateX(${(opts.dir || 1) * 24}px)` }, { opacity: 1, transform: 'none' }], { duration: 280, easing: EASE_OUT }); $$('.dgroup', box).forEach((g, i) => g.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, delay: 30 + i * 40, easing: 'ease', fill: 'backwards' })); }
+  if (opts.slide && !reduceMotion()) { doIt(); box.firstElementChild.animate([{ opacity: 0, transform: `translateX(${(opts.dir || 1) * 10}px)` }, { opacity: 1, transform: 'none' }], { duration: 240, easing: EASE_OUT }); $$('.dgroup', box).forEach((g, i) => g.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, delay: 30 + i * 40, easing: 'ease', fill: 'backwards' })); }
   else if (opts.mode && !reduceMotion()) { doIt(); box.firstElementChild.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: EASE_OUT }); }
   else doIt();
 
@@ -1636,7 +1715,8 @@ function trackerRows() {
 function renderTrackerSummary() {
   const all = S.requests.filter(r => r.status !== 'declined');
   const c = { green: 0, amber: 0, red: 0, done: 0 }; all.forEach(r => c[ragOf(r)]++);
-  $('#tSum').innerHTML = [['green', 'On track'], ['amber', 'At risk'], ['red', 'Off track'], ['done', 'Done']].map(([k, l]) => `<button type="button" class="tcard" data-tf="${k}" aria-pressed="${S.ui.tfilter === k}"><span class="rag ${k}">${l}</span><b data-tc="${k}">${c[k]}</b></button>`).join('');
+  if (!$('#tSum .tcard')) $('#tSum').innerHTML = [['green', 'On track'], ['amber', 'At risk'], ['red', 'Off track'], ['done', 'Done']].map(([k, l]) => `<button type="button" class="tcard" data-tf="${k}" aria-pressed="false"><span class="rag ${k}">${l}</span><b data-tc="${k}"></b></button>`).join('');
+  $$('#tSum .tcard').forEach(b => { b.setAttribute('aria-pressed', String(S.ui.tfilter === b.dataset.tf)); roll($('b', b), c[b.dataset.tf]); });
 }
 function renderTracker() {
   renderTrackerSummary();
@@ -1694,7 +1774,8 @@ function route() {
   for (const x of VIEWS) $('#view-' + x).hidden = x !== v;
   $$('.nav-a').forEach(a => a.setAttribute('aria-current', a.dataset.view === v ? 'page' : 'false'));
   computeAll(); renderView(v);
-  if (changed && !reduceMotion()) $('#view-' + v).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 140, easing: 'ease' });
+  if (!UIX.booted) entrance(v);
+  else if (changed && !reduceMotion()) $('#view-' + v).animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'cubic-bezier(.2, .8, .2, 1)' });
   if (changed) window.scrollTo(0, 0);
 }
 let toastT;
@@ -1725,7 +1806,7 @@ document.addEventListener('click', e => {
   if (t.dataset.action === 'plan') { renderPlanDlg(); $('#planDlg').showModal(); return; }
   if (t.dataset.action === 'task') { openTask(); return; }
   if (t.matches('[data-go]')) { location.hash = '#' + t.dataset.go; return; }
-  if (t.matches('[data-day]')) { S.ui.dayOff = Math.max(0, S.ui.dayOff + +t.dataset.day); renderHome(); if (!reduceMotion()) $('#focusCard').animate([{ opacity: 0, transform: `translateX(${+t.dataset.day * 12}px)` }, { opacity: 1, transform: 'none' }], { duration: 240, easing: EASE_OUT }); return; }
+  if (t.matches('[data-day]')) { S.ui.dayOff = Math.max(0, S.ui.dayOff + +t.dataset.day); renderHome(); if (!reduceMotion()) { $$('#focusCard .focus-card > *').forEach((c, i) => c.animate([{ opacity: 0, transform: `translateX(${+t.dataset.day * 10}px)` }, { opacity: 1, transform: 'none' }], { duration: 240, delay: i * 40, easing: EASE_OUT, fill: 'backwards' })); $$('#focusCard .sb').forEach((sb, i) => sb.animate([{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 420, delay: 80 + i * 25, easing: EASE_OUT, fill: 'backwards' })); } return; }
   if (t.matches('[data-wstep]')) { const old = S.ui.week; S.ui.week = clamp(old + +t.dataset.wstep, 0, weeksCount() - 1); if (S.ui.week === old) return; renderWeek(e.detail === 0 ? {} : { slide: true, dir: S.ui.week > old ? 1 : -1 }); return; }
   if (t.matches('[data-wmode]')) { if (S.ui.weekMode === t.dataset.wmode) return; S.ui.weekMode = t.dataset.wmode; renderWeek(e.detail === 0 ? {} : { mode: true }); return; }
   if (t.matches('[data-oc]')) {
@@ -1782,9 +1863,7 @@ document.addEventListener('change', e => {
     if (f === 'rag') { r.rag = el.value || null; } else if (f === 'due') r.due = el.value || null; else if (f === 'progress') { r.progress = +el.value; if (r.progress === 100 && r.status !== 'done') toast('At 100%. Mark it Done from its details when it’s delivered.'); } else r[f] = el.value.trim();
     Store.saveRequest(r, 200); computeAll();
     const g = ragOf(r); const sel = $(`select[data-tfld="rag"][data-id="${CSS.escape(r.id)}"]`); if (sel) sel.className = `tin ${g}`;
-    const before = {}; $$('#tSum [data-tc]').forEach(b => { before[b.dataset.tc] = +b.textContent; });
     renderTrackerSummary();
-    $$('#tSum [data-tc]').forEach(b => { const k = b.dataset.tc; const to = +b.textContent; if (before[k] !== to) tween(before[k], to, 350, v => { b.textContent = Math.round(v); }); });
     return;
   }
   if (el.id === 'rstatus') { S.ui.rstatus = el.value; renderRequests(); return; }
