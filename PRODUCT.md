@@ -63,13 +63,15 @@ Undecided:
 ## Brand Commitments
 
 - Working name: Priority Planner (no logo; do not invent one).
-- Look: the user's concept (two screens: "Today's focus" home and "My Week") is binding. Light lavender-white ground, white cards, a left sidebar with Home, My Week, Priorities, Timeline, Requests, Tracker and Settings, one indigo-violet accent. It replaces the earlier navy command-centre look.
-- Bands follow the concept: P1 Critical (red), P2 High (orange), P3 Normal (blue), P4 Low (green).
+- Look: the layout of the user's concept (Home "Today's focus" and "My Week") is binding, now in a dark green theme the user chose: dark green sidebar, pale green-grey ground, white cards, dark green accent. No purple anywhere.
+- Bands: P1 Critical (red), P2 High (orange), P3 Normal (blue), P4 Low (slate).
 - "Tracker" replaces "Notes" from the concept: a live delivery tracker (RAG status, owner, % complete, next milestone, due date per piece of work).
 - Do not put a real organisation's name or logo into a published page, and do not fabricate photographs.
 - Voice: plain, direct British English. Controls say what they do.
 
 ## Evidence on Hand
+
+- The user's real current priorities, in their order: 1 Finance cash flow report (P1, due 11 Dec 2026), 2 Partage app (P2, end of Q1 2027), 3 Data lake (before Q3 2027), 4 Purchasing dashboard (before Q3 2027), 5 Health and safety data clean-up (end of Q1 2027), 6 Carbon reporting system (Q2 to Q3 2027; end of Q3 used). Kept in `planner/current-priorities.xlsx` and in the app's private storage. The app starts as a clean slate: no example data.
 
 - No real requests, requester names, meetings or organisational data are in the repository. Everything shown in the app is labelled example data (fictional requesters, an example Change Advisory Board meeting).
 - No logos, testimonials, metrics or case studies exist. Do not fabricate any.
