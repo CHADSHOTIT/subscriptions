@@ -6,7 +6,7 @@
 
 web
 
-A single-page web app (`triage-desk/app.html`, published as a claude.ai artifact; `triage-desk/index.html` is the standalone copy). Designed phone-first: bottom tab bar on phones, side rail on wide screens.
+A single-page web app, Priority Planner (`planner/app.html`, published as a claude.ai artifact; `planner/index.html` is the standalone copy). Desktop-first with a left sidebar; on phones the sidebar becomes a scrolling row of tabs. It replaced the earlier Triage Desk app, which the user asked to delete.
 
 ## Users
 
@@ -42,7 +42,11 @@ Confirmed and built:
 - Missing answers count as middle values and are flagged "Needs info" with who to ask.
 - Statuses: New, Accepted, In progress, On hold, Done, Declined. The user can force a request into a band.
 - Weekly plan: per-day capacity, working hours, a protected "Your time" block, a high/low priority split, longest stretch on one request, meetings and out-of-office days from the calendar, warnings when work will miss its date or a meeting overlaps protected time.
-- Overview (home): this week's focus ring (average progress of the top focus items), active priorities, items this week, at risk, due in 30 days, delivery areas by team (filter the roadmap), a Now / Next / Later roadmap by delivery date with progress, a mini week calendar, and the week's focus items with mark-done.
+- Home: today's focus card (top planned request for the chosen day, progress ring, due, hours remaining, Continue), priority list, priority mix, new requests awaiting assessment, this week at a glance (deliverables, planned workload against capacity, at risk), coming up (meetings and due dates).
+- My Week: capacity bar, by-day view (editable day names, checkable items with hours, meetings, your own tasks) or by-priority view, editable weekly outcomes (suggested from Critical and High work until edited), unscheduled items, Plan my week (working hours and Teams meetings) and Add task (personal tasks that take time out of the day's plan).
+- Timeline: a bar per request from its first planned day to its delivery date, progress fill, late overrun shown.
+- Requests: assess new requests (Accept, Hold, Decline), search all requests, import forms, download the intake template.
+- Tracker: RAG status (automatic from the plan or set by the user), owner, progress, next milestone, due date, editable in place, counts per status, CSV status report.
 - Each request has a progress percentage the user sets; Done means 100%.
 - Data is private to the user (artifact database under the user's own path; browser storage in the standalone copy). CSV export of the ranked list and a downloadable intake-form template.
 
@@ -58,11 +62,11 @@ Undecided:
 
 ## Brand Commitments
 
-- Name in the app: "Digital Priorities Command Centre" (the user's reference design). The underlying project is Triage Desk.
-- Band names are fixed in the user's words: Urgent, Priority, Later, Backlog.
-- Navigation: Overview (home), My week, Priorities, Settings.
-- Look: the user supplied a reference design (dark navy "command centre" dashboard with frosted glass panels, light cards for work items, an electric-blue accent, a ring gauge for this week's focus, a stats strip, delivery areas, a Now / Next / Later priority roadmap, a mini week calendar and a "This week's focus" bar). Treat that reference as binding; it replaces the earlier "clean blue" palette.
-- The reference carried the user's employer name and logo and a bridge photograph. Do not put a real organisation's name or logo into a published page, and do not fabricate a photograph; the user may add their own name and photo to their own copy.
+- Working name: Priority Planner (no logo; do not invent one).
+- Look: the user's concept (two screens: "Today's focus" home and "My Week") is binding. Light lavender-white ground, white cards, a left sidebar with Home, My Week, Priorities, Timeline, Requests, Tracker and Settings, one indigo-violet accent. It replaces the earlier navy command-centre look.
+- Bands follow the concept: P1 Critical (red), P2 High (orange), P3 Normal (blue), P4 Low (green).
+- "Tracker" replaces "Notes" from the concept: a live delivery tracker (RAG status, owner, % complete, next milestone, due date per piece of work).
+- Do not put a real organisation's name or logo into a published page, and do not fabricate photographs.
 - Voice: plain, direct British English. Controls say what they do.
 
 ## Evidence on Hand
